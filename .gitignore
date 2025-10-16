@@ -1,7 +1,7 @@
 # Dependencies
 # This folder is managed by npm and can be reinstalled by running `npm install`.
 # It should not be committed to version control.
-/node_modules
+node_modules/
 
 # Cached Data
 # This file is automatically downloaded and created by the server on startup.
@@ -10,8 +10,8 @@ pokedex.json
 
 # User Data
 # This folder contains sensitive, user-specific data and should not be committed.
-/pgsharp_player_data/
-/users.json
+pgsharp_player_data/
+users.json
 
 # Environment Variables (Good Practice)
 # Contains sensitive information like API keys or secrets.
