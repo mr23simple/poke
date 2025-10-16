@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 id="trainerName">My Dashboard</h1>
+        <div>
+            <span id="timestamp"></span> | <a href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="card" id="trainer-summary">
+            </section>
+        <section class="card" id="item-summary">
+            </section>
+        <section class="card" id="pokemon-summary">
+            <div class="summary-header">
+                <h2>Pokémon Highlights</h2>
+                <button id="view-all-pokemon-btn">View All</button>
+            </div>
+            <div id="pokemon-highlights-container">
+                </div>
+        </section>
+    </main>
+
+    <div id="modal-backdrop" class="hidden">
+        <div id="modal-content" class="card">
+            <div class="summary-header">
+                <h2>My Pokémon (<span id="pokemon-count">0</span>)</h2>
+                <button id="modal-close-btn">&times;</button>
+            </div>
+            
+            <div class="sort-bar">
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="caughtTime">Caught Time</option>
+                    <option value="cp">Combat Power</option>
+                    <option value="pokedex">Pokédex #</option>
+                    <option value="name">Name</option>
+                </select>
+                <button id="sort-direction" data-direction="desc">▼ Desc</button>
+            </div>
+
+            <div id="all-pokemon-list">
+                </div>
+        </div>
+    </div>
+
+    <script src="/scripts/private.js"></script>
+</body>
+</html>

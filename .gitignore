@@ -1,0 +1,29 @@
+# Dependencies
+# This folder is managed by npm and can be reinstalled by running `npm install`.
+# It should not be committed to version control.
+/node_modules
+
+# Cached Data
+# This file is automatically downloaded and created by the server on startup.
+# Committing it would add unnecessary bulk to the repository.
+pokedex.json
+
+# User Data
+# This folder contains sensitive, user-specific data and should not be committed.
+/pgsharp_player_data/
+/users.json
+
+# Environment Variables (Good Practice)
+# Contains sensitive information like API keys or secrets.
+# Always create a .env.example file to show required variables.
+.env
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
