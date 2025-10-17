@@ -166,24 +166,20 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     try {
-        let data;
-
-        // Try to parse the body. If it's not valid JSON (e.g., empty string), this will fail.
-        try {
-            data = JSON.parse(req.body);
-        } catch (e) {
-            // This catches the empty/invalid "test connection" and correctly returns an error.
-            console.error("✅ [400 Bad Request] Received an expected invalid/empty request (likely a connection test).");
-            return res.status(400).json({ message: 'Request body must be valid JSON.' });
-        }
-
-        // From here on, we assume the JSON is valid, but we check its contents.
+        const data = req.body;
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
-        if (!name || !playerId) {
-            console.error("❌ [400 Bad Request] Payload was valid JSON but missed required fields (name or playerId).");
-            return res.status(400).json({ message: 'Payload is missing required account data.' });
+         if (!name || !playerId) {
+            if (Object.keys(data).length === 0) {
+                console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
+                return res.status(200).json({ success: true, message: 'Connection test successful.' });
+            } else {
+                console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
+                return res.status(400).json({ message: 'Payload is missing required account data.' });
+            }
+        } else {
+            console.log(`✅ Received valid data for ${name} (${playerId}).`);
         }
         
         // If we get here, the data is fully valid. Proceed to save.
