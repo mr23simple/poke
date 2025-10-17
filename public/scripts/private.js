@@ -14,6 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+function createBackgroundStyle(colors) {
+    if (!colors || colors.length === 0) {
+        return 'background-color: #f1f1f1; color: #333; text-shadow: none;';
+    }
+    if (colors.length === 1) {
+        return `background-color: ${colors[0]};`;
+    }
+    return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
+}
+
+function getIvColor(iv) {
+    if (iv == 100) return '#ff8000';
+    if (iv >= 80) return '#2196f3';
+    if (iv >= 60) return '#4caf50';
+    return '#6c757d';
+}
+
 function setupModalListeners() {
     const modalBackdrop = document.getElementById('modal-backdrop');
     document.getElementById('view-all-pokemon-btn').addEventListener('click', () => {
@@ -38,9 +55,9 @@ function populateSummaryCards(data) {
     document.getElementById('trainerName').textContent = `My Dashboard: ${account.name}`;
     document.getElementById('timestamp').textContent = `Data as of: ${data.time}`;
 
-    // --- Populate Trainer Summary (No changes here) ---
     const trainerSummary = document.getElementById('trainer-summary');
     trainerSummary.innerHTML = `<h2>Trainer Summary</h2><div class="trainer-info"><img id="teamLogo" src="" alt="Team Logo" class="team-logo"><div><strong id="trainerLevel"></strong></div></div><div class="xp-bar-container"><div id="xpBar" class="xp-bar"></div></div><p id="xpProgress" class="xp-text"></p><div class="grid-stats"><div><span>Stardust</span><strong id="stardustCount">0</strong></div><div><span>PokéCoins</span><strong id="pokecoinCount">0</strong></div><div><span>Pokémon Caught</span><strong id="pokemonCaught">0</strong></div><div><span>Pokédex Entries</span><strong id="pokedexEntries">0</strong></div><div><span>Distance Walked</span><strong id="kmWalked">0 km</strong></div><div><span>PokéStops Visited</span><strong id="pokestopVisits">0</strong></div></div>`;
+    
     const teamLogos = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
     document.getElementById('teamLogo').style.backgroundColor = teamLogos[account.team] || '#ccc';
     document.getElementById('trainerLevel').textContent = `Lv. ${player.level}`;
@@ -55,10 +72,8 @@ function populateSummaryCards(data) {
     document.getElementById('kmWalked').textContent = `${parseFloat(player.kmWalked).toFixed(2)} km`;
     document.getElementById('pokestopVisits').textContent = player.pokeStopVisits.toLocaleString();
 
-    // --- Populate Item Summary (NEW GRID LOGIC) ---
     const itemSummary = document.getElementById('item-summary');
     itemSummary.innerHTML = '<h2>Full Item Bag</h2>';
-
     const itemCategories = {
         'Poké Balls': ['PokeBall', 'GreatBall', 'UltraBall'],
         'Potions & Revives': ['Potion', 'SuperPotion', 'HyperPotion', 'MaxPotion', 'Revive', 'MaxRevive'],
@@ -70,41 +85,26 @@ function populateSummaryCards(data) {
     for (const category in itemCategories) {
         itemCategories[category].forEach(itemName => { categoryLookup[itemName] = category; });
     }
-
-    const groupedItems = items
-        .filter(item => item.count > 0 && !item.itemName.includes('Unlimited') && !item.itemName.includes('Camera'))
-        .reduce((groups, item) => {
-            const category = categoryLookup[item.itemName] || 'Miscellaneous';
-            if (!groups[category]) groups[category] = [];
-            groups[category].push(item);
-            return groups;
-        }, {});
-
+    const groupedItems = items.filter(item => item.count > 0 && !item.itemName.includes('Unlimited') && !item.itemName.includes('Camera')).reduce((groups, item) => {
+        const category = categoryLookup[item.itemName] || 'Miscellaneous';
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(item);
+        return groups;
+    }, {});
     const categoryOrder = ['Poké Balls', 'Potions & Revives', 'Berries', 'Special Items', 'Battle & TMs', 'Miscellaneous'];
     categoryOrder.forEach(category => {
         if (groupedItems[category]) {
-            const header = document.createElement('h3');
-            header.className = 'item-category-header';
-            header.textContent = category;
-            itemSummary.appendChild(header);
-
+            itemSummary.innerHTML += `<h3 class="item-category-header">${category}</h3>`;
             const gridContainer = document.createElement('div');
             gridContainer.className = 'item-grid-container';
-
             groupedItems[category].forEach(item => {
                 const itemId = String(item.item).padStart(4, '0');
-                const spriteUrl = `https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Bag/ic_item_${itemId}.png`;
-                gridContainer.innerHTML += `
-                    <div class="item-card">
-                        <img src="${spriteUrl}" alt="${item.itemName}" loading="lazy" onerror="this.style.display='none'">
-                        <span class="item-count-badge">${item.count}</span>
-                    </div>`;
+                gridContainer.innerHTML += `<div class="item-card"><img src="https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Bag/ic_item_${itemId}.png" alt="${item.itemName}" loading="lazy" onerror="this.style.display='none'"><span class="item-count-badge">${item.count}</span></div>`;
             });
             itemSummary.appendChild(gridContainer);
         }
     });
 
-    // --- Populate Pokémon Highlights (No changes here) ---
     const highlightsContainer = document.getElementById('pokemon-highlights-container');
     highlightsContainer.innerHTML = '';
     const getIvPercent = (p) => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
@@ -117,7 +117,8 @@ function populateSummaryCards(data) {
         if (pokemon.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
         if (pokemon.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
         if (getIvPercent(pokemon) === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-        highlightsContainer.innerHTML += `<div class="pokemon-card"><img src="${pokemon.sprite}" alt="${name}" loading="lazy"><p class="pokemon-name">${name} ${badges}</p><p class="pokemon-cp">CP ${pokemon.cp}</p></div>`;
+        const cardClass = pokemon.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+        highlightsContainer.innerHTML += `<div class="${cardClass}" style="${createBackgroundStyle(pokemon.typeColors)}"><img src="${pokemon.sprite}" alt="${name}" loading="lazy"><p class="pokemon-name">${name} ${badges}</p><p class="pokemon-cp">CP ${pokemon.cp}</p></div>`;
     });
 }
 
@@ -125,8 +126,8 @@ function sortAndRenderAllPokemon() {
     const sortBy = document.getElementById('sort-by').value;
     const sortDirection = document.getElementById('sort-direction').dataset.direction;
     const container = document.getElementById('all-pokemon-list');
+    
     let sortedPokemons = [...allPokemons];
-
     sortedPokemons.sort((a, b) => {
         switch (sortBy) {
             case 'cp': return a.cp - b.cp;
@@ -142,14 +143,14 @@ function sortAndRenderAllPokemon() {
     sortedPokemons.forEach(p => {
         const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
         const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
-        
         let badges = '';
         if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
         if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
         if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
+        const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
 
         container.innerHTML += `
-            <div class="pokemon-card">
+            <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
                 <img src="${p.sprite}" alt="${displayName}" loading="lazy">
                 <p class="pokemon-name">${displayName} ${badges}</p>
                 <p class="pokemon-cp">CP ${p.cp}</p>
@@ -159,11 +160,4 @@ function sortAndRenderAllPokemon() {
                 <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
             </div>`;
     });
-}
-
-function getIvColor(iv) {
-    if (iv == 100) return '#ff8000';      // Orange for 100%
-    if (iv >= 80) return '#2196f3';       // Blue for 80% to 99.9%
-    if (iv >= 60) return '#4caf50';       // Green for 60% to 79.9%
-    return '#6c757d';                    // Dark Gray for everything below 60%
 }

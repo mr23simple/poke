@@ -4,6 +4,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalContent = document.getElementById('modal-content');
     const closeModalBtn = document.getElementById('modal-close-btn');
 
+    // Helper function to create the background style string
+    function createBackgroundStyle(colors) {
+        if (!colors || colors.length === 0) {
+            // Return a style that results in a default non-colored card
+            return 'background-color: #f1f1f1; color: #333; text-shadow: none;';
+        }
+        if (colors.length === 1) {
+            return `background-color: ${colors[0]};`;
+        }
+        return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
+    }
+
     try {
         const response = await fetch('/api/public-data');
         const players = await response.json();
@@ -13,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Sort players by level descending
         players.sort((a, b) => b.level - a.level);
         
         players.forEach(player => {
@@ -41,7 +52,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const detailRes = await fetch(`/api/player-detail/${playerId}`);
                 const details = await detailRes.json();
                 
-                // Populate and show the modal
+                const cardClass = details.highlights.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+
                 modalContent.innerHTML = `
                     <button id="modal-close-btn">&times;</button>
                     <h2>${details.name}</h2>
@@ -55,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h3>Highlights</h3>
                     <div id="modal-pokemon-container">
                         ${details.highlights.map(p => `
-                            <div class="pokemon-card">
+                            <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
                                 <img src="${p.sprite}" alt="${p.name}" loading="lazy">
                                 <p class="pokemon-name">${p.name}</p>
                                 <p class="pokemon-cp">CP ${p.cp}</p>
