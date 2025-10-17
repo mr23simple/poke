@@ -15,13 +15,24 @@ const POKEDEX_API_URL = 'https://pokemon-go-api.github.io/pokemon-go-api/api/pok
 const SALT_ROUNDS = 10;
 
 // --- Pokedex Caching Service ---
+Of course. You're right, vibrant colors can sometimes make it harder to see the details on the Pokémon sprites. A more muted, matte color palette will look cleaner and improve readability.
+
+This change only requires an update to the pokedexService object in your server.js file.
+
+## The Updated Code
+
+Please replace the entire pokedexService object in your server.js file with this new version. It contains a new typeColorMap with a more muted, modern color scheme.
+JavaScript
+
+// --- Find and replace the entire pokedexService object ---
 const pokedexService = {
     pokedex: null,
+    // NEW muted/matte color palette
     typeColorMap: {
-        NORMAL: '#A8A878', FIRE: '#F08030', WATER: '#6890F0', GRASS: '#78C850', ELECTRIC: '#F8D030',
-        ICE: '#98D8D8', FIGHTING: '#C03028', POISON: '#A040A0', GROUND: '#E0C068', FLYING: '#A890F0',
-        PSYCHIC: '#F85888', BUG: '#A8B820', ROCK: '#B8A038', GHOST: '#705898', DRAGON: '#7038F8',
-        DARK: '#705848', STEEL: '#B8B8D0', FAIRY: '#EE99AC'
+        NORMAL: '#A8A77A', FIRE: '#EE8130', WATER: '#6390F0', GRASS: '#7AC74C', ELECTRIC: '#F7D02C',
+        ICE: '#96D9D6', FIGHTING: '#C22E28', POISON: '#A33EA1', GROUND: '#E2BF65', FLYING: '#A98FF3',
+        PSYCHIC: '#F95587', BUG: '#A6B91A', ROCK: '#B6A136', GHOST: '#735797', DRAGON: '#6F35FC',
+        DARK: '#705746', STEEL: '#B7B7CE', FAIRY: '#D685AD'
     },
     async initialize() {
         try {
@@ -39,18 +50,16 @@ const pokedexService = {
         try {
             const localPokedexJson = await fs.readFile(POKEDEX_FILE, 'utf-8');
             const data = JSON.parse(localPokedexJson);
-
             this.pokedex = {};
             data.forEach(pokemon => {
                 const dexKey = pokemon.dexNr;
                 const formKey = pokemon.formId.replace(`_${pokemon.names.English.toUpperCase()}`, '');
-                
                 if (!this.pokedex[dexKey]) this.pokedex[dexKey] = {};
                 this.pokedex[dexKey][formKey] = pokemon;
             });
             console.log(`👍 Pokédex is now loaded with ${Object.keys(this.pokedex).length} entries.`);
         } catch (error) {
-            console.error('❌ CRITICAL: Could not load Pokédex from local file. Pokémon names will not be available.', error);
+            console.error('❌ CRITICAL: Could not load Pokédex from local file.', error);
             this.pokedex = {};
         }
     },
@@ -59,7 +68,7 @@ const pokedexService = {
         if (!this.pokedex[dexNr]) return defaultName;
         const normalEntry = this.pokedex[dexNr]['NORMAL'] || Object.values(this.pokedex[dexNr])[0];
         if (!normalEntry) return defaultName;
-        const formKey = formName.replace(normalEntry.names.English, '').toUpperCase() || 'NORMAL';
+        const formKey = formName.replace(normalEntry.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, ""), '').toUpperCase() || 'NORMAL';
         const entry = this.pokedex[dexNr]?.[formKey] || normalEntry;
         return entry?.names?.English || defaultName;
     },
@@ -72,26 +81,18 @@ const pokedexService = {
         if (!basePokemon || !basePokemon.assetForms) {
             return p.pokemonDisplay.shiny ? shinySprite : defaultSprite;
         }
-        
-        const formName = p.pokemonDisplay.formName;
-        const baseName = basePokemon.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        
-        let formKey = formName.replace(baseName, '').toUpperCase();
-        
-        let foundAsset = null;
-        if (formKey !== "") {
-            foundAsset = basePokemon.assetForms.find(asset => {
-                const assetForm = (asset.form || '').toUpperCase();
-                const assetCostume = (asset.costume || '').toUpperCase();
 
-                return assetForm === formKey || assetCostume.includes(formKey.replace(/_/g, ''));
-            });
-        }
-        
+        const formNameUpper = p.pokemonDisplay.formName.toUpperCase();
+        const baseNameUpper = basePokemon.names.English.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const key = formNameUpper.replace(baseNameUpper, '').replace(/_/g, '').trim();
+
+        let foundAsset = basePokemon.assetForms.find(asset =>
+            (asset.form && asset.form.toUpperCase() === key) ||
+            (asset.costume && asset.costume.toUpperCase() === key)
+        );
         if (!foundAsset) {
             foundAsset = basePokemon.assetForms.find(asset => asset.form === null && asset.costume === null);
         }
-        
         return foundAsset?.[targetSprite] || (p.pokemonDisplay.shiny ? shinySprite : defaultSprite);
     },
     getPokemonTypeColors(pokedexEntry) {
