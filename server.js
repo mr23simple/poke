@@ -159,17 +159,6 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-Yes, absolutely. The "old code" works, but it lacks the intelligent handling for the app's "connection test" requests and doesn't provide clear feedback in the logs.
-
-Here is the improved version of the /api/save-data route that combines the working save logic with proper return codes and detailed logging for every scenario.
-
-## The Improved Code
-
-Replace the entire app.post('/api/save-data', ...) route in your server.js file with this final, robust version.
-JavaScript
-
-// --- Find this route in server.js and replace the entire block ---
-
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     // Scenario 1: The request body is empty or not JSON. Treat as a connection test.
     if (typeof req.body !== 'string' || req.body.trim() === '' || !req.body.startsWith('{')) {
