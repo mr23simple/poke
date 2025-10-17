@@ -159,38 +159,52 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-app.post('/api/save-data', async (req, res) => {
+app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
+    // 1. Check for an empty body (the "Test Connection" request)
+    if (typeof req.body !== 'string' || req.body.trim() === '') {
+        console.log('✅ Received a successful connection test from the app.');
+        return res.status(200).json({ success: true, message: 'Connection test successful.' });
+    }
+
+    // 2. If the body is not empty, proceed with saving the data
+    let data;
     try {
-        const data = req.body;
+        data = JSON.parse(req.body);
+    } catch (e) {
+        console.error("Malformed JSON received:", e.message);
+        return res.status(400).json({ success: false, message: 'Malformed JSON received.' });
+    }
+    
+    try {
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
+            return res.status(400).json({ success: false, message: 'Parsed JSON is missing account name or playerSupportId.' });
         }
-
-        // Save the data file
-        await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
-        await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
+        
+        const safePlayerId = path.basename(playerId);
+        const userFolderPath = path.join(__dirname, DATA_FOLDER);
+        await fs.mkdir(userFolderPath, { recursive: true });
+        await fs.writeFile(path.join(userFolderPath, `${safePlayerId}.json`), req.body);
 
         const users = await readUsers();
         const userIndex = users.findIndex(u => u.playerId === playerId);
+        const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
 
         if (userIndex > -1) {
-            // If user exists, update their username in case it changed in-game
             users[userIndex].username = name;
         } else {
-            // If user does not exist, create a new entry.
-            // The password becomes the playerSupportId by default.
-            const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
             users.push({ username: name, password: hashedPassword, playerId: playerId });
         }
         await writeUsers(users);
 
+        console.log(`✅ Data saved for user '${name}' via API.`);
         res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
+
     } catch (error) {
-        console.error("Error in /api/save-data", error);
-        res.status(500).json({ message: 'Server error processing data.' });
+        console.error("Error saving data in /api/save-data:", error);
+        res.status(500).json({ success: false, message: 'Server error while processing data.' });
     }
 });
 
