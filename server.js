@@ -107,24 +107,28 @@ app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
+// Handles web registration for an existing data profile
 app.post('/register', async (req, res) => {
     try {
-        const { username, password, playerId } = req.body;
-        if (!username || !password || !playerId) {
-            return res.status(400).send('Username, password, and Player Support ID are required.');
+        const { web_username, password, playerId } = req.body;
+        if (!web_username || !password || !playerId) {
+            return res.status(400).send('Web Username, Password, and Player Support ID are all required.');
         }
 
         const users = await readUsers();
-        if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-            return res.status(409).send('Username already exists. <a href="/register">Try another</a>.');
+        const userIndex = users.findIndex(u => u.playerId === playerId);
+
+        if (userIndex === -1) {
+            return res.status(404).send('Player ID not found. Please upload your data from the PGSharp app before registering.');
         }
-        if (users.find(u => u.playerId === playerId)) {
-            return res.status(409).send('Player Support ID is already registered. <a href="/">Try logging in</a>.');
+
+        if (users[userIndex].web_username !== "" || users[userIndex].password !== "") {
+            return res.status(409).send('This Player ID has already been registered with a web account. <a href="/login.html">Try logging in</a>.');
         }
 
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-        // Add ingameName: null to the new user object
-        users.push({ username, password: hashedPassword, playerId, ingameName: null });
+        users[userIndex].web_username = web_username;
+        users[userIndex].password = hashedPassword;
         await writeUsers(users);
 
         res.redirect('/login.html');
@@ -162,22 +166,28 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     try {
-        // Robust parsing to handle clients that don't send the right content-type
-        const data = req.body;;
+        let data;
+
+        // Try to parse the body. If it's not valid JSON (e.g., empty string), this will fail.
+        try {
+            data = JSON.parse(req.body);
+        } catch (e) {
+            // This catches the empty/invalid "test connection" and correctly returns an error.
+            console.error("✅ [400 Bad Request] Received an expected invalid/empty request (likely a connection test).");
+            return res.status(400).json({ message: 'Request body must be valid JSON.' });
+        }
+
+        // From here on, we assume the JSON is valid, but we check its contents.
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            if (Object.keys(data).length === 0) {
-                console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
-                return res.status(200).json({ success: true, message: 'Connection test successful.' });
-            } else {
-                console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
-                return res.status(400).json({ message: 'Payload is missing required account data.' });
-            }
-        } else {
-            console.log(`✅ Received valid data for ${name} (${playerId}).`);
+            console.error("❌ [400 Bad Request] Payload was valid JSON but missed required fields (name or playerId).");
+            return res.status(400).json({ message: 'Payload is missing required account data.' });
         }
+        
+        // If we get here, the data is fully valid. Proceed to save.
+        console.log(`✅ Received valid data for ${name} (${playerId}). Proceeding to save...`);
         
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
@@ -186,28 +196,25 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
         const userIndex = users.findIndex(u => u.playerId === playerId);
 
         if (userIndex > -1) {
-            // User exists, just update their in-game name
             users[userIndex].ingameName = name;
-            console.log(`- User record found for ${playerId}. Updating in-game name to '${name}'.`);
         } else {
-            // User does not exist, create a new record
             const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
             users.push({ 
                 username: name,
                 password: hashedPassword,
                 playerId: playerId,
-                ingameName: name
+                ingameName: name,
+                web_username: "" // Ensure new fields exist
             });
-            console.log(`- No user record found for ${playerId}. Creating new user '${name}'.`);
         }
         await writeUsers(users);
-        // --- END OF NEW LOGIC ---
 
-        // ** YOUR ORIGINAL SUCCESS RESPONSE IS PRESERVED HERE **
+        console.log(`✅ SUCCESS: Data for '${name}' was saved successfully.`);
+        // Returning the success message you wanted
         return res.status(200).json({ message: 'Found account name or playerSupportId.' });
 
     } catch (error) {
-        console.error("Error in /api/save-data", error);
+        console.error("❌ [500 Server Error] An unexpected error occurred:", error);
         res.status(500).json({ message: 'Server error processing data.' });
     }
 });
@@ -222,25 +229,20 @@ app.post('/login', async (req, res) => {
             // Method 1: Login with Player ID only
             user = users.find(u => u.playerId === playerId);
         } else if (username && password) {
-            // Method 2: Login with username and password
+            // Method 2: Login with web_username and password
             const loginIdentifier = username.toLowerCase();
-            user = users.find(u => 
-                u.username.toLowerCase() === loginIdentifier || 
-                (u.ingameName && u.ingameName.toLowerCase() === loginIdentifier)
-            );
+            user = users.find(u => u.web_username.toLowerCase() === loginIdentifier);
 
             if (user && !(await bcrypt.compare(password, user.password))) {
-                user = null; // Password doesn't match, so invalidate the user
+                user = null; // Password doesn't match
             }
         }
         
         if (user) {
-            // If any method was successful, create the session
-            req.session.user = { username: user.username, playerId: user.playerId };
+            req.session.user = { username: user.web_username || user.ingameName, playerId: user.playerId };
             return res.redirect('/me');
         }
 
-        // If all methods fail
         res.send('Login failed. Please check your credentials. <a href="/login.html">Try again</a>.');
 
     } catch (error) {
