@@ -160,9 +160,9 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 });
 
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
-    // Check for an empty or non-JSON body first.
-    if (typeof req.body !== 'string' || req.body.trim() === '' || !req.body.startsWith('{')) {
-        console.log('✅ Received a successful connection test (empty or non-JSON body).');
+    // Check for a completely empty body first.
+    if (typeof req.body !== 'string' || req.body.trim() === '') {
+        console.log('✅ Received a successful connection test (empty body).');
         return res.status(200).json({ success: true, message: 'Connection test successful.' });
     }
 
@@ -170,21 +170,25 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
     try {
         data = JSON.parse(req.body);
     } catch (e) {
-        console.error("Malformed JSON received:", e.message);
-        return res.status(400).json({ success: false, message: 'Malformed JSON received.' });
+        // This handles truly broken/malformed JSON from the client.
+        console.error("⚠️ Malformed JSON received, treating as a test.", e.message);
+        return res.status(200).json({ success: true, message: 'Connection test successful (malformed JSON ignored).' });
     }
     
     // Now, validate the parsed JSON content.
     const name = data?.account?.name;
     const playerId = data?.account?.playerSupportId;
 
-    // If the JSON is valid but lacks the critical data, treat it as a test.
     if (!name || !playerId) {
-        console.log(`✅ Received a valid JSON object, but it's a test payload (missing critical data).`);
-        return res.status(200).json({ success: true, message: 'Connection test successful.' });
+        // THIS IS THE IMPORTANT DEBUGGING PART
+        console.log(`⚠️ Received a JSON payload but it was missing the required fields.`);
+        console.log('--- UNKNOWN PAYLOAD START ---');
+        console.log(JSON.stringify(data, null, 2)); // Log the entire object
+        console.log('--- UNKNOWN PAYLOAD END ---');
+        return res.status(200).json({ success: true, message: 'Connection test successful (payload format unrecognized).' });
     }
 
-    // If validation passes, we can finally save the data.
+    // If validation passes, we save the data.
     try {
         const safePlayerId = path.basename(playerId);
         const userFolderPath = path.join(__dirname, DATA_FOLDER);
