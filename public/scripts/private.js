@@ -1,22 +1,9 @@
 let allPokemons = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/private-data')
-        .then(response => response.ok ? response.json() : Promise.reject('Could not load data'))
-        .then(data => {
-            allPokemons = data.pokemons.filter(p => !p.isEgg);
-            populateSummaryCards(data);
-            setupModalListeners();
-        })
-        .catch(error => {
-            console.error('Dashboard Error:', error);
-            document.querySelector('main').innerHTML = `<div class="card"><p>Could not load your player data.</p></div>`;
-        });
-});
-
+// --- HELPER FUNCTIONS ---
 function createBackgroundStyle(colors) {
     if (!colors || colors.length === 0) {
-        return 'background-color: #f1f1f1; color: #333; text-shadow: none;';
+        return ''; // Will use default CSS background
     }
     if (colors.length === 1) {
         return `background-color: ${colors[0]};`;
@@ -25,21 +12,25 @@ function createBackgroundStyle(colors) {
 }
 
 function getIvColor(iv) {
-    if (iv == 100) return '#ff8000';
-    if (iv >= 80) return '#2196f3';
-    if (iv >= 60) return '#4caf50';
-    return '#6c757d';
+    if (iv == 100) return '#ff8000';      // Orange for 100%
+    if (iv >= 80) return '#2196f3';       // Blue for 80-99%
+    if (iv >= 60) return '#4caf50';       // Green for 60-79%
+    return '#6c757d';                    // Dark Gray for everything else
 }
 
+
+// --- MODAL AND EVENT LISTENERS ---
 function setupModalListeners() {
     const modalBackdrop = document.getElementById('modal-backdrop');
     document.getElementById('view-all-pokemon-btn').addEventListener('click', () => {
         document.getElementById('pokemon-count').textContent = allPokemons.length;
-        sortAndRenderAllPokemon();
+        sortAndRenderAllPokemon(); // Initial render of the list
         modalBackdrop.classList.remove('hidden');
     });
     document.getElementById('modal-close-btn').addEventListener('click', () => modalBackdrop.classList.add('hidden'));
-    modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) modalBackdrop.classList.add('hidden'); });
+    modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) modalBackdrop.classList.add('hidden');
+    });
     document.getElementById('sort-by').addEventListener('change', sortAndRenderAllPokemon);
     document.getElementById('sort-direction').addEventListener('click', () => {
         const button = document.getElementById('sort-direction');
@@ -50,16 +41,19 @@ function setupModalListeners() {
     });
 }
 
+
+// --- DASHBOARD POPULATION ---
 function populateSummaryCards(data) {
     const { account, player, items } = data;
     document.getElementById('trainerName').textContent = `My Dashboard: ${account.name}`;
     document.getElementById('timestamp').textContent = `Data as of: ${data.time}`;
 
+    // 1. Populate Trainer Summary
     const trainerSummary = document.getElementById('trainer-summary');
-    trainerSummary.innerHTML = `<h2>Trainer Summary</h2><div class="trainer-info"><img id="teamLogo" src="" alt="Team Logo" class="team-logo"><div><strong id="trainerLevel"></strong></div></div><div class="xp-bar-container"><div id="xpBar" class="xp-bar"></div></div><p id="xpProgress" class="xp-text"></p><div class="grid-stats"><div><span>Stardust</span><strong id="stardustCount">0</strong></div><div><span>PokéCoins</span><strong id="pokecoinCount">0</strong></div><div><span>Pokémon Caught</span><strong id="pokemonCaught">0</strong></div><div><span>Pokédex Entries</span><strong id="pokedexEntries">0</strong></div><div><span>Distance Walked</span><strong id="kmWalked">0 km</strong></div><div><span>PokéStops Visited</span><strong id="pokestopVisits">0</strong></div></div>`;
+    trainerSummary.innerHTML = `<h2>Trainer Summary</h2><div class="trainer-info"><div id="teamLogo" class="team-logo"></div><div><strong id="trainerLevel"></strong></div></div><div class="xp-bar-container"><div id="xpBar" class="xp-bar"></div></div><p id="xpProgress" class="xp-text"></p><div class="grid-stats"><div><span>Stardust</span><strong id="stardustCount">0</strong></div><div><span>PokéCoins</span><strong id="pokecoinCount">0</strong></div><div><span>Pokémon Caught</span><strong id="pokemonCaught">0</strong></div><div><span>Pokédex Entries</span><strong id="pokedexEntries">0</strong></div><div><span>Distance Walked</span><strong id="kmWalked">0 km</strong></div><div><span>PokéStops Visited</span><strong id="pokestopVisits">0</strong></div></div>`;
     
-    const teamLogos = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
-    document.getElementById('teamLogo').style.backgroundColor = teamLogos[account.team] || '#ccc';
+    const teamColors = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
+    document.getElementById('teamLogo').style.backgroundColor = teamColors[account.team] || '#ccc';
     document.getElementById('trainerLevel').textContent = `Lv. ${player.level}`;
     const xpForLevel = player.nextLevelExp - player.prevLevelExp;
     const xpProgress = player.experience - player.prevLevelExp;
@@ -72,19 +66,18 @@ function populateSummaryCards(data) {
     document.getElementById('kmWalked').textContent = `${parseFloat(player.kmWalked).toFixed(2)} km`;
     document.getElementById('pokestopVisits').textContent = player.pokeStopVisits.toLocaleString();
 
+    // 2. Populate Item Bag Grid
     const itemSummary = document.getElementById('item-summary');
     itemSummary.innerHTML = '<h2>Full Item Bag</h2>';
     const itemCategories = {
         'Poké Balls': ['PokeBall', 'GreatBall', 'UltraBall'],
         'Potions & Revives': ['Potion', 'SuperPotion', 'HyperPotion', 'MaxPotion', 'Revive', 'MaxRevive'],
-        'Berries': ['GoldenRazzBerry', 'GoldenPinapBerry'],
+        'Berries': ['GoldenRazzBerry', 'GoldenPinapBerry', 'RazzBerry', 'PinapBerry', 'NanabBerry'],
         'Special Items': ['RareCandy', 'XlRareCandy', 'LuckyEgg', 'StarPiece', 'IncenseOrdinary', 'TroyDisk'],
         'Battle & TMs': ['MoveRerollFastAttack', 'MoveRerollSpecialAttack', 'ShadowGem', 'ShadowGemFragment']
     };
     const categoryLookup = {};
-    for (const category in itemCategories) {
-        itemCategories[category].forEach(itemName => { categoryLookup[itemName] = category; });
-    }
+    for (const category in itemCategories) { itemCategories[category].forEach(itemName => { categoryLookup[itemName] = category; }); }
     const groupedItems = items.filter(item => item.count > 0 && !item.itemName.includes('Unlimited') && !item.itemName.includes('Camera')).reduce((groups, item) => {
         const category = categoryLookup[item.itemName] || 'Miscellaneous';
         if (!groups[category]) groups[category] = [];
@@ -105,6 +98,7 @@ function populateSummaryCards(data) {
         }
     });
 
+    // 3. Populate Pokémon Highlights
     const highlightsContainer = document.getElementById('pokemon-highlights-container');
     highlightsContainer.innerHTML = '';
     const getIvPercent = (p) => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
@@ -117,11 +111,13 @@ function populateSummaryCards(data) {
         if (pokemon.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
         if (pokemon.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
         if (getIvPercent(pokemon) === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-        const cardClass = pokemon.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+        const cardClass = pokemon.typeColors && pokemon.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
         highlightsContainer.innerHTML += `<div class="${cardClass}" style="${createBackgroundStyle(pokemon.typeColors)}"><img src="${pokemon.sprite}" alt="${name}" loading="lazy"><p class="pokemon-name">${name} ${badges}</p><p class="pokemon-cp">CP ${pokemon.cp}</p></div>`;
     });
 }
 
+
+// --- MODAL POKEMON LIST RENDERING ---
 function sortAndRenderAllPokemon() {
     const sortBy = document.getElementById('sort-by').value;
     const sortDirection = document.getElementById('sort-direction').dataset.direction;
@@ -147,7 +143,7 @@ function sortAndRenderAllPokemon() {
         if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
         if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
         if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-        const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+        const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
 
         container.innerHTML += `
             <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
@@ -161,3 +157,24 @@ function sortAndRenderAllPokemon() {
             </div>`;
     });
 }
+
+
+// --- MAIN ENTRY POINT ---
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/private-data')
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Could not load data.') });
+            }
+            return response.json();
+        })
+        .then(data => {
+            allPokemons = data.pokemons.filter(p => !p.isEgg);
+            populateSummaryCards(data);
+            setupModalListeners();
+        })
+        .catch(error => {
+            console.error('Dashboard Error:', error);
+            document.querySelector('main').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
+        });
+});
