@@ -111,7 +111,7 @@ h2 {
 /* --- Modal & Sorting --- */
 .hidden { display: none !important; }
 #modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-#modal-content { position: relative; width: 90%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; }
+#modal-content { position: relative; width: 90%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
 #modal-close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8em; background: none; border: none; cursor: pointer; }
 .sort-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background-color: #f4f4f9; padding: 10px; border-radius: 8px; }
 .sort-bar select, .sort-bar button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; background-color: white; }
@@ -139,4 +139,10 @@ h2 {
     #trainer-summary { flex-basis: 35%; }
     #item-summary { flex-basis: 25%; }
     #pokemon-summary { flex-basis: 40%; }
+}
+
+#modal-pokemon-container {
+    /* This makes the grid of Pokémon scrollable */
+    overflow-y: auto;
+    padding: 10px; /* Adds a little space around the scrolling content */
 }
