@@ -159,24 +159,39 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-// Auto-create/update user when data is saved (UPDATED to be more flexible)
-app.post('/api/save-data', (req, res) => {
-    // This is a temporary debugging endpoint.
-    let rawBody = '';
-    req.on('data', chunk => {
-        rawBody += chunk.toString();
-    });
+app.post('/api/save-data', async (req, res) => {
+    try {
+        const data = req.body;
+        const name = data?.account?.name;
+        const playerId = data?.account?.playerSupportId;
 
-    req.on('end', () => {
-        console.log('--- NEW DATA RECEIVED FOR DEBUGGING ---');
-        console.log('Timestamp:', new Date().toISOString());
-        console.log('Headers:', JSON.stringify(req.headers, null, 2));
-        console.log('Body Content:', rawBody);
-        console.log('-----------------------------------------');
+        if (!name || !playerId) {
+            return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
+        }
 
-        // Just send a simple success message for now so the app doesn't error out.
-        res.status(200).json({ success: true, message: 'Data received for debugging.' });
-    });
+        // Save the data file
+        await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
+        await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
+
+        const users = await readUsers();
+        const userIndex = users.findIndex(u => u.playerId === playerId);
+
+        if (userIndex > -1) {
+            // If user exists, update their username in case it changed in-game
+            users[userIndex].username = name;
+        } else {
+            // If user does not exist, create a new entry.
+            // The password becomes the playerSupportId by default.
+            const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
+            users.push({ username: name, password: hashedPassword, playerId: playerId });
+        }
+        await writeUsers(users);
+
+        res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
+    } catch (error) {
+        console.error("Error in /api/save-data", error);
+        res.status(500).json({ message: 'Server error processing data.' });
+    }
 });
 
 app.post('/login', async (req, res) => {
