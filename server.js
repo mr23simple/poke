@@ -161,12 +161,28 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 
 app.post('/api/save-data', async (req, res) => {
     try {
-        const data = req.body;
+        // Scenario 1: The request body is empty or not JSON. Treat as a connection test.
+        if (typeof req.body !== 'string' || req.body.trim() === '' || !req.body.startsWith('{')) {
+            console.log('✅ [200 OK] Received a successful connection test (empty or non-JSON body).');
+            return res.status(200).json({ success: true, message: 'Connection test successful.' });
+        }
+
+        let data
+        try {
+            data = JSON.parse(req.body);
+        } catch (e) {
+            // Scenario 2: The body is not valid JSON.
+            console.error("⚠️ [400 Bad Request] Malformed JSON received:", e.message);
+            return res.status(400).json({ success: false, message: 'Malformed JSON received.' });
+        }
+        
+        // Scenario 3: The body is valid JSON, but is missing the required fields. Also a test.
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            return res.status(200).json({ message: 'JSON is missing account name or playerSupportId.' });
+            console.log(`✅ [200 OK] Received a test payload (valid JSON, but missing required fields).`);
+            return res.status(200).json({ success: true, message: 'Connection test successful (payload format unrecognized).' });
         }
 
         // Save the data file
