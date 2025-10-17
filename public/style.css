@@ -158,3 +158,27 @@ h2 {
 .tab-button { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; border-bottom: 3px solid transparent; }
 .tab-button.active { font-weight: bold; border-bottom: 3px solid var(--team-instinct); background: white; }
 .form-content.hidden { display: none; }
+
+@media (min-width: 1024px) {
+    .dashboard-container {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: flex-start; /* Aligns cards to the top */
+        gap: 20px;
+    }
+    
+    #trainer-summary {
+        flex: 1 1 35%;
+        order: 1; /* First column */
+    }
+    
+    #item-summary {
+        flex: 1 1 25%;
+        order: 2; /* Second column */
+    }
+    
+    #pokemon-summary {
+        flex: 1 1 40%;
+        order: 3; /* Third column */
+    }
+}
