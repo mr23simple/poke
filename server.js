@@ -159,56 +159,38 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
-    // Scenario 1: The request body is empty or not JSON. Treat as a connection test.
-    if (typeof req.body !== 'string' || req.body.trim() === '' || !req.body.startsWith('{')) {
-        console.log('✅ [200 OK] Received a successful connection test (empty or non-JSON body).');
-        return res.status(200).json({ success: true, message: 'Connection test successful.' });
-    }
-
-    let data;
+app.post('/api/save-data', async (req, res) => {
     try {
-        data = JSON.parse(req.body);
-    } catch (e) {
-        // Scenario 2: The body is not valid JSON.
-        console.error("⚠️ [400 Bad Request] Malformed JSON received:", e.message);
-        return res.status(400).json({ success: false, message: 'Malformed JSON received.' });
-    }
-    
-    // Scenario 3: The body is valid JSON, but is missing the required fields. Also a test.
-    const name = data?.account?.name;
-    const playerId = data?.account?.playerSupportId;
+        const data = req.body;
+        const name = data?.account?.name;
+        const playerId = data?.account?.playerSupportId;
 
-    if (!name || !playerId) {
-        console.log(`✅ [200 OK] Received a test payload (valid JSON, but missing required fields).`);
-        return res.status(200).json({ success: true, message: 'Connection test successful (payload format unrecognized).' });
-    }
+        if (!name || !playerId) {
+            return res.status(200).json({ message: 'JSON is missing account name or playerSupportId.' });
+        }
 
-    // Scenario 4: The data is valid and can be saved.
-    try {
-        const safePlayerId = path.basename(playerId);
-        const userFolderPath = path.join(__dirname, DATA_FOLDER);
-        await fs.mkdir(userFolderPath, { recursive: true });
-        await fs.writeFile(path.join(userFolderPath, `${safePlayerId}.json`), req.body);
+        // Save the data file
+        await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
+        await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
 
         const users = await readUsers();
         const userIndex = users.findIndex(u => u.playerId === playerId);
-        const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
 
         if (userIndex > -1) {
+            // If user exists, update their username in case it changed in-game
             users[userIndex].username = name;
         } else {
+            // If user does not exist, create a new entry.
+            // The password becomes the playerSupportId by default.
+            const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
             users.push({ username: name, password: hashedPassword, playerId: playerId });
         }
         await writeUsers(users);
 
-        console.log(`✅ [201 Created] SUCCESS: Data saved for user '${name}' via API.`);
         res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
-
     } catch (error) {
-        // Scenario 5: A server-side error occurred during the save process.
-        console.error("❌ [500 Server Error] Failed to save data:", error);
-        res.status(500).json({ success: false, message: 'Server error while saving data.' });
+        console.error("Error in /api/save-data", error);
+        res.status(500).json({ message: 'Server error processing data.' });
     }
 });
 
