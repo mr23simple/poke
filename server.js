@@ -172,12 +172,17 @@ app.post('/api/save-data', express.json({ limit: '10mb' }), async (req, res) => 
 
         if (!name || !playerId) {
             if (Object.keys(data).length === 0) {
+                console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
                 return res.status(200).json({ success: true, message: 'Connection test successful.' });
             } else {
+                console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
                 return res.status(400).json({ message: 'Payload is missing required account data.' });
             }
+        } else {
+            console.log(`✅ Received valid data for ${name} (${playerId}).`);
         }
-        
+
+        // Save the data file
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
 
@@ -187,6 +192,7 @@ app.post('/api/save-data', express.json({ limit: '10mb' }), async (req, res) => 
         if (userIndex > -1) {
             // User exists, ONLY update their in-game name.
             users[userIndex].username = name;
+            console.log(`- User record found for ${playerId}. Updating in-game name.`);
         } else {
             // User is new, create a placeholder with empty web credentials.
             users.push({
@@ -195,13 +201,15 @@ app.post('/api/save-data', express.json({ limit: '10mb' }), async (req, res) => 
                 password: "",
                 web_username: ""
             });
+            console.log(`- No user record found for ${playerId}. Creating new placeholder user.`);
         }
         await writeUsers(users);
         
+        console.log(`✅ Data for '${name}' was saved successfully.`);
         return res.status(200).json({ message: 'Data saved and user profile updated.' });
 
     } catch (error) {
-        console.error("Error in /api/save-data", error);
+        console.error("❌ [500 Server Error] Error in /api/save-data:", error);
         res.status(500).json({ message: 'Server error processing data.' });
     }
 });
