@@ -166,8 +166,12 @@ app.post('/api/save-data', async (req, res) => {
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            console.error("❌ [400 Bad Request] JSON is missing account name or playerSupportId.");
-            return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
+            if (data == "{}") {
+                return res.status(200).json({ message: 'Received a successful connection test (missing account name or playerSupportId).' });
+            } else {
+                console.error("❌ [400 Bad Request] JSON is missing account name or playerSupportId.");
+                return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
+            }
         } else {
             console.log(`✅ [200 OK] Received data for ${name} (${playerId}).`);
         }
