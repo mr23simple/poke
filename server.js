@@ -166,14 +166,18 @@ app.post('/api/save-data', async (req, res) => {
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            if (data == "{}") {
-                return res.status(200).json({ message: 'Received a successful connection test (missing account name or playerSupportId).' });
+            // FIX: Check if the object has zero keys
+            if (Object.keys(data).length === 0) {
+                console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
+                return res.status(200).json({ success: true, message: 'Connection test successful.' });
             } else {
-                console.error("❌ [400 Bad Request] JSON is missing account name or playerSupportId.");
-                return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
+                // This is now correctly identified as an error
+                console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
+                return res.status(400).json({ message: 'Payload is missing required account data.' });
             }
         } else {
-            console.log(`✅ [200 OK] Received data for ${name} (${playerId}).`);
+            // This part is correct and will now be reached by valid data
+            console.log(`✅ Received data for ${name} (${playerId}).`);
         }
 
         // Save the data file
