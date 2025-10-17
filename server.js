@@ -15,16 +15,6 @@ const POKEDEX_API_URL = 'https://pokemon-go-api.github.io/pokemon-go-api/api/pok
 const SALT_ROUNDS = 10;
 
 // --- Pokedex Caching Service ---
-Of course. You're right, vibrant colors can sometimes make it harder to see the details on the Pokémon sprites. A more muted, matte color palette will look cleaner and improve readability.
-
-This change only requires an update to the pokedexService object in your server.js file.
-
-## The Updated Code
-
-Please replace the entire pokedexService object in your server.js file with this new version. It contains a new typeColorMap with a more muted, modern color scheme.
-JavaScript
-
-// --- Find and replace the entire pokedexService object ---
 const pokedexService = {
     pokedex: null,
     // NEW muted/matte color palette
