@@ -163,9 +163,7 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     try {
         // Robust parsing to handle clients that don't send the right content-type
-        let data;
-
-        // --- YOUR VALIDATION LOGIC STARTS HERE ---
+        const data = req.body;;
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
@@ -180,10 +178,7 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
         } else {
             console.log(`✅ Received valid data for ${name} (${playerId}).`);
         }
-        // --- YOUR VALIDATION LOGIC ENDS HERE ---
-
         
-        // --- NEW USER MANAGEMENT LOGIC INTEGRATED HERE ---
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
 
