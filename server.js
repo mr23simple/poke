@@ -164,13 +164,6 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
     try {
         // Robust parsing to handle clients that don't send the right content-type
         let data;
-        try {
-            data = JSON.parse(req.body);
-        } catch (e) {
-            // Your logic requires returning 200 for empty or non-JSON connection tests
-            console.log('✅ [200 OK] Received a successful connection test (empty or non-JSON body).');
-            return res.status(200).json({ success: true, message: 'Connection test successful.' });
-        }
 
         // --- YOUR VALIDATION LOGIC STARTS HERE ---
         const name = data?.account?.name;
