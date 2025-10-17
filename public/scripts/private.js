@@ -1,4 +1,5 @@
 let allPokemons = [];
+let pokemonVirtualList;
 
 // --- HELPER FUNCTIONS ---
 function createBackgroundStyle(colors) {
@@ -124,6 +125,8 @@ function sortAndRenderAllPokemon() {
     const container = document.getElementById('all-pokemon-list');
     
     let sortedPokemons = [...allPokemons];
+
+    // Sorting logic (remains the same)
     sortedPokemons.sort((a, b) => {
         switch (sortBy) {
             case 'cp': return a.cp - b.cp;
@@ -133,31 +136,50 @@ function sortAndRenderAllPokemon() {
         }
     });
 
-    if (sortDirection === 'desc') sortedPokemons.reverse();
-    container.innerHTML = '';
-    
-    sortedPokemons.forEach(p => {
-        const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
-        const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
-        let badges = '';
-        if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
-        if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
-        if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-        const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+    if (sortDirection === 'desc') {
+        sortedPokemons.reverse();
+    }
 
-        container.innerHTML += `
-            <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                <img src="${p.sprite}" alt="${displayName}" loading="lazy">
-                <p class="pokemon-name">${displayName} ${badges}</p>
-                <p class="pokemon-cp">CP ${p.cp}</p>
-                <div class="iv-bar-container">
-                    <div class="iv-bar" style="width: ${ivPercent}%; background-color: ${getIvColor(ivPercent)}"></div>
-                </div>
-                <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
-            </div>`;
-    });
+    // --- START OF NEW VIRTUALIZATION LOGIC ---
+
+    // If the list doesn't exist yet, create it.
+    if (!pokemonVirtualList) {
+        pokemonVirtualList = new VirtualList({
+            container: container,
+            data: sortedPokemons,
+            
+            // This function tells the library how to render a SINGLE card
+            render: (p) => {
+                const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
+                const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
+                
+                let badges = '';
+                if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
+                if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
+                if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
+                
+                const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+
+                // Return the HTML for one card as a string
+                return `
+                    <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
+                        <img src="${p.sprite}" alt="${displayName}" loading="lazy">
+                        <p class="pokemon-name">${displayName} ${badges}</p>
+                        <p class="pokemon-cp">CP ${p.cp}</p>
+                        <div class="iv-bar-container">
+                            <div class="iv-bar" style="width: ${ivPercent}%; background-color: ${getIvColor(ivPercent)}"></div>
+                        </div>
+                        <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
+                    </div>
+                `;
+            }
+        });
+    } else {
+        // If the list already exists, just update its data and re-render.
+        pokemonVirtualList.updateData(sortedPokemons);
+    }
+    // --- END OF NEW VIRTUALIZATION LOGIC ---
 }
-
 
 // --- MAIN ENTRY POINT ---
 document.addEventListener('DOMContentLoaded', () => {
