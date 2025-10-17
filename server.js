@@ -330,7 +330,15 @@ app.get('/api/private-data', isAuthenticated, async (req, res) => {
         const filePath = path.join(__dirname, DATA_FOLDER, `${playerId}.json`);
         const fileContent = await fs.readFile(filePath, 'utf-8');
         const data = JSON.parse(fileContent);
+
+        // This map function now safely handles eggs
         data.pokemons = data.pokemons.map(p => {
+            // If the entry is an egg or doesn't have display data, return it as is.
+            if (p.isEgg || !p.pokemonDisplay) {
+                return p;
+            }
+
+            // Otherwise, process it normally
             const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
             return {
                 ...p,
@@ -339,8 +347,13 @@ app.get('/api/private-data', isAuthenticated, async (req, res) => {
                 typeColors: pokedexService.getPokemonTypeColors(pokedexEntry)
             };
         });
+        
         res.json(data);
-    } catch (error) { res.status(404).json({ message: 'Could not find your data file.' }); }
+
+    } catch (error) {
+        console.error("❌ [500 Server Error] in /api/private-data:", error);
+        res.status(500).json({ message: 'A server error occurred while processing your player data.' });
+    }
 });
 
 // --- Start Server ---
