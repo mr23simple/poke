@@ -123,7 +123,8 @@ app.post('/register', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-        users.push({ username, password: hashedPassword, playerId });
+        // Add ingameName: null to the new user object
+        users.push({ username, password: hashedPassword, playerId, ingameName: null });
         await writeUsers(users);
 
         res.redirect('/login.html');
@@ -159,48 +160,66 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-app.post('/api/save-data', async (req, res) => {
+app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     try {
-        const data = req.body;
+        // This parser and initial check handles empty bodies and malformed JSON
+        let data;
+        try {
+            data = JSON.parse(req.body);
+        } catch (e) {
+            // Catches empty bodies or non-JSON text, treats as a connection test
+            console.log('✅ [200 OK] Received a successful connection test (empty or non-JSON body).');
+            return res.status(200).json({ success: true, message: 'Connection test successful.' });
+        }
+
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            // FIX: Check if the object has zero keys
+            // Your logic for handling test/invalid JSON payloads
             if (Object.keys(data).length === 0) {
                 console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
                 return res.status(200).json({ success: true, message: 'Connection test successful.' });
             } else {
-                // This is now correctly identified as an error
                 console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
                 return res.status(400).json({ message: 'Payload is missing required account data.' });
             }
-        } else {
-            // This part is correct and will now be reached by valid data
-            console.log(`✅ Received data for ${name} (${playerId}).`);
         }
+
+        // --- This is the main logic block that only runs for VALID data ---
+        console.log(`✅ Received valid data for ${name} (${playerId}).`);
 
         // Save the data file
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
 
+        // Find or create the user record
         const users = await readUsers();
         const userIndex = users.findIndex(u => u.playerId === playerId);
 
         if (userIndex > -1) {
-            // If user exists, update their username in case it changed in-game
-            users[userIndex].username = name;
+            // User exists, just update their in-game name
+            users[userIndex].ingameName = name;
+            console.log(`- User record found for ${playerId}. Updating in-game name to '${name}'.`);
         } else {
-            // If user does not exist, create a new entry.
-            // The password becomes the playerSupportId by default.
+            // User does not exist, create a new record
+            // The username and password both default to the in-game name and playerId
             const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
-            users.push({ username: name, password: hashedPassword, playerId: playerId });
+            users.push({ 
+                username: name,       // Web username defaults to in-game name
+                password: hashedPassword, // Default password is the player ID
+                playerId: playerId,
+                ingameName: name      // Store the in-game name
+            });
+            console.log(`- No user record found for ${playerId}. Creating new user '${name}'.`);
         }
         await writeUsers(users);
 
-        return res.status(200).json({ message: 'Found account name or playerSupportId.' });
+        // Send the final success response
+        return res.status(201).json({ success: true, message: `Data for ${name} saved and user record updated.` });
+
     } catch (error) {
-        console.error("Error in /api/save-data", error);
+        console.error("❌ [500 Server Error] Error in /api/save-data:", error);
         res.status(500).json({ message: 'Server error processing data.' });
     }
 });
@@ -214,21 +233,26 @@ app.post('/login', async (req, res) => {
         if (playerId) {
             // Method 1: Login with Player ID only
             user = users.find(u => u.playerId === playerId);
-            if (user) {
-                // For ID-only login, we trust the ID is correct
-                req.session.user = { username: user.username, playerId: user.playerId };
-                return res.redirect('/me');
-            }
         } else if (username && password) {
             // Method 2: Login with username and password
-            user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-            if (user && await bcrypt.compare(password, user.password)) {
-                req.session.user = { username: user.username, playerId: user.playerId };
-                return res.redirect('/me');
+            const loginIdentifier = username.toLowerCase();
+            user = users.find(u => 
+                u.username.toLowerCase() === loginIdentifier || 
+                (u.ingameName && u.ingameName.toLowerCase() === loginIdentifier)
+            );
+
+            if (user && !(await bcrypt.compare(password, user.password))) {
+                user = null; // Password doesn't match, so invalidate the user
             }
         }
         
-        // If either method fails
+        if (user) {
+            // If any method was successful, create the session
+            req.session.user = { username: user.username, playerId: user.playerId };
+            return res.redirect('/me');
+        }
+
+        // If all methods fail
         res.send('Login failed. Please check your credentials. <a href="/login.html">Try again</a>.');
 
     } catch (error) {
