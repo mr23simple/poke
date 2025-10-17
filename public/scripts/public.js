@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Helper function to create the background style string
     function createBackgroundStyle(colors) {
         if (!colors || colors.length === 0) {
-            // Return a style that results in a default non-colored card
             return 'background-color: #f1f1f1; color: #333; text-shadow: none;';
         }
         if (colors.length === 1) {
@@ -52,8 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const detailRes = await fetch(`/api/player-detail/${playerId}`);
                 const details = await detailRes.json();
                 
-                const cardClass = details.highlights.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
-
+                // This is the HTML that builds the modal's content
                 modalContent.innerHTML = `
                     <button id="modal-close-btn">&times;</button>
                     <h2>${details.name}</h2>
@@ -66,13 +64,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <h3>Highlights</h3>
                     <div id="modal-pokemon-container">
-                        ${details.highlights.map(p => `
-                            <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                                <img src="${p.sprite}" alt="${p.name}" loading="lazy">
-                                <p class="pokemon-name">${p.name}</p>
-                                <p class="pokemon-cp">CP ${p.cp}</p>
-                            </div>
-                        `).join('')}
+                        ${details.highlights.map(p => {
+                            // Use the same pokemon-card structure here
+                            const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+                            return `
+                                <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
+                                    <img src="${p.sprite}" alt="${p.name}" loading="lazy">
+                                    <p class="pokemon-name">${p.name}</p>
+                                    <p class="pokemon-cp">CP ${p.cp}</p>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
                 modalBackdrop.classList.remove('hidden');
