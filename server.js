@@ -160,57 +160,23 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 });
 
 // Auto-create/update user when data is saved (UPDATED to be more flexible)
-app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
-    let data;
-    
-    // First, try to parse the incoming text as JSON
-    try {
-        if (typeof req.body !== 'string' || req.body.trim() === '') {
-            throw new Error('Request body is empty or not a string.');
-        }
-        data = JSON.parse(req.body);
-    } catch (e) {
-        console.error("Malformed JSON received:", e.message);
-        return res.status(400).json({ success: false, message: 'Malformed or empty JSON received.' });
-    }
+app.post('/api/save-data', (req, res) => {
+    // This is a temporary debugging endpoint.
+    let rawBody = '';
+    req.on('data', chunk => {
+        rawBody += chunk.toString();
+    });
 
-    // If parsing succeeds, proceed with the original logic
-    try {
-        const name = data?.account?.name;
-        const playerId = data?.account?.playerSupportId;
+    req.on('end', () => {
+        console.log('--- NEW DATA RECEIVED FOR DEBUGGING ---');
+        console.log('Timestamp:', new Date().toISOString());
+        console.log('Headers:', JSON.stringify(req.headers, null, 2));
+        console.log('Body Content:', rawBody);
+        console.log('-----------------------------------------');
 
-        if (!name || !playerId) {
-            return res.status(400).json({ success: false, message: 'Parsed JSON is missing account name or playerSupportId.' });
-        }
-
-        const safePlayerId = path.basename(playerId);
-        const userFolderPath = path.join(__dirname, DATA_FOLDER);
-        const filePath = path.join(userFolderPath, `${safePlayerId}.json`);
-        
-        await fs.mkdir(userFolderPath, { recursive: true });
-        // Save the original text body, not the re-stringified object, to preserve formatting
-        await fs.writeFile(filePath, req.body);
-
-        const users = await readUsers();
-        const userIndex = users.findIndex(u => u.playerId === playerId);
-        const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
-
-        if (userIndex > -1) {
-            users[userIndex].username = name; // Update username in case it changed
-            // Optionally update password if needed, though playerId shouldn't change
-            // users[userIndex].password = hashedPassword; 
-        } else {
-            users.push({ username: name, password: hashedPassword, playerId: playerId });
-        }
-        await writeUsers(users);
-
-        console.log(`✅ Data saved for user '${name}' via API.`);
-        res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
-
-    } catch (error) {
-        console.error("Error saving data in /api/save-data:", error);
-        res.status(500).json({ success: false, message: 'Server error while processing data.' });
-    }
+        // Just send a simple success message for now so the app doesn't error out.
+        res.status(200).json({ success: true, message: 'Data received for debugging.' });
+    });
 });
 
 app.post('/login', async (req, res) => {
