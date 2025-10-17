@@ -2,37 +2,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const playerGrid = document.getElementById('player-grid');
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalContent = document.getElementById('modal-content');
-    const closeModalBtn = document.getElementById('modal-close-btn');
 
-    // Helper function to create the background style string
     function createBackgroundStyle(colors) {
-        if (!colors || colors.length === 0) {
-            return 'background-color: #f1f1f1; color: #333; text-shadow: none;';
-        }
-        if (colors.length === 1) {
-            return `background-color: ${colors[0]};`;
-        }
+        if (!colors || colors.length === 0) return 'color: #333; text-shadow: none;';
+        if (colors.length === 1) return `background-color: ${colors[0]};`;
         return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
     }
 
     try {
         const response = await fetch('/api/public-data');
         const players = await response.json();
-
         if (players.length === 0) {
             playerGrid.innerHTML = '<p>No player data has been submitted yet.</p>';
             return;
         }
 
-        players.sort((a, b) => b.level - a.level);
-        
-        players.forEach(player => {
+        players.sort((a, b) => b.level - a.level).forEach(player => {
             const teamColors = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
             const card = document.createElement('div');
             card.className = 'card player-card';
             card.style.borderTop = `5px solid ${teamColors[player.team] || '#ccc'}`;
             card.dataset.playerId = player.playerId;
-
             card.innerHTML = `
                 <h3>${player.name}</h3>
                 <p>Level: <strong>${player.level}</strong></p>
@@ -40,8 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="recent-catch">
                     <img src="${player.recentCatch.sprite}" alt="${player.recentCatch.name}" loading="lazy">
                     <small>Recent: ${player.recentCatch.name} (CP ${player.recentCatch.cp})</small>
-                </div>
-            `;
+                </div>`;
             playerGrid.appendChild(card);
         });
 
@@ -51,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const detailRes = await fetch(`/api/player-detail/${playerId}`);
                 const details = await detailRes.json();
                 
-                // This is the HTML that builds the modal's content
                 modalContent.innerHTML = `
                     <button id="modal-close-btn">&times;</button>
                     <h2>${details.name}</h2>
@@ -65,28 +53,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h3>Highlights</h3>
                     <div id="modal-pokemon-container">
                         ${details.highlights.map(p => {
-                            // Use the same pokemon-card structure here
                             const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
-                            return `
-                                <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                                    <img src="${p.sprite}" alt="${p.name}" loading="lazy">
-                                    <p class="pokemon-name">${p.name}</p>
-                                    <p class="pokemon-cp">CP ${p.cp}</p>
-                                </div>
-                            `;
+                            return `<div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
+                                        <img src="${p.sprite}" alt="${p.name}" loading="lazy">
+                                        <p class="pokemon-name">${p.name}</p>
+                                        <p class="pokemon-cp">CP ${p.cp}</p>
+                                    </div>`;
                         }).join('')}
-                    </div>
-                `;
+                    </div>`;
                 modalBackdrop.classList.remove('hidden');
                 document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
             });
         });
-
     } catch (error) {
         playerGrid.innerHTML = '<p>Could not load player data.</p>';
     }
 
-    closeModalBtn.addEventListener('click', () => modalBackdrop.classList.add('hidden'));
     modalBackdrop.addEventListener('click', (e) => {
         if (e.target === modalBackdrop) modalBackdrop.classList.add('hidden');
     });
