@@ -160,13 +160,12 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 });
 
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
-    // 1. Check for an empty body (the "Test Connection" request)
-    if (typeof req.body !== 'string' || req.body.trim() === '') {
-        console.log('✅ Received a successful connection test from the app.');
+    // Check for an empty or non-JSON body first.
+    if (typeof req.body !== 'string' || req.body.trim() === '' || !req.body.startsWith('{')) {
+        console.log('✅ Received a successful connection test (empty or non-JSON body).');
         return res.status(200).json({ success: true, message: 'Connection test successful.' });
     }
 
-    // 2. If the body is not empty, proceed with saving the data
     let data;
     try {
         data = JSON.parse(req.body);
@@ -175,18 +174,21 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
         return res.status(400).json({ success: false, message: 'Malformed JSON received.' });
     }
     
-    try {
-        const name = data?.account?.name;
-        const playerId = data?.account?.playerSupportId;
+    // Now, validate the parsed JSON content.
+    const name = data?.account?.name;
+    const playerId = data?.account?.playerSupportId;
 
-        if (!name || !playerId) {
-            return res.status(400).json({ success: false, message: 'Parsed JSON is missing account name or playerSupportId.' });
-        }
-        
+    if (!name || !playerId) {
+        console.log(`✅ Received a valid JSON object, but it's a test payload (missing critical data).`);
+        return res.status(200).json({ success: false, message: 'Parsed JSON is missing required account data.' });
+    }
+
+    // If validation passes, we can finally save the data.
+    try {
         const safePlayerId = path.basename(playerId);
         const userFolderPath = path.join(__dirname, DATA_FOLDER);
         await fs.mkdir(userFolderPath, { recursive: true });
-        await fs.writeFile(path.join(userFolderPath, `${safePlayerId}.json`), req.body);
+        await fs.writeFile(path.join(userFolderPath, `${safePlayerId}.json`), req.body); // Save the original raw text
 
         const users = await readUsers();
         const userIndex = users.findIndex(u => u.playerId === playerId);
@@ -199,12 +201,12 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
         }
         await writeUsers(users);
 
-        console.log(`✅ Data saved for user '${name}' via API.`);
+        console.log(`✅ SUCCESS: Data saved for user '${name}' via API.`);
         res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
 
     } catch (error) {
-        console.error("Error saving data in /api/save-data:", error);
-        res.status(500).json({ success: false, message: 'Server error while processing data.' });
+        console.error("❌ ERROR: Failed to save data in /api/save-data:", error);
+        res.status(500).json({ success: false, message: 'Server error while saving data.' });
     }
 });
 
