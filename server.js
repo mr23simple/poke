@@ -167,10 +167,9 @@ app.post('/api/save-data', async (req, res) => {
 
         if (!name || !playerId) {
             console.log('✅ [200 OK] Received a successful connection test (missing account name or playerSupportId).');
-            return res.status(200).json({ message: 'JSON is missing account name or playerSupportId.' });
+            return res.status(400).json({ message: 'JSON is missing account name or playerSupportId.' });
         } else {
             console.log(`✅ [200 OK] Received data for ${name} (${playerId}).`);
-            return res.status(200).json({ message: 'JSON found account name or playerSupportId.' });
         }
 
         // Save the data file
@@ -191,7 +190,7 @@ app.post('/api/save-data', async (req, res) => {
         }
         await writeUsers(users);
 
-        res.status(201).json({ success: true, message: `Data for ${name} saved/updated.` });
+        return res.status(200).json({ message: 'Found account name or playerSupportId.' });
     } catch (error) {
         console.error("Error in /api/save-data", error);
         res.status(500).json({ message: 'Server error processing data.' });
