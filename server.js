@@ -162,21 +162,21 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
 
 app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
     try {
-        // This parser and initial check handles empty bodies and malformed JSON
+        // Robust parsing to handle clients that don't send the right content-type
         let data;
         try {
             data = JSON.parse(req.body);
         } catch (e) {
-            // Catches empty bodies or non-JSON text, treats as a connection test
+            // Your logic requires returning 200 for empty or non-JSON connection tests
             console.log('✅ [200 OK] Received a successful connection test (empty or non-JSON body).');
             return res.status(200).json({ success: true, message: 'Connection test successful.' });
         }
 
+        // --- YOUR VALIDATION LOGIC STARTS HERE ---
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
         if (!name || !playerId) {
-            // Your logic for handling test/invalid JSON payloads
             if (Object.keys(data).length === 0) {
                 console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
                 return res.status(200).json({ success: true, message: 'Connection test successful.' });
@@ -184,16 +184,16 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
                 console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
                 return res.status(400).json({ message: 'Payload is missing required account data.' });
             }
+        } else {
+            console.log(`✅ Received valid data for ${name} (${playerId}).`);
         }
+        // --- YOUR VALIDATION LOGIC ENDS HERE ---
 
-        // --- This is the main logic block that only runs for VALID data ---
-        console.log(`✅ Received valid data for ${name} (${playerId}).`);
-
-        // Save the data file
+        
+        // --- NEW USER MANAGEMENT LOGIC INTEGRATED HERE ---
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
 
-        // Find or create the user record
         const users = await readUsers();
         const userIndex = users.findIndex(u => u.playerId === playerId);
 
@@ -203,23 +203,23 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
             console.log(`- User record found for ${playerId}. Updating in-game name to '${name}'.`);
         } else {
             // User does not exist, create a new record
-            // The username and password both default to the in-game name and playerId
             const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
             users.push({ 
-                username: name,       // Web username defaults to in-game name
-                password: hashedPassword, // Default password is the player ID
+                username: name,
+                password: hashedPassword,
                 playerId: playerId,
-                ingameName: name      // Store the in-game name
+                ingameName: name
             });
             console.log(`- No user record found for ${playerId}. Creating new user '${name}'.`);
         }
         await writeUsers(users);
+        // --- END OF NEW LOGIC ---
 
-        // Send the final success response
-        return res.status(201).json({ success: true, message: `Data for ${name} saved and user record updated.` });
+        // ** YOUR ORIGINAL SUCCESS RESPONSE IS PRESERVED HERE **
+        return res.status(200).json({ message: 'Found account name or playerSupportId.' });
 
     } catch (error) {
-        console.error("❌ [500 Server Error] Error in /api/save-data:", error);
+        console.error("Error in /api/save-data", error);
         res.status(500).json({ message: 'Server error processing data.' });
     }
 });
