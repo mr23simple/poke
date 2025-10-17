@@ -107,7 +107,6 @@ app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 
 app.get('/logout', (req, res) => req.session.destroy(() => res.redirect('/')));
 
-// Handles web registration for an existing data profile
 app.post('/register', async (req, res) => {
     try {
         const { web_username, password, playerId } = req.body;
@@ -123,9 +122,10 @@ app.post('/register', async (req, res) => {
         }
 
         if (users[userIndex].web_username !== "" || users[userIndex].password !== "") {
-            return res.status(409).send('This Player ID has already been registered with a web account. <a href="/login.html">Try logging in</a>.');
+            return res.status(409).send('This Player ID has already been registered. <a href="/login.html">Try logging in</a>.');
         }
-
+        
+        // Update the existing user with web credentials
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
         users[userIndex].web_username = web_username;
         users[userIndex].password = hashedPassword;
@@ -164,26 +164,19 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
     } catch { res.status(404).json({ message: 'Player data not found.' }); }
 });
 
-app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
+app.post('/api/save-data', express.json({ limit: '10mb' }), async (req, res) => {
     try {
         const data = req.body;
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
-         if (!name || !playerId) {
+        if (!name || !playerId) {
             if (Object.keys(data).length === 0) {
-                console.log('✅ [200 OK] Received a successful connection test (empty JSON object).');
                 return res.status(200).json({ success: true, message: 'Connection test successful.' });
             } else {
-                console.error("❌ [400 Bad Request] Received a payload but it was missing required fields.");
                 return res.status(400).json({ message: 'Payload is missing required account data.' });
             }
-        } else {
-            console.log(`✅ Received valid data for ${name} (${playerId}).`);
         }
-        
-        // If we get here, the data is fully valid. Proceed to save.
-        console.log(`✅ Received valid data for ${name} (${playerId}). Proceeding to save...`);
         
         await fs.mkdir(path.join(__dirname, DATA_FOLDER), { recursive: true });
         await fs.writeFile(path.join(__dirname, DATA_FOLDER, `${playerId}.json`), JSON.stringify(data, null, 2));
@@ -192,25 +185,23 @@ app.post('/api/save-data', express.text({ type: '*/*', limit: '10mb' }), async (
         const userIndex = users.findIndex(u => u.playerId === playerId);
 
         if (userIndex > -1) {
-            users[userIndex].ingameName = name;
+            // User exists, ONLY update their in-game name.
+            users[userIndex].username = name;
         } else {
-            const hashedPassword = await bcrypt.hash(playerId, SALT_ROUNDS);
-            users.push({ 
+            // User is new, create a placeholder with empty web credentials.
+            users.push({
                 username: name,
-                password: hashedPassword,
                 playerId: playerId,
-                ingameName: name,
-                web_username: "" // Ensure new fields exist
+                password: "",
+                web_username: ""
             });
         }
         await writeUsers(users);
-
-        console.log(`✅ SUCCESS: Data for '${name}' was saved successfully.`);
-        // Returning the success message you wanted
-        return res.status(200).json({ message: 'Found account name or playerSupportId.' });
+        
+        return res.status(200).json({ message: 'Data saved and user profile updated.' });
 
     } catch (error) {
-        console.error("❌ [500 Server Error] An unexpected error occurred:", error);
+        console.error("Error in /api/save-data", error);
         res.status(500).json({ message: 'Server error processing data.' });
     }
 });
@@ -225,21 +216,25 @@ app.post('/login', async (req, res) => {
             // Method 1: Login with Player ID only
             user = users.find(u => u.playerId === playerId);
         } else if (username && password) {
-            // Method 2: Login with web_username and password
+            // Method 2: Login with web_username or in-game name and password
             const loginIdentifier = username.toLowerCase();
-            user = users.find(u => u.web_username.toLowerCase() === loginIdentifier);
+            user = users.find(u => 
+                (u.web_username && u.web_username.toLowerCase() === loginIdentifier) || 
+                u.username.toLowerCase() === loginIdentifier
+            );
 
-            if (user && !(await bcrypt.compare(password, user.password))) {
+            // Verify password only if the account has one set (is fully registered)
+            if (user && user.password !== "" && !(await bcrypt.compare(password, user.password))) {
                 user = null; // Password doesn't match
             }
         }
         
         if (user) {
-            req.session.user = { username: user.web_username || user.ingameName, playerId: user.playerId };
+            req.session.user = { username: user.web_username || user.username, playerId: user.playerId };
             return res.redirect('/me');
         }
 
-        res.send('Login failed. Please check your credentials. <a href="/login.html">Try again</a>.');
+        res.send('Login failed. Please check your credentials or register. <a href="/login.html">Try again</a>.');
 
     } catch (error) {
         res.status(500).send('Server error during login.');
