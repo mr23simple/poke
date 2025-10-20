@@ -158,7 +158,7 @@ app.get('/api/rankings', async (req, res) => {
             return res.json({ recentPlayers: [], strongestPokemon: [], rarestPokemon: [] });
         }
 
-        let allPokemon = [];
+        let allPokemonForCpRank = [];
         let recentPlayers = [];
         const rarePokemonTracker = new Map();
 
@@ -185,7 +185,7 @@ app.get('/api/rankings', async (req, res) => {
             // --- 2 & 3. Gather Pokémon for CP ranking and Rarity tracking ---
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
-                    allPokemon.push({ ...p, owner: playerName, ownerId: playerId });
+                    allPokemonForCpRank.push({ ...p, owner: playerName, ownerId: playerId });
 
                     const isShiny = p.pokemonDisplay.shiny;
                     const isLucky = p.isLucky;
@@ -194,10 +194,7 @@ app.get('/api/rankings', async (req, res) => {
                     if (isShiny || isLucky || isPerfect) {
                         const uniqueKey = `${p.pokemonId}-${p.pokemonDisplay.formName}-${isShiny}-${isLucky}-${isPerfect}`;
                         if (!rarePokemonTracker.has(uniqueKey)) {
-                            rarePokemonTracker.set(uniqueKey, {
-                                pokemon: p,
-                                owners: new Set()
-                            });
+                            rarePokemonTracker.set(uniqueKey, { pokemon: p, owners: new Set() });
                         }
                         rarePokemonTracker.get(uniqueKey).owners.add(playerId);
                     }
@@ -208,7 +205,7 @@ app.get('/api/rankings', async (req, res) => {
         // --- Process Rankings ---
         const sortedRecentPlayers = recentPlayers.sort((a, b) => b.lastUpdate - a.lastUpdate).slice(0, 50);
         
-        const strongestPokemon = [...allPokemon].sort((a, b) => b.cp - a.cp).slice(0, 50).map(p => ({
+        const strongestPokemon = [...allPokemonForCpRank].sort((a, b) => b.cp - a.cp).slice(0, 50).map(p => ({
             name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
             sprite: pokedexService.getPokemonSprite(p),
             cp: p.cp, owner: p.owner, ownerId: p.ownerId
@@ -219,16 +216,31 @@ app.get('/api/rankings', async (req, res) => {
             .map(item => {
                 const p = item.pokemon;
                 const ownershipPercentage = (item.owners.size / totalPlayers) * 100;
+                const isShiny = p.pokemonDisplay.shiny;
+                const isLucky = p.isLucky;
+                const isPerfect = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1;
+
+                let rarityTier = 0;
+                if (isShiny && isPerfect && isLucky) rarityTier = 7;
+                else if (isShiny && isPerfect) rarityTier = 6;
+                else if (isShiny && isLucky) rarityTier = 5;
+                else if (isPerfect && isLucky) rarityTier = 4;
+                else if (isPerfect) rarityTier = 3;
+                else if (isShiny) rarityTier = 2;
+                else if (isLucky) rarityTier = 1;
+
                 return {
                     name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                     sprite: pokedexService.getPokemonSprite(p),
-                    isShiny: p.pokemonDisplay.shiny,
-                    isLucky: p.isLucky,
-                    isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
-                    ownershipPercentage: ownershipPercentage
+                    isShiny, isLucky, isPerfect,
+                    ownershipPercentage, rarityTier, cp: p.cp
                 };
             })
-            .sort((a, b) => a.ownershipPercentage - b.ownershipPercentage) // Sort by lowest percentage (rarest)
+            .sort((a, b) => {
+                if (b.rarityTier !== a.rarityTier) return b.rarityTier - a.rarityTier;
+                if (a.ownershipPercentage !== b.ownershipPercentage) return a.ownershipPercentage - b.ownershipPercentage;
+                return b.cp - a.cp;
+            })
             .slice(0, 50);
 
         res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked });
