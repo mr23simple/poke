@@ -146,6 +146,88 @@ app.post('/register', async (req, res) => {
     }
 });
 
+app.get('/api/rankings', async (req, res) => {
+    try {
+        const folderPath = path.join(__dirname, DATA_FOLDER);
+        await fs.access(folderPath);
+        const files = await fs.readdir(folderPath);
+
+        let allPokemon = [];
+        let recentPlayers = [];
+
+        for (const file of files.filter(f => f.endsWith('.json'))) {
+            const filePath = path.join(folderPath, file);
+            const stats = await fs.stat(filePath);
+            const content = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+
+            if (!content.account || !content.player || !content.pokemons) continue;
+
+            const playerName = content.account.name;
+            const playerId = content.account.playerSupportId; // Get the Player ID
+
+            // 1. Gather Data for Recent Players
+            const buddy = content.pokemons.find(p => p.id === content.account.buddyPokemonProto?.buddyPokemonId);
+            recentPlayers.push({
+                name: playerName,
+                playerId: playerId, // Include playerId here
+                buddy: buddy ? {
+                    name: pokedexService.getPokemonName(buddy.pokemonId, buddy.pokemonDisplay.formName),
+                    sprite: pokedexService.getPokemonSprite(buddy)
+                } : null,
+                kmWalked: content.player.kmWalked.toFixed(1),
+                pokemonCaught: content.player.numPokemonCaptured,
+                lastUpdate: stats.mtimeMs
+            });
+
+            // 2 & 3. Gather all Pokémon for ranking, now with playerId
+            content.pokemons.forEach(p => {
+                if (!p.isEgg && p.pokemonDisplay) {
+                    const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
+                    const rarityScore = (p.pokemonDisplay.shiny * 10) + (p.isLucky * 5) + (getIvPercent() >= 100 ? 8 : 0);
+                    allPokemon.push({ ...p, owner: playerName, ownerId: playerId, rarityScore }); // Add ownerId
+                }
+            });
+        }
+
+        // --- Process and Sort Rankings ---
+
+        const sortedRecentPlayers = recentPlayers
+            .sort((a, b) => b.lastUpdate - a.lastUpdate)
+            .slice(0, 50);
+
+        const strongestPokemon = [...allPokemon]
+            .sort((a, b) => b.cp - a.cp)
+            .slice(0, 50)
+            .map(p => ({
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                cp: p.cp,
+                owner: p.owner,
+                ownerId: p.ownerId // Pass the ownerId to the frontend
+            }));
+
+        const rarestPokemonRanked = [...allPokemon]
+            .filter(p => p.rarityScore > 0)
+            .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
+            .slice(0, 50)
+            .map(p => ({
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                owner: p.owner,
+                ownerId: p.ownerId, // Pass the ownerId to the frontend
+                isShiny: p.pokemonDisplay.shiny,
+                isLucky: p.isLucky,
+                isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100) >= 100
+            }));
+            
+        res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked });
+
+    } catch (error) {
+        console.error("Error in /api/rankings:", error);
+        res.status(500).json({ message: 'Server error processing rankings.' });
+    }
+});
+
 app.get('/api/public-data', async (req, res) => {
     try {
         const folderPath = path.join(__dirname, DATA_FOLDER);

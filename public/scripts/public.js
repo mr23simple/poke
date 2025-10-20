@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const playerGrid = document.getElementById('player-grid');
+    const loadingMessage = document.getElementById('loading-message');
+    const rankingsGrid = document.getElementById('rankings-grid');
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalContent = document.getElementById('modal-content');
 
@@ -9,80 +10,108 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
     }
 
-    try {
-        const response = await fetch('/api/public-data');
-        const players = await response.json();
+    // Function to open the details modal for a player
+    async function openPlayerModal(playerId) {
+        try {
+            const detailRes = await fetch(`/api/player-detail/${playerId}`);
+            if (!detailRes.ok) throw new Error('Could not fetch player details.');
+            const details = await detailRes.json();
 
-        if (players.length === 0) {
-            playerGrid.innerHTML = '<div class="card"><p>No player data has been submitted yet.</p></div>';
-            return;
-        }
-
-        players.sort((a, b) => b.level - a.level).forEach(player => {
-            const teamColors = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
-            const teamColor = teamColors[player.team] || '#6c757d';
-            
-            const card = document.createElement('div');
-            card.className = 'card player-card';
-            card.dataset.playerId = player.playerId;
-            card.style.background = `linear-gradient(135deg, ${teamColor} 20%, #495057 100%)`;
-
-            card.innerHTML = `
-                <div class="player-card-header">
-                    <h3>${player.name}</h3>
-                    <span>Lv. ${player.level}</span>
+            modalContent.innerHTML = `
+                <button id="modal-close-btn">&times;</button>
+                <h2>${details.name}</h2>
+                <p>Start Date: ${details.startDate}</p>
+                <div class="grid-stats">
+                    <div><span>Total XP</span><strong>${details.totalXp.toLocaleString()}</strong></div>
+                    <div><span>Pokémon Caught</span><strong>${details.pokemonCaught.toLocaleString()}</strong></div>
+                    <div><span>Distance Walked</span><strong>${details.kmWalked.toFixed(1)} km</strong></div>
+                    <div><span>PokéStops Visited</span><strong>${details.pokestopsVisited.toLocaleString()}</strong></div>
                 </div>
-                <div class="player-card-body">
-                    <img src="${player.displayPokemon.sprite}" alt="${player.displayPokemon.name}" onerror="this.style.display='none'">
-                    <p>${player.displayPokemon.name}</p>
-                    <small>Buddy</small>
-                </div>
-                <div class="player-card-footer">
-                    <span>${player.kmWalked} km walked</span>
+                
+                <h3>Highlights</h3>
+                <div id="modal-pokemon-container">
+                    ${details.highlights.map(p => {
+                        const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+                        return `<div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
+                                    <img src="${p.sprite}" alt="${p.name}" loading="lazy">
+                                    <p class="pokemon-name">${p.name}</p>
+                                    <p class="pokemon-cp">CP ${p.cp}</p>
+                                </div>`;
+                    }).join('')}
                 </div>
             `;
-            playerGrid.appendChild(card);
-        });
+            modalBackdrop.classList.remove('hidden');
+            document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
+        } catch (error) {
+            console.error('Failed to open player modal:', error);
+        }
+    }
 
-        document.querySelectorAll('.player-card').forEach(card => {
-            card.addEventListener('click', async () => {
-                const playerId = card.dataset.playerId;
-                const detailRes = await fetch(`/api/player-detail/${playerId}`);
-                if (!detailRes.ok) return;
-                const details = await detailRes.json();
-                
-                // This is the corrected modal HTML, with the "Recently Caught" section removed.
-                modalContent.innerHTML = `
-                    <button id="modal-close-btn">&times;</button>
-                    <h2>${details.name}</h2>
-                    <p>Start Date: ${details.startDate}</p>
-                    <div class="grid-stats">
-                        <div><span>Total XP</span><strong>${details.totalXp.toLocaleString()}</strong></div>
-                        <div><span>Pokémon Caught</span><strong>${details.pokemonCaught.toLocaleString()}</strong></div>
-                        <div><span>Distance Walked</span><strong>${details.kmWalked.toFixed(1)} km</strong></div>
-                        <div><span>PokéStops Visited</span><strong>${details.pokestopsVisited.toLocaleString()}</strong></div>
-                    </div>
-                    
-                    <h3>Highlights</h3>
-                    <div id="modal-pokemon-container">
-                        ${details.highlights.map(p => {
-                            const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
-                            return `<div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                                        <img src="${p.sprite}" alt="${p.name}" loading="lazy">
-                                        <p class="pokemon-name">${p.name}</p>
-                                        <p class="pokemon-cp">CP ${p.cp}</p>
-                                    </div>`;
-                        }).join('')}
-                    </div>
-                `;
-                modalBackdrop.classList.remove('hidden');
-                document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
+    try {
+        const response = await fetch('/api/rankings');
+        if (!response.ok) throw new Error('Failed to load rankings.');
+        const rankings = await response.json();
+
+        // 1. Populate Recent Players table
+        const recentBody = document.getElementById('recent-players-body');
+        recentBody.innerHTML = rankings.recentPlayers.map(player => `
+            <tr class="clickable-row" data-player-id="${player.playerId}">
+                <td><strong>${player.name}</strong></td>
+                <td>
+                    ${player.buddy ? `<img src="${player.buddy.sprite}" alt="${player.buddy.name}" title="${player.buddy.name}">` : 'N/A'}
+                </td>
+                <td>${player.kmWalked} km</td>
+                <td>${player.pokemonCaught.toLocaleString()}</td>
+            </tr>
+        `).join('');
+
+        // 2. Populate Strongest Pokémon table
+        const strongestBody = document.getElementById('strongest-pokemon-body');
+        strongestBody.innerHTML = rankings.strongestPokemon.map((p, index) => `
+            <tr class="clickable-row" data-player-id="${p.ownerId}">
+                <td>${index + 1}</td>
+                <td class="pokemon-cell">
+                    <img src="${p.sprite}" alt="${p.name}">
+                    <span>${p.name}</span>
+                </td>
+                <td><strong>${p.cp.toLocaleString()}</strong></td>
+                <td>${p.owner}</td>
+            </tr>
+        `).join('');
+
+        // 3. Populate Rarest Pokémon list
+        const rarestList = document.getElementById('rarest-pokemon-list');
+        rarestList.innerHTML = rankings.rarestPokemon.map(p => `
+            <div class="list-row clickable-row" data-player-id="${p.ownerId}">
+                <div class="pokemon-cell">
+                    <img src="${p.sprite}" alt="${p.name}">
+                    <span>${p.name}</span>
+                </div>
+                <div class="badges-cell">
+                    ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
+                    ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
+                    ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
+                </div>
+                <div class="owner-cell">${p.owner}</div>
+            </div>
+        `).join('');
+
+        // 4. Add event listeners to all clickable rows
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const playerId = row.dataset.playerId;
+                if (playerId) {
+                    openPlayerModal(playerId);
+                }
             });
         });
 
+        loadingMessage.classList.add('hidden');
+        rankingsGrid.classList.remove('hidden');
+
     } catch (error) {
-        console.error(error);
-        playerGrid.innerHTML = '<div class="card"><p>Could not load player data.</p></div>';
+        console.error('Failed to load rankings:', error);
+        loadingMessage.innerHTML = '<p>Could not load ranking data.</p>';
     }
 
     modalBackdrop.addEventListener('click', (e) => {
