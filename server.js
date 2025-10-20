@@ -151,11 +151,21 @@ app.get('/api/rankings', async (req, res) => {
         const folderPath = path.join(__dirname, DATA_FOLDER);
         await fs.access(folderPath);
         const files = await fs.readdir(folderPath);
+        const playerFiles = files.filter(f => f.endsWith('.json'));
+
+        const totalPlayers = playerFiles.length;
+        if (totalPlayers === 0) {
+            return res.json({ recentPlayers: [], strongestPokemon: [], rarestPokemon: [] });
+        }
 
         let allPokemon = [];
         let recentPlayers = [];
+        let shinyOwners = new Set();
+        let luckyOwners = new Set();
+        let perfectOwners = new Set();
+        let maxCpOwners = new Set();
 
-        for (const file of files.filter(f => f.endsWith('.json'))) {
+        for (const file of playerFiles) {
             const filePath = path.join(folderPath, file);
             const stats = await fs.stat(filePath);
             const content = JSON.parse(await fs.readFile(filePath, 'utf-8'));
@@ -163,64 +173,55 @@ app.get('/api/rankings', async (req, res) => {
             if (!content.account || !content.player || !content.pokemons) continue;
 
             const playerName = content.account.name;
-            const playerId = content.account.playerSupportId; // Get the Player ID
+            const playerId = content.account.playerSupportId;
 
-            // 1. Gather Data for Recent Players
+            // --- 1. Gather Data for Recent Players ---
             const buddy = content.pokemons.find(p => p.id === content.account.buddyPokemonProto?.buddyPokemonId);
             recentPlayers.push({
-                name: playerName,
-                playerId: playerId, // Include playerId here
-                buddy: buddy ? {
-                    name: pokedexService.getPokemonName(buddy.pokemonId, buddy.pokemonDisplay.formName),
-                    sprite: pokedexService.getPokemonSprite(buddy)
-                } : null,
+                name: playerName, playerId,
+                buddy: buddy ? { sprite: pokedexService.getPokemonSprite(buddy) } : null,
                 kmWalked: content.player.kmWalked.toFixed(1),
                 pokemonCaught: content.player.numPokemonCaptured,
                 lastUpdate: stats.mtimeMs
             });
 
-            // 2 & 3. Gather all Pokémon for ranking, now with playerId
+            // --- 2 & 3. Gather all Pokémon and check for rarity attributes ---
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
                     const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
-                    const rarityScore = (p.pokemonDisplay.shiny * 10) + (p.isLucky * 5) + (getIvPercent() >= 100 ? 8 : 0);
-                    allPokemon.push({ ...p, owner: playerName, ownerId: playerId, rarityScore }); // Add ownerId
+                    
+                    if (p.pokemonDisplay.shiny) shinyOwners.add(playerName);
+                    if (p.isLucky) luckyOwners.add(playerName);
+                    if (getIvPercent() >= 100) perfectOwners.add(playerName);
+                    
+                    const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
+                    if (pokedexEntry && p.cp >= (pokedexEntry.stats.attack * 2)) { // Simplified max CP check
+                        maxCpOwners.add(playerName);
+                    }
+
+                    allPokemon.push({ ...p, owner: playerName, ownerId: playerId });
                 }
             });
         }
+        
+        // --- Process Rankings ---
+        const sortedRecentPlayers = recentPlayers.sort((a, b) => b.lastUpdate - a.lastUpdate).slice(0, 50);
+        
+        const strongestPokemon = [...allPokemon].sort((a, b) => b.cp - a.cp).slice(0, 50).map(p => ({
+            name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+            sprite: pokedexService.getPokemonSprite(p),
+            cp: p.cp, owner: p.owner, ownerId: p.ownerId
+        }));
+        
+        // --- NEW Rarity Showcase Data ---
+        const rarityShowcase = [
+            { attribute: 'Shiny', percentage: (shinyOwners.size / totalPlayers) * 100, owners: Array.from(shinyOwners).slice(0, 5) },
+            { attribute: 'Lucky', percentage: (luckyOwners.size / totalPlayers) * 100, owners: Array.from(luckyOwners).slice(0, 5) },
+            { attribute: 'Perfect IVs', percentage: (perfectOwners.size / totalPlayers) * 100, owners: Array.from(perfectOwners).slice(0, 5) },
+            { attribute: 'Max CP', percentage: (maxCpOwners.size / totalPlayers) * 100, owners: Array.from(maxCpOwners).slice(0, 5) }
+        ];
 
-        // --- Process and Sort Rankings ---
-
-        const sortedRecentPlayers = recentPlayers
-            .sort((a, b) => b.lastUpdate - a.lastUpdate)
-            .slice(0, 50);
-
-        const strongestPokemon = [...allPokemon]
-            .sort((a, b) => b.cp - a.cp)
-            .slice(0, 50)
-            .map(p => ({
-                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
-                sprite: pokedexService.getPokemonSprite(p),
-                cp: p.cp,
-                owner: p.owner,
-                ownerId: p.ownerId // Pass the ownerId to the frontend
-            }));
-
-        const rarestPokemonRanked = [...allPokemon]
-            .filter(p => p.rarityScore > 0)
-            .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
-            .slice(0, 50)
-            .map(p => ({
-                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
-                sprite: pokedexService.getPokemonSprite(p),
-                owner: p.owner,
-                ownerId: p.ownerId, // Pass the ownerId to the frontend
-                isShiny: p.pokemonDisplay.shiny,
-                isLucky: p.isLucky,
-                isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100) >= 100
-            }));
-            
-        res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked });
+        res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarityShowcase });
 
     } catch (error) {
         console.error("Error in /api/rankings:", error);

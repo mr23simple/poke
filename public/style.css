@@ -126,3 +126,38 @@ td img { width: 36px; height: 36px; }
 .sort-bar select, .sort-bar button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; background-color: white; }
 .sort-bar button { cursor: pointer; font-weight: bold; }
 #all-pokemon-list, #modal-pokemon-container { overflow-y: auto; padding: 10px; }
+
+#rarity-showcase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.rarity-item {
+    display: flex;
+    flex-direction: column;
+}
+.rarity-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+.rarity-attribute { font-weight: bold; }
+.rarity-percentage { color: #6c757d; }
+.rarity-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.rarity-bar-fill {
+    height: 100%;
+    background-color: var(--team-instinct);
+    border-radius: 5px;
+}
+.rarity-owners {
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #6c757d;
+}
