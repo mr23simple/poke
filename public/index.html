@@ -12,13 +12,17 @@
         <a href="/login.html" class="login-button">Player Login</a>
     </header>
 
-    <main id="player-grid" class="dashboard-container">
+    <div class="container">
+        <main id="player-grid">
+            <!-- Player cards will be inserted here by public.js -->
         </main>
+    </div>
     
+    <!-- Modal for detailed view -->
     <div id="modal-backdrop" class="hidden">
         <div id="modal-content" class="card">
-            <button id="modal-close-btn">&times;</button>
-            </div>
+            <!-- Modal content will be inserted here by public.js -->
+        </div>
     </div>
 
     <script src="/scripts/public.js"></script>

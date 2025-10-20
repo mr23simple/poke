@@ -24,7 +24,6 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
-
 header {
     padding: 15px 20px;
     background-color: white;
@@ -38,43 +37,63 @@ header {
 header h1 { margin: 0; font-size: 1.5em; }
 header .login-button, header a[href="/logout"] { position: absolute; right: 20px; padding: 8px 16px; background-color: #333; color: white; text-decoration: none; border-radius: 8px; font-size: 0.9em; }
 
-/* --- Card Styles --- */
+/* --- General Card & Component Styles --- */
 .card { background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
 h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-color); margin-bottom: 20px; }
 .grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; text-align: center; }
 .grid-stats div span { display: block; color: #555; font-size: 0.9em; }
 .grid-stats div strong { font-size: 1.2em; }
 
-/* --- Public Dashboard Player Grid --- */
-#player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.player-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-.player-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-.player-card .recent-catch { display: flex; align-items: center; gap: 10px; margin-top: 15px; font-size: 0.9em; color: #555; }
-.player-card .recent-catch img { width: 40px; height: 40px; }
+/* --- Login & Register Forms --- */
+.form-container { max-width: 450px; margin: 40px auto; }
+.form-container h2 { text-align: center; margin-bottom: 10px; font-size: 1.2em; border: none; }
+.form-container p { text-align: center; margin-bottom: 25px; font-size: 0.9em; color: #666; }
+.form-container form { display: flex; flex-direction: column; gap: 15px; }
+.form-container input { padding: 12px 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 1em; }
+.form-container input:focus { outline: none; border-color: var(--team-instinct); box-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
+.form-container button[type="submit"] { padding: 12px; border: none; border-radius: 8px; background-color: #333; color: white; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+.form-container button[type="submit"]:hover { background-color: #555; }
+.form-container a { display: block; margin-top: 20px; text-align: center; color: var(--team-mystic); text-decoration: none; }
+.tab-buttons { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+.tab-button { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; border-bottom: 3px solid transparent; font-size: 0.9em; }
+.tab-button.active { font-weight: bold; border-bottom: 3px solid var(--team-instinct); background: white; }
+.form-content.hidden { display: none; }
 
-/* --- Private Dashboard --- */
-#trainer-summary .grid-stats { margin-top: 20px; }
+/* --- Public Dashboard Player Grid --- */
+#player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.player-card { padding: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; overflow: hidden; }
+.player-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+.player-card-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+.player-card-header h3 { margin: 0; font-size: 1.2em; }
+.player-card-header span { font-weight: bold; }
+.player-card-body { padding: 20px; text-align: center; flex-grow: 1; }
+.player-card-body img { width: 96px; height: 96px; margin-bottom: 10px; }
+.player-card-body p, .player-card-body small { margin: 0; }
+.player-card-footer { background: rgba(0,0,0,0.2); padding: 10px; text-align: center; font-size: 0.9em; }
+
+/* --- Private Dashboard Layout --- */
+.dashboard-container { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px; }
+#trainer-summary { flex: 1 1 35%; order: 1; }
+#item-summary { flex: 1 1 25%; order: 2; }
+#pokemon-summary { flex: 1 1 40%; order: 3; }
 .trainer-info { display: flex; align-items: center; gap: 15px; }
-.team-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+.team-logo { width: 60px; height: 60px; border-radius: 50%; }
 #trainerLevel { font-size: 1.5em; font-weight: bold; }
 .xp-bar-container { width: 100%; background-color: #e9ecef; border-radius: 10px; margin-top: 15px; }
-.xp-bar { height: 20px; background-color: #4caf50; border-radius: 10px; width: 0%; transition: width 0.5s ease-in-out; }
+.xp-bar { height: 20px; background-color: #4caf50; border-radius: 10px; transition: width 0.5s ease-in-out; }
 .xp-text { font-size: 0.8em; color: #555; text-align: center; margin-top: 5px; }
 
-/* --- Item Grid --- */
+/* --- Item & Pokémon Grids --- */
 .item-category-header { font-size: 0.9em; text-transform: uppercase; margin-top: 20px; margin-bottom: 10px; color: #6c757d; font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #eee; }
 #item-summary > div:first-of-type > h3 { margin-top: 0; }
 .item-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 15px; }
 .item-card { position: relative; width: 60px; height: 60px; background-color: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dee2e6; }
 .item-card img { width: 75%; height: 75%; object-fit: contain; }
 .item-count-badge { position: absolute; bottom: -5px; right: -5px; background-color: rgba(33, 37, 41, 0.8); color: white; border-radius: 10px; padding: 1px 6px; font-size: 0.75em; font-weight: bold; border: 1px solid white; }
-
-/* --- Pokémon Grids (Highlights & Modals) --- */
 .summary-header { display: flex; justify-content: space-between; align-items: center; }
 .summary-header h2 { border-bottom: none; margin-bottom: 10px; }
 #view-all-pokemon-btn { padding: 8px 16px; font-size: 0.9em; font-weight: bold; background-color: #e9e9e9; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
 #view-all-pokemon-btn:hover { background-color: #ddd; }
-
 #pokemon-highlights-container, #all-pokemon-list, #modal-pokemon-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
 .pokemon-card { border-radius: var(--border-radius); padding: 10px; text-align: center; background-color: #f1f1f1; color: #333; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
 .pokemon-card img { width: 72px; height: 72px; object-fit: contain; }
@@ -82,22 +101,10 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
 .pokemon-card.colored .pokemon-name, .pokemon-card.colored .pokemon-cp, .pokemon-card.colored small { color: white; }
 .pokemon-card.colored .iv-bar-container { background-color: rgba(255, 255, 255, 0.3); }
 .pokemon-card.colored .badge { text-shadow: none; border: 1px solid rgba(255, 255, 255, 0.5); }
-
-/* THIS IS THE FIX FOR THE WRAPPING BADGES */
-.pokemon-name {
-    font-weight: bold;
-    font-size: 0.9em;
-    margin: 5px 0;
-    display: inline-flex; /* Use inline-flex to keep items together */
-    flex-wrap: wrap;       /* Allow wrapping if the name is very long */
-    justify-content: center;
-    align-items: center;
-    gap: 4px;              /* Add a small space between name and badges */
-}
+.pokemon-name { font-weight: bold; font-size: 0.9em; margin: 5px 0; display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; }
 .pokemon-cp { font-size: 0.9em; }
 .pokemon-card small { font-size: 0.75em; }
-
-.badge { font-size: 0.7em; padding: 2px 6px; border-radius: 10px; color: white; flex-shrink: 0; /* Prevents badges from shrinking */ }
+.badge { font-size: 0.7em; padding: 2px 6px; border-radius: 10px; color: white; flex-shrink: 0; }
 .shiny-badge { background-color: #d4af37; }
 .lucky-badge { background-color: #ff69b4; }
 .perfect-badge { background-color: #e74c3c; }
@@ -116,18 +123,3 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
 .sort-bar select, .sort-bar button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1em; background-color: white; }
 .sort-bar button { cursor: pointer; font-weight: bold; }
 #all-pokemon-list, #modal-pokemon-container { overflow-y: auto; padding: 10px; }
-
-/* --- Login & Register Forms --- */
-.form-container { max-width: 450px; margin: 80px auto; padding: 20px 30px 30px 30px; }
-.form-container h2 { text-align: center; margin-bottom: 10px; }
-.form-container p { text-align: center; margin-bottom: 25px; font-size: 0.9em; color: #666; }
-.form-container form { display: flex; flex-direction: column; gap: 15px; }
-.form-container input { padding: 12px 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 1em; }
-.form-container input:focus { outline: none; border-color: var(--team-instinct); box-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
-.form-container button[type="submit"] { padding: 12px; border: none; border-radius: 8px; background-color: #333; color: white; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
-.form-container button[type="submit"]:hover { background-color: #555; }
-.form-container a { display: block; margin-top: 20px; text-align: center; color: var(--team-mystic); text-decoration: none; }
-.tab-buttons { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-.tab-button { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; border-bottom: 3px solid transparent; }
-.tab-button.active { font-weight: bold; border-bottom: 3px solid var(--team-instinct); background: white; }
-.form-content.hidden { display: none; }

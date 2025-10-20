@@ -5,38 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - P-GO Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .login-container { max-width: 400px; margin: 100px auto; text-align: center; }
-        .login-container input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; }
-        .login-container button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #333; color: white; font-size: 1em; cursor: pointer; }
-        .login-container a { display: block; margin-top: 15px; }
-        .tab-buttons { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .tab-button { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab-button.active { font-weight: bold; border-bottom: 3px solid var(--team-instinct); background: white; }
-        .form-content.hidden { display: none; }
-    </style>
 </head>
 <body>
-    <div class="form-container card">
-        <div class="tab-buttons">
-            <button class="tab-button active" onclick="showForm('credentials')">Username/Password</button>
-            <button class="tab-button" onclick="showForm('playerId')">Player ID</button>
+    <header>
+        <h1>Player Dashboard</h1>
+    </header>
+
+    <div class="container">
+        <div class="form-container card">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showForm('credentials')">Username/Password</button>
+                <button class="tab-button" onclick="showForm('playerId')">Player ID</button>
+            </div>
+    
+            <!-- Username/Password Login Form -->
+            <form id="form-credentials" class="form-content" action="/login" method="post">
+                <h2>Login with Credentials</h2>
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+    
+            <!-- Player ID Only Login Form -->
+            <form id="form-playerId" class="form-content hidden" action="/login" method="post">
+                <h2>Login with Player ID</h2>
+                <input type="text" name="playerId" placeholder="Player Support ID" required>
+                <button type="submit">Login</button>
+            </form>
+    
+            <a href="/register.html">Create a new account</a>
         </div>
-
-        <form id="form-credentials" class="form-content" action="/login" method="post">
-            <h2>Login with Credentials</h2>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-
-        <form id="form-playerId" class="form-content hidden" action="/login" method="post">
-            <h2>Login with Player ID</h2>
-            <input type="text" name="playerId" placeholder="Player Support ID" required>
-            <button type="submit">Login</button>
-        </form>
-
-        <a href="/register.html">Create a new account</a>
     </div>
 
     <script>

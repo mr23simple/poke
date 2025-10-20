@@ -155,35 +155,41 @@ app.get('/api/public-data', async (req, res) => {
         const playerSummaries = await Promise.all(
             files.filter(f => f.endsWith('.json')).map(async file => {
                 const content = JSON.parse(await fs.readFile(path.join(folderPath, file), 'utf-8'));
-                const recentPokemon = content.pokemons.filter(p => !p.isEgg).sort((a, b) => b.creationTimeMs - a.creationTimeMs)[0];
-                
-                // --- Start of new code ---
-                let typeColors = [];
-                if (recentPokemon) {
-                    const pokedexEntry = Object.values(pokedexService.pokedex[recentPokemon.pokemonId] || {})[0];
-                    typeColors = pokedexService.getPokemonTypeColors(pokedexEntry);
+
+                // --- Find Buddy Pokémon ---
+                const buddyPokemonId = content.account?.buddyPokemonProto?.buddyPokemonId;
+                let displayPokemon = null;
+                if (buddyPokemonId) {
+                    displayPokemon = content.pokemons.find(p => p.id === buddyPokemonId);
                 }
-                // --- End of new code ---
+                // Fallback to highest CP Pokémon if no buddy is set
+                if (!displayPokemon) {
+                    displayPokemon = content.pokemons.filter(p => !p.isEgg).sort((a, b) => b.cp - a.cp)[0];
+                }
+                // ---
+
+                let displayPokemonInfo = { name: 'N/A', cp: 0, sprite: '', typeColors: [] };
+                if (displayPokemon) {
+                    const pokedexEntry = Object.values(pokedexService.pokedex[displayPokemon.pokemonId] || {})[0];
+                    displayPokemonInfo = {
+                        name: pokedexService.getPokemonName(displayPokemon.pokemonId, displayPokemon.pokemonDisplay.formName),
+                        cp: displayPokemon.cp,
+                        sprite: pokedexService.getPokemonSprite(displayPokemon)
+                    };
+                }
 
                 return {
                     name: content.account.name,
                     level: content.player.level,
                     team: content.account.team,
                     kmWalked: content.player.kmWalked.toFixed(1),
-                    recentCatch: {
-                        name: recentPokemon ? pokedexService.getPokemonName(recentPokemon.pokemonId, recentPokemon.pokemonDisplay.formName) : 'N/A',
-                        cp: recentPokemon?.cp || 0,
-                        sprite: recentPokemon ? pokedexService.getPokemonSprite(recentPokemon) : '',
-                        typeColors: typeColors // Add the new colors array here
-                    },
+                    displayPokemon: displayPokemonInfo, // This is now the buddy (or fallback)
                     playerId: content.account.playerSupportId
                 };
             })
         );
         res.json(playerSummaries);
-    } catch {
-        res.json([]);
-    }
+    } catch { res.json([]); }
 });
 
 app.get('/api/player-detail/:playerId', async (req, res) => {
@@ -192,26 +198,47 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
         const filePath = path.join(__dirname, DATA_FOLDER, `${path.basename(playerId)}.json`);
         const content = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
-        const getIvPercent = p => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
-        const sorted = content.pokemons.filter(p => !p.isEgg).sort((a, b) => b.cp - a.cp);
-        const highlightsRaw = [...sorted.filter(p => getIvPercent(p) === 100).slice(0, 2), ...sorted.filter(p => p.pokemonDisplay?.shiny).slice(0, 2), ...sorted.filter(p => p.isLucky).slice(0, 2), ...sorted.slice(0, 2)];
+        const allPokemon = content.pokemons.filter(p => !p.isEgg);
 
-        const highlights = [...new Set(highlightsRaw.map(p => p.id))]
-            .map(id => sorted.find(p => p.id === id))
-            .slice(0, 4)
-            .map(p => {
-                // --- Start of new code ---
-                const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
-                const typeColors = pokedexService.getPokemonTypeColors(pokedexEntry);
-                // --- End of new code ---
+        // --- NEW HIGHLIGHTS LOGIC ---
+        const highlights = [];
+        const addedIds = new Set();
 
-                return {
-                    cp: p.cp,
-                    name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
-                    sprite: pokedexService.getPokemonSprite(p),
-                    typeColors: typeColors // Add the new colors array here
-                };
-            });
+        // 1. Add Recently Caught
+        const recentlyCaught = [...allPokemon].sort((a, b) => b.creationTimeMs - a.creationTimeMs)[0];
+        if (recentlyCaught) {
+            highlights.push(recentlyCaught);
+            addedIds.add(recentlyCaught.id);
+        }
+
+        // 2. Add Latest Shiny (if it's not already the most recent catch)
+        const latestShiny = [...allPokemon].filter(p => p.pokemonDisplay?.shiny).sort((a, b) => b.creationTimeMs - a.creationTimeMs)[0];
+        if (latestShiny && !addedIds.has(latestShiny.id)) {
+            highlights.push(latestShiny);
+            addedIds.add(latestShiny.id);
+        }
+
+        // 3. Fill remaining slots with Strongest CP Pokémon
+        const strongest = [...allPokemon].sort((a, b) => b.cp - a.cp);
+        for (const pokemon of strongest) {
+            if (highlights.length >= 4) break;
+            if (!addedIds.has(pokemon.id)) {
+                highlights.push(pokemon);
+                addedIds.add(pokemon.id);
+            }
+        }
+        // --- END OF NEW HIGHLIGHTS LOGIC ---
+
+        // Enrich the selected highlights with names, sprites, and colors
+        const enrichedHighlights = highlights.map(p => {
+            const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
+            return {
+                cp: p.cp,
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                typeColors: pokedexService.getPokemonTypeColors(pokedexEntry)
+            };
+        });
 
         res.json({
             name: content.account.name,
@@ -220,7 +247,7 @@ app.get('/api/player-detail/:playerId', async (req, res) => {
             pokemonCaught: content.player.numPokemonCaptured,
             pokestopsVisited: content.player.pokeStopVisits,
             kmWalked: content.player.kmWalked,
-            highlights
+            highlights: enrichedHighlights // Send the new, curated list
         });
     } catch (error) {
         console.error("Error in /api/player-detail:", error);
