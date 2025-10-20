@@ -45,7 +45,14 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
 .grid-stats div span { display: block; color: #555; font-size: 0.9em; }
 .grid-stats div strong { font-size: 1.2em; }
 
-/* --- Trainer Summary --- */
+/* --- Public Dashboard Player Grid --- */
+#player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.player-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.player-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+.player-card .recent-catch { display: flex; align-items: center; gap: 10px; margin-top: 15px; font-size: 0.9em; color: #555; }
+.player-card .recent-catch img { width: 40px; height: 40px; }
+
+/* --- Private Dashboard --- */
 #trainer-summary .grid-stats { margin-top: 20px; }
 .trainer-info { display: flex; align-items: center; gap: 15px; }
 .team-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
@@ -75,10 +82,22 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
 .pokemon-card.colored .pokemon-name, .pokemon-card.colored .pokemon-cp, .pokemon-card.colored small { color: white; }
 .pokemon-card.colored .iv-bar-container { background-color: rgba(255, 255, 255, 0.3); }
 .pokemon-card.colored .badge { text-shadow: none; border: 1px solid rgba(255, 255, 255, 0.5); }
-.pokemon-name { font-weight: bold; font-size: 0.9em; margin: 5px 0; word-break: break-all; }
+
+/* THIS IS THE FIX FOR THE WRAPPING BADGES */
+.pokemon-name {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin: 5px 0;
+    display: inline-flex; /* Use inline-flex to keep items together */
+    flex-wrap: wrap;       /* Allow wrapping if the name is very long */
+    justify-content: center;
+    align-items: center;
+    gap: 4px;              /* Add a small space between name and badges */
+}
 .pokemon-cp { font-size: 0.9em; }
 .pokemon-card small { font-size: 0.75em; }
-.badge { font-size: 0.7em; padding: 2px 6px; border-radius: 10px; color: white; margin-left: 5px; vertical-align: middle; }
+
+.badge { font-size: 0.7em; padding: 2px 6px; border-radius: 10px; color: white; flex-shrink: 0; /* Prevents badges from shrinking */ }
 .shiny-badge { background-color: #d4af37; }
 .lucky-badge { background-color: #ff69b4; }
 .perfect-badge { background-color: #e74c3c; }
