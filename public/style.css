@@ -162,10 +162,17 @@ td img { width: 36px; height: 36px; }
     color: #6c757d;
 }
 
-.list-header, .list-row {
-    grid-template-columns: 1.5fr 1.2fr 0.8fr 1fr; /* 4 columns */
+.pokemon-cell div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
-.score-cell {
-    font-weight: bold;
-    font-size: 0.9em;
+
+.pokemon-cell .badges-cell {
+    flex-direction: row; /* Make badges horizontal in this context */
+    margin-top: 4px;
+}
+
+.shadow-badge {
+    background-color: #5A2D82; /* A dark purple for shadow */
 }

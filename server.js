@@ -146,10 +146,10 @@ app.post('/register', async (req, res) => {
     }
 });
 
+// --- Replace this entire route in server.js ---
 app.get('/api/rankings', async (req, res) => {
     try {
         const folderPath = path.join(__dirname, DATA_FOLDER);
-        await fs.access(folderPath);
         const files = await fs.readdir(folderPath);
         const playerFiles = files.filter(f => f.endsWith('.json'));
 
@@ -158,11 +158,11 @@ app.get('/api/rankings', async (req, res) => {
             return res.json({ recentPlayers: [], strongestPokemon: [], rarestPokemon: [] });
         }
 
-        let allPokemonForCpRank = [];
+        let allPokemon = [];
         let recentPlayers = [];
-        const pokemonOwnership = new Map(); // Tracks owners for each species/form
+        const speciesOwnership = new Map();
 
-        // --- First Pass: Collect all data and track ownership counts ---
+        // --- Pass 1: Aggregate all data ---
         for (const file of playerFiles) {
             const filePath = path.join(folderPath, file);
             const stats = await fs.stat(filePath);
@@ -173,72 +173,74 @@ app.get('/api/rankings', async (req, res) => {
             const playerName = content.account.name;
             const playerId = content.account.playerSupportId;
 
-            // Gather Recent Players
+            // Gather recent player data
             const buddy = content.pokemons.find(p => p.id === content.account.buddyPokemonProto?.buddyPokemonId);
-            recentPlayers.push({ name: playerName, playerId, buddy: buddy ? { sprite: pokedexService.getPokemonSprite(buddy) } : null, kmWalked: content.player.kmWalked.toFixed(1), pokemonCaught: content.player.numPokemonCaptured, lastUpdate: stats.mtimeMs });
+            recentPlayers.push({
+                name: playerName, playerId,
+                buddy: buddy ? { sprite: pokedexService.getPokemonSprite(buddy) } : null,
+                kmWalked: content.player.kmWalked.toFixed(1),
+                pokemonCaught: content.player.numPokemonCaptured,
+                lastUpdate: stats.mtimeMs
+            });
 
-            // Gather all Pokémon and update ownership map
+            // Gather all Pokémon and track species ownership
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
-                    allPokemonForCpRank.push({ ...p, owner: playerName, ownerId: playerId });
-
-                    const key = `${p.pokemonId}-${p.pokemonDisplay.formName}`;
-                    if (!pokemonOwnership.has(key)) {
-                        pokemonOwnership.set(key, new Set());
+                    allPokemon.push({ ...p, owner: playerName, ownerId: playerId });
+                    const speciesKey = `${p.pokemonId}-${p.pokemonDisplay.formName}`;
+                    if (!speciesOwnership.has(speciesKey)) {
+                        speciesOwnership.set(speciesKey, new Set());
                     }
-                    pokemonOwnership.get(key).add(playerId);
+                    speciesOwnership.get(speciesKey).add(playerId);
                 }
             });
         }
         
-        // --- Second Pass: Calculate score for each rare Pokémon ---
-        let scoredRarePokemon = [];
-        allPokemonForCpRank.forEach(p => {
+        // --- Pass 2: Calculate scores and rank Pokémon ---
+        const scoredPokemon = allPokemon.map(p => {
+            const isPerfect = (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15);
             const isShiny = p.pokemonDisplay.shiny;
             const isLucky = p.isLucky;
-            const isPerfect = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1;
+            const isShadow = p.pokemonDisplay.alignment === 1;
 
-            if (isShiny || isLucky || isPerfect) {
-                let score = 0;
-                const key = `${p.pokemonId}-${p.pokemonDisplay.formName}`;
-                const ownerCount = pokemonOwnership.get(key)?.size || 1;
-
-                // Apply scoring formula
-                score += 8 * (1 - (ownerCount / totalPlayers)); // Rarity score
-                if (isPerfect) score += 4;
-                if (isShiny) score += 2;
-                if (isLucky) score += 1;
-                score += p.cp / 5000; // CP score
-
-                scoredRarePokemon.push({ pokemon: p, score, owner: p.owner, ownerId: p.ownerId });
-            }
+            const speciesKey = `${p.pokemonId}-${p.pokemonDisplay.formName}`;
+            const numOwners = speciesOwnership.get(speciesKey)?.size || 1;
+            
+            // Your scoring formula
+            const ownershipScore = 16 * (1 - (numOwners / totalPlayers));
+            const perfectScore = isPerfect ? (8 + (4 * (p.cp / 5000))) : 0;
+            const shinyScore = isShiny ? 4 : 0;
+            const luckyScore = isLucky ? 2 : 0;
+            const shadowScore = isShadow ? 1 : 0;
+            
+            const totalScore = ownershipScore + perfectScore + shinyScore + luckyScore + shadowScore;
+            
+            return { ...p, totalScore, isPerfect, isShiny, isLucky, isShadow };
         });
 
-        // --- Process and Sort Final Rankings ---
+        // --- Process Final Rankings ---
         const sortedRecentPlayers = recentPlayers.sort((a, b) => b.lastUpdate - a.lastUpdate).slice(0, 50);
         
-        const strongestPokemon = [...allPokemonForCpRank].sort((a, b) => b.cp - a.cp).slice(0, 50).map(p => ({
+        const strongestPokemon = [...allPokemon].sort((a, b) => b.cp - a.cp).slice(0, 50).map(p => ({
             name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
             sprite: pokedexService.getPokemonSprite(p),
             cp: p.cp, owner: p.owner, ownerId: p.ownerId
         }));
         
-        const rarestPokemonRanked = scoredRarePokemon
-            .sort((a, b) => b.score - a.score)
+        const rarestPokemonRanked = scoredPokemon
+            .sort((a, b) => b.totalScore - a.totalScore)
             .slice(0, 50)
-            .map(item => {
-                const p = item.pokemon;
-                return {
-                    name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
-                    sprite: pokedexService.getPokemonSprite(p),
-                    isShiny: p.pokemonDisplay.shiny,
-                    isLucky: p.isLucky,
-                    isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
-                    score: item.score,
-                    owner: item.owner,
-                    ownerId: item.ownerId
-                };
-            });
+            .map(p => ({
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                owner: p.owner,
+                ownerId: p.ownerId,
+                totalScore: p.totalScore,
+                isShiny: p.isShiny,
+                isLucky: p.isLucky,
+                isPerfect: p.isPerfect,
+                isShadow: p.isShadow
+            }));
 
         res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked });
 

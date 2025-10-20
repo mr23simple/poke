@@ -31,21 +31,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- THIS IS THE UPDATED SECTION ---
         // 3. Populate Rarity Showcase list
-        const rarestList = document.getElementById('rarest-pokemon-list');
-        rarestList.innerHTML = rankings.rarestPokemon.map(p => `
-            <div class="list-row clickable-row" data-player-id="${p.ownerId}">
-                <div class="pokemon-cell">
+        const rarestBody = document.getElementById('rarest-pokemon-body');
+        rarestBody.innerHTML = rankings.rarestPokemon.map((p, index) => `
+            <tr class="clickable-row" data-player-id="${p.ownerId}">
+                <td>${index + 1}</td>
+                <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
-                    <span>${p.name}</span>
-                </div>
-                <div class="badges-cell">
-                    ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
-                    ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
-                    ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
-                </div>
-                <div class="score-cell">${p.score.toFixed(2)}</div>
-                <div class="owner-cell">${p.owner}</div>
-            </div>
+                    <div>
+                        <span>${p.name}</span>
+                        <div class="badges-cell">
+                            ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
+                            ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
+                            ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
+                            ${p.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
+                        </div>
+                    </div>
+                </td>
+                <td><strong>${p.totalScore.toFixed(2)}</strong></td>
+                <td>${p.owner}</td>
+            </tr>
         `).join('');
 
         // 4. Add event listeners
