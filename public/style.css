@@ -74,7 +74,7 @@ td img { width: 36px; height: 36px; }
 .list-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: 10px; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; }
 .list-row:last-child { border-bottom: none; }
 .list-row:hover { background-color: #f8f9fa; }
-.owner-cell { font-size: 0.9em; }
+/* .owner-cell { font-size: 0.9em; } */
 .pokemon-cell { display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
 .pokemon-cell img { width: 36px; height: 36px; }
 .badges-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -162,17 +162,26 @@ td img { width: 36px; height: 36px; }
     color: #6c757d;
 }
 
-.pokemon-cell div {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+/* Add a new badge color for Shadow Pokémon */
+.badge.shadow-badge {
+    background-color: #5A2D82; /* Dark purple */
 }
 
-.pokemon-cell .badges-cell {
-    flex-direction: row; /* Make badges horizontal in this context */
-    margin-top: 4px;
+/* Update the grid layout for the rare list */
+.list-header.rare-header, .list-row.rare-row {
+    grid-template-columns: 1.5fr 1fr 0.7fr 1.5fr; /* 4 columns with new sizes */
 }
 
-.shadow-badge {
-    background-color: #5A2D82; /* A dark purple for shadow */
+.score-cell {
+    font-size: 0.9em;
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.owner-cell {
+    font-size: 0.8em;
+    color: #6c757d;
+    white-space: normal; /* Allow owner list to wrap */
+    line-height: 1.4;
 }
