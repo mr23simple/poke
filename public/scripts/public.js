@@ -31,19 +31,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- THIS IS THE UPDATED SECTION ---
         // 3. Populate Rarity Showcase list
-        const rarityList = document.getElementById('rarity-showcase-list');
-        rarityList.innerHTML = rankings.rarityShowcase.map(item => `
-            <div class="rarity-item">
-                <div class="rarity-header">
-                    <span class="rarity-attribute">${item.attribute}</span>
-                    <span class="rarity-percentage">${item.percentage.toFixed(1)}%</span>
+        const rarestList = document.getElementById('rarest-pokemon-list');
+        rarestList.innerHTML = rankings.rarestPokemon.map(p => `
+            <div class="list-row">
+                <div class="pokemon-cell">
+                    <img src="${p.sprite}" alt="${p.name}">
+                    <span>${p.name}</span>
                 </div>
-                <div class="rarity-bar">
-                    <div class="rarity-bar-fill" style="width: ${item.percentage}%"></div>
+                <div class="badges-cell">
+                    ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
+                    ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
+                    ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                 </div>
-                <div class="rarity-owners">
-                    <small>Owned by: ${item.owners.join(', ')}${item.owners.length > 0 ? '...' : 'None'}</small>
-                </div>
+                <div class="owner-cell"><strong>${p.ownershipPercentage.toFixed(2)}%</strong></div>
             </div>
         `).join('');
 

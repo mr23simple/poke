@@ -160,10 +160,7 @@ app.get('/api/rankings', async (req, res) => {
 
         let allPokemon = [];
         let recentPlayers = [];
-        let shinyOwners = new Set();
-        let luckyOwners = new Set();
-        let perfectOwners = new Set();
-        let maxCpOwners = new Set();
+        const rarePokemonTracker = new Map();
 
         for (const file of playerFiles) {
             const filePath = path.join(folderPath, file);
@@ -175,7 +172,7 @@ app.get('/api/rankings', async (req, res) => {
             const playerName = content.account.name;
             const playerId = content.account.playerSupportId;
 
-            // --- 1. Gather Data for Recent Players ---
+            // --- 1. Gather Recent Players ---
             const buddy = content.pokemons.find(p => p.id === content.account.buddyPokemonProto?.buddyPokemonId);
             recentPlayers.push({
                 name: playerName, playerId,
@@ -185,21 +182,25 @@ app.get('/api/rankings', async (req, res) => {
                 lastUpdate: stats.mtimeMs
             });
 
-            // --- 2 & 3. Gather all Pokémon and check for rarity attributes ---
+            // --- 2 & 3. Gather Pokémon for CP ranking and Rarity tracking ---
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
-                    const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
-                    
-                    if (p.pokemonDisplay.shiny) shinyOwners.add(playerName);
-                    if (p.isLucky) luckyOwners.add(playerName);
-                    if (getIvPercent() >= 100) perfectOwners.add(playerName);
-                    
-                    const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
-                    if (pokedexEntry && p.cp >= (pokedexEntry.stats.attack * 2)) { // Simplified max CP check
-                        maxCpOwners.add(playerName);
-                    }
-
                     allPokemon.push({ ...p, owner: playerName, ownerId: playerId });
+
+                    const isShiny = p.pokemonDisplay.shiny;
+                    const isLucky = p.isLucky;
+                    const isPerfect = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1;
+
+                    if (isShiny || isLucky || isPerfect) {
+                        const uniqueKey = `${p.pokemonId}-${p.pokemonDisplay.formName}-${isShiny}-${isLucky}-${isPerfect}`;
+                        if (!rarePokemonTracker.has(uniqueKey)) {
+                            rarePokemonTracker.set(uniqueKey, {
+                                pokemon: p,
+                                owners: new Set()
+                            });
+                        }
+                        rarePokemonTracker.get(uniqueKey).owners.add(playerId);
+                    }
                 }
             });
         }
@@ -213,15 +214,24 @@ app.get('/api/rankings', async (req, res) => {
             cp: p.cp, owner: p.owner, ownerId: p.ownerId
         }));
         
-        // --- NEW Rarity Showcase Data ---
-        const rarityShowcase = [
-            { attribute: 'Shiny', percentage: (shinyOwners.size / totalPlayers) * 100, owners: Array.from(shinyOwners).slice(0, 5) },
-            { attribute: 'Lucky', percentage: (luckyOwners.size / totalPlayers) * 100, owners: Array.from(luckyOwners).slice(0, 5) },
-            { attribute: 'Perfect IVs', percentage: (perfectOwners.size / totalPlayers) * 100, owners: Array.from(perfectOwners).slice(0, 5) },
-            { attribute: 'Max CP', percentage: (maxCpOwners.size / totalPlayers) * 100, owners: Array.from(maxCpOwners).slice(0, 5) }
-        ];
+        // --- NEW Rarity Showcase Logic ---
+        const rarestPokemonRanked = Array.from(rarePokemonTracker.values())
+            .map(item => {
+                const p = item.pokemon;
+                const ownershipPercentage = (item.owners.size / totalPlayers) * 100;
+                return {
+                    name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                    sprite: pokedexService.getPokemonSprite(p),
+                    isShiny: p.pokemonDisplay.shiny,
+                    isLucky: p.isLucky,
+                    isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
+                    ownershipPercentage: ownershipPercentage
+                };
+            })
+            .sort((a, b) => a.ownershipPercentage - b.ownershipPercentage) // Sort by lowest percentage (rarest)
+            .slice(0, 50);
 
-        res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarityShowcase });
+        res.json({ recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked });
 
     } catch (error) {
         console.error("Error in /api/rankings:", error);
