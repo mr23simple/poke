@@ -1,53 +1,157 @@
 let allPokemons = [];
-let pokemonVirtualList;
+let pokedexService = {};
+let pokemonVGrid; // This will hold the VGrid instance
 
 // --- HELPER FUNCTIONS ---
 function createBackgroundStyle(colors) {
-    if (!colors || colors.length === 0) {
-        return ''; // Will use default CSS background
-    }
-    if (colors.length === 1) {
-        return `background-color: ${colors[0]};`;
-    }
+    if (!colors || colors.length === 0) return '';
+    if (colors.length === 1) return `background-color: ${colors[0]};`;
     return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
 }
 
 function getIvColor(iv) {
-    if (iv == 100) return '#ff8000';      // Orange for 100%
-    if (iv >= 80) return '#2196f3';       // Blue for 80-99%
-    if (iv >= 60) return '#4caf50';       // Green for 60-79%
-    return '#6c757d';                    // Dark Gray for everything else
+    if (iv == 100) return '#ff8000';
+    if (iv >= 80) return '#2196f3';
+    if (iv >= 60) return '#4caf50';
+    return '#6c757d';
 }
 
-// --- MODAL AND EVENT LISTENERS ---
+// --- MAIN FUNCTION to Filter, Sort, and Render ---
+function filterAndSortAndRender() {
+    const searchInput = document.getElementById('search-bar').value.toLowerCase().trim();
+    const searchTerms = searchInput.split(',').map(term => term.trim()).filter(term => term);
+    
+    const getIvPercent = (p) => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
+
+    // 1. Filter Pokémon
+    const filteredPokemons = searchTerms.length > 0 ? allPokemons.filter(p => {
+        if (!p.pokemonDisplay) return false;
+        return searchTerms.every(term => {
+            const isNegated = term.startsWith('!');
+            const searchTerm = isNegated ? term.substring(1) : term;
+            let match = false;
+            
+            const types = (p.typeColors || []).map(color => {
+                for (const type in window.pokedexService.typeColorMap) {
+                    if (window.pokedexService.typeColorMap[type] === color) return type.toLowerCase();
+                }
+                return null;
+            }).filter(Boolean);
+
+            if (types.includes(searchTerm)) match = true;
+            else if ((p.name || '').toLowerCase().includes(searchTerm) || (p.nickname || '').toLowerCase().includes(searchTerm)) match = true;
+            else if (searchTerm === 'shiny' && p.pokemonDisplay.shiny) match = true;
+            else if (searchTerm === 'lucky' && p.isLucky) match = true;
+            else if (searchTerm === 'perfect' && getIvPercent(p) === '100.0') match = true;
+
+            return isNegated ? !match : match;
+        });
+    }) : allPokemons;
+
+    document.getElementById('pokemon-count').textContent = filteredPokemons.length;
+
+    // 2. Sort the filtered list
+    const sortBy = document.getElementById('sort-by').value;
+    const sortDirection = document.getElementById('sort-direction').dataset.direction;
+    let sortedPokemons = [...filteredPokemons];
+
+    sortedPokemons.sort((a, b) => {
+        switch (sortBy) {
+            case 'cp': return a.cp - b.cp;
+            case 'pokedex': return a.pokemonId - b.pokemonId;
+            case 'name': return (a.nickname || a.name).localeCompare(b.nickname || b.name);
+            default: return a.creationTimeMs - b.creationTimeMs;
+        }
+    });
+
+    if (sortDirection === 'desc') sortedPokemons.reverse();
+
+    // 3. Render the list using VGrid
+    const container = document.getElementById('all-pokemon-list');
+    
+    // This function defines how to create a single Pokémon card element
+    const cardRenderer = (p) => {
+        const card = document.createElement('div');
+        if (!p.pokemonDisplay) return card;
+
+        const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
+        let badges = '';
+        if (p.pokemonDisplay.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
+        if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
+        if (getIvPercent(p) === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
+        
+        card.className = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+        card.style.cssText = createBackgroundStyle(p.typeColors);
+        
+        card.innerHTML = `
+            <img src="${p.sprite}" alt="${displayName}" loading="lazy">
+            <p class="pokemon-name">${displayName} ${badges}</p>
+            <p class="pokemon-cp">CP ${p.cp}</p>
+            <div class="iv-bar-container">
+                <div class="iv-bar" style="width: ${getIvPercent(p)}%; background-color: ${getIvColor(getIvPercent(p))}"></div>
+            </div>
+            <small>${getIvPercent(p)}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>`;
+        return card;
+    };
+
+    if (pokemonVGrid) {
+        // If the grid already exists, just update its items
+        pokemonVGrid.items = sortedPokemons;
+    } else {
+        // If it's the first time, create the grid
+        pokemonVGrid = new VGrid(container, {
+            renderer: cardRenderer,
+            items: sortedPokemons
+        });
+    }
+}
+
+// --- EVENT LISTENERS & DASHBOARD POPULATION (Unchanged) ---
 function setupModalListeners() {
     const modalBackdrop = document.getElementById('modal-backdrop');
+    const sortBySelect = document.getElementById('sort-by');
+    const sortDirectionButton = document.getElementById('sort-direction');
+    const searchBar = document.getElementById('search-bar');
+    
+    const defaultSortDirections = { caughtTime: 'desc', cp: 'desc', pokedex: 'asc', name: 'asc' };
+
+    function setSortDirection(direction) {
+        sortDirectionButton.dataset.direction = direction;
+        sortDirectionButton.textContent = direction === 'desc' ? '▼ Desc' : '▲ Asc';
+    }
+
     document.getElementById('view-all-pokemon-btn').addEventListener('click', () => {
-        document.getElementById('pokemon-count').textContent = allPokemons.length;
-        sortAndRenderAllPokemon(); // Initial render of the list
+        const initialSort = sortBySelect.value;
+        setSortDirection(defaultSortDirections[initialSort]);
+        filterAndSortAndRender();
         modalBackdrop.classList.remove('hidden');
     });
+
     document.getElementById('modal-close-btn').addEventListener('click', () => modalBackdrop.classList.add('hidden'));
-    modalBackdrop.addEventListener('click', (e) => {
-        if (e.target === modalBackdrop) modalBackdrop.classList.add('hidden');
+    modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) modalBackdrop.classList.add('hidden'); });
+    
+    let searchTimeout;
+    searchBar.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => { filterAndSortAndRender(); }, 300);
     });
-    document.getElementById('sort-by').addEventListener('change', sortAndRenderAllPokemon);
-    document.getElementById('sort-direction').addEventListener('click', () => {
-        const button = document.getElementById('sort-direction');
-        const newDirection = button.dataset.direction === 'desc' ? 'asc' : 'desc';
-        button.dataset.direction = newDirection;
-        button.textContent = newDirection === 'desc' ? '▼ Desc' : '▲ Asc';
-        sortAndRenderAllPokemon();
+    
+    sortBySelect.addEventListener('change', () => {
+        setSortDirection(defaultSortDirections[sortBySelect.value]);
+        filterAndSortAndRender();
+    });
+    sortDirectionButton.addEventListener('click', () => {
+        const newDirection = sortDirectionButton.dataset.direction === 'desc' ? 'asc' : 'desc';
+        setSortDirection(newDirection);
+        filterAndSortAndRender();
     });
 }
 
-// --- DASHBOARD POPULATION ---
 function populateSummaryCards(data) {
-    const { account, player, items } = data;
+    const { account, player, items } = data.playerData;
     document.getElementById('trainerName').textContent = `My Dashboard: ${account.name}`;
-    document.getElementById('timestamp').textContent = `Data as of: ${data.time}`;
+    document.getElementById('timestamp').textContent = `Data as of: ${data.playerData.time}`;
 
-    // 1. Populate Trainer Summary
     const trainerSummary = document.getElementById('trainer-summary');
     trainerSummary.innerHTML = `<h2>Trainer Summary</h2><div class="trainer-info"><div id="teamLogo" class="team-logo"></div><div><strong id="trainerLevel"></strong></div></div><div class="xp-bar-container"><div id="xpBar" class="xp-bar"></div></div><p id="xpProgress" class="xp-text"></p><div class="grid-stats"><div><span>Stardust</span><strong id="stardustCount">0</strong></div><div><span>PokéCoins</span><strong id="pokecoinCount">0</strong></div><div><span>Pokémon Caught</span><strong id="pokemonCaught">0</strong></div><div><span>Pokédex Entries</span><strong id="pokedexEntries">0</strong></div><div><span>Distance Walked</span><strong id="kmWalked">0 km</strong></div><div><span>PokéStops Visited</span><strong id="pokestopVisits">0</strong></div></div>`;
     
@@ -65,7 +169,6 @@ function populateSummaryCards(data) {
     document.getElementById('kmWalked').textContent = `${parseFloat(player.kmWalked).toFixed(2)} km`;
     document.getElementById('pokestopVisits').textContent = player.pokeStopVisits.toLocaleString();
 
-    // 2. Populate Item Bag Grid
     const itemSummary = document.getElementById('item-summary');
     itemSummary.innerHTML = '<h2>Full Item Bag</h2>';
     const itemCategories = {
@@ -97,7 +200,6 @@ function populateSummaryCards(data) {
         }
     });
 
-    // 3. Populate Pokémon Highlights
     const highlightsContainer = document.getElementById('pokemon-highlights-container');
     highlightsContainer.innerHTML = '';
     const getIvPercent = (p) => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
@@ -115,81 +217,19 @@ function populateSummaryCards(data) {
     });
 }
 
-// --- MODAL POKEMON LIST RENDERING ---
-function sortAndRenderAllPokemon() {
-    const sortBy = document.getElementById('sort-by').value;
-    const sortDirection = document.getElementById('sort-direction').dataset.direction;
-    const container = document.getElementById('all-pokemon-list');
-    
-    let sortedPokemons = [...allPokemons];
-
-    sortedPokemons.sort((a, b) => {
-        switch (sortBy) {
-            case 'cp': return a.cp - b.cp;
-            case 'pokedex': return a.pokemonId - b.pokemonId;
-            case 'name': return (a.nickname || a.name).localeCompare(b.nickname || b.name);
-            default: return a.creationTimeMs - b.creationTimeMs;
-        }
-    });
-
-    if (sortDirection === 'desc') {
-        sortedPokemons.reverse();
-    }
-
-    // If the list already exists, just update its data and re-render.
-    if (pokemonVirtualList) {
-        pokemonVirtualList.updateData(sortedPokemons);
-    } else {
-        // If the list doesn't exist yet, create it for the first time.
-        pokemonVirtualList = new VirtualList({
-            container: container,
-            data: sortedPokemons,
-            
-            // This function tells the library how to render a SINGLE card
-            render: (p) => {
-                const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
-                const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
-                
-                let badges = '';
-                if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
-                if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
-                if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-                
-                const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
-
-                // Return the HTML for one card as a string
-                return `
-                    <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                        <img src="${p.sprite}" alt="${displayName}" loading="lazy">
-                        <p class="pokemon-name">${displayName} ${badges}</p>
-                        <p class="pokemon-cp">CP ${p.cp}</p>
-                        <div class="iv-bar-container">
-                            <div class="iv-bar" style="width: ${ivPercent}%; background-color: ${getIvColor(ivPercent)}"></div>
-                        </div>
-                        <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
-                    </div>
-                `;
-            }
-        });
-    }
-}
-
 // --- MAIN ENTRY POINT ---
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/private-data')
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.message || 'Could not load data.') });
-            }
-            return response.json();
-        })
-        .then(data => {
-            allPokemons = data.pokemons.filter(p => !p.isEgg);
-            populateSummaryCards(data);
+        .then(response => response.ok ? response.json() : Promise.reject('Could not load data'))
+        .then(responseData => {
+            const data = responseData.playerData;
+            window.pokedexService = { typeColorMap: responseData.pokedexService.typeColorMap };
+            allPokemons = data.pokemons.filter(p => !p.isEgg && p.pokemonId !== 0);
+            populateSummaryCards(responseData);
             setupModalListeners();
         })
         .catch(error => {
             console.error('Dashboard Error:', error);
-            document.querySelector('main').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
+            document.querySelector('.container').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
         });
 });

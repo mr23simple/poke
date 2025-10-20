@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/virtual-list"></script>
+    <script src="https://unpkg.com/v-grid@3.0.1/dist/v-grid.js"></script>
 </head>
 <body>
     <header>
@@ -40,14 +40,17 @@
             </div>
             
             <div class="sort-bar">
-                <label for="sort-by">Sort by:</label>
-                <select id="sort-by">
-                    <option value="caughtTime">Caught Time</option>
-                    <option value="cp">Combat Power</option>
-                    <option value="pokedex">Pokédex #</option>
-                    <option value="name">Name</option>
-                </select>
-                <button id="sort-direction" data-direction="desc">▼ Desc</button>
+                <input type="text" id="search-bar" placeholder="Search Pokémon...">
+                <div class="sort-controls">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by">
+                        <option value="caughtTime">Caught Time</option>
+                        <option value="cp">Combat Power</option>
+                        <option value="pokedex">Pokédex #</option>
+                        <option value="name">Name</option>
+                    </select>
+                    <button id="sort-direction" data-direction="desc">▼ Desc</button>
+                </div>
             </div>
 
             <div id="all-pokemon-list">

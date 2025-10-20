@@ -158,6 +158,24 @@ h2 {
 .tab-button { flex: 1; padding: 10px; background: #f0f0f0; border: none; cursor: pointer; border-bottom: 3px solid transparent; }
 .tab-button.active { font-weight: bold; border-bottom: 3px solid var(--team-instinct); background: white; }
 .form-content.hidden { display: none; }
+#search-bar {
+    flex-grow: 1; /* Make the search bar take up available space */
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    min-width: 150px; /* Prevent it from getting too small */
+}
+#search-bar:focus {
+    outline: none;
+    border-color: var(--team-instinct);
+    box-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
+}
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
 @media (min-width: 1024px) {
     .dashboard-container {
