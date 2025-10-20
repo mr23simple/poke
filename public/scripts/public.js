@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3. Populate Rarity Showcase list
         const rarestList = document.getElementById('rarest-pokemon-list');
         rarestList.innerHTML = rankings.rarestPokemon.map(p => `
-            <div class="list-row">
+            <div class="list-row clickable-row" data-player-id="${p.ownerId}">
                 <div class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
                     <span>${p.name}</span>
@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
                     ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                 </div>
-                <div class="owner-cell"><strong>${p.ownershipPercentage.toFixed(2)}%</strong></div>
+                <div class="score-cell">${p.score.toFixed(2)}</div>
+                <div class="owner-cell">${p.owner}</div>
             </div>
         `).join('');
 
