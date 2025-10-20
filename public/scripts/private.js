@@ -19,7 +19,6 @@ function getIvColor(iv) {
     return '#6c757d';                    // Dark Gray for everything else
 }
 
-
 // --- MODAL AND EVENT LISTENERS ---
 function setupModalListeners() {
     const modalBackdrop = document.getElementById('modal-backdrop');
@@ -41,7 +40,6 @@ function setupModalListeners() {
         sortAndRenderAllPokemon();
     });
 }
-
 
 // --- DASHBOARD POPULATION ---
 function populateSummaryCards(data) {
@@ -117,7 +115,6 @@ function populateSummaryCards(data) {
     });
 }
 
-
 // --- MODAL POKEMON LIST RENDERING ---
 function sortAndRenderAllPokemon() {
     const sortBy = document.getElementById('sort-by').value;
@@ -125,6 +122,7 @@ function sortAndRenderAllPokemon() {
     const container = document.getElementById('all-pokemon-list');
     
     let sortedPokemons = [...allPokemons];
+
     sortedPokemons.sort((a, b) => {
         switch (sortBy) {
             case 'cp': return a.cp - b.cp;
@@ -134,31 +132,47 @@ function sortAndRenderAllPokemon() {
         }
     });
 
-    if (sortDirection === 'desc') sortedPokemons.reverse();
-    container.innerHTML = '';
-    
-    sortedPokemons.forEach(p => {
-        const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
-        const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
-        let badges = '';
-        if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
-        if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
-        if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
-        const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+    if (sortDirection === 'desc') {
+        sortedPokemons.reverse();
+    }
 
-        container.innerHTML += `
-            <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
-                <img src="${p.sprite}" alt="${displayName}" loading="lazy">
-                <p class="pokemon-name">${displayName} ${badges}</p>
-                <p class="pokemon-cp">CP ${p.cp}</p>
-                <div class="iv-bar-container">
-                    <div class="iv-bar" style="width: ${ivPercent}%; background-color: ${getIvColor(ivPercent)}"></div>
-                </div>
-                <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
-            </div>`;
-    });
+    // If the list already exists, just update its data and re-render.
+    if (pokemonVirtualList) {
+        pokemonVirtualList.updateData(sortedPokemons);
+    } else {
+        // If the list doesn't exist yet, create it for the first time.
+        pokemonVirtualList = new VirtualList({
+            container: container,
+            data: sortedPokemons,
+            
+            // This function tells the library how to render a SINGLE card
+            render: (p) => {
+                const ivPercent = ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1);
+                const displayName = p.nickname ? `${p.nickname} (${p.name})` : p.name;
+                
+                let badges = '';
+                if (p.pokemonDisplay?.shiny) badges += '<span class="badge shiny-badge">Shiny</span>';
+                if (p.isLucky) badges += '<span class="badge lucky-badge">Lucky</span>';
+                if (ivPercent === '100.0') badges += '<span class="badge perfect-badge">Perfect</span>';
+                
+                const cardClass = p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+
+                // Return the HTML for one card as a string
+                return `
+                    <div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
+                        <img src="${p.sprite}" alt="${displayName}" loading="lazy">
+                        <p class="pokemon-name">${displayName} ${badges}</p>
+                        <p class="pokemon-cp">CP ${p.cp}</p>
+                        <div class="iv-bar-container">
+                            <div class="iv-bar" style="width: ${ivPercent}%; background-color: ${getIvColor(ivPercent)}"></div>
+                        </div>
+                        <small>${ivPercent}% (${p.individualAttack}/${p.individualDefense}/${p.individualStamina})</small>
+                    </div>
+                `;
+            }
+        });
+    }
 }
-
 
 // --- MAIN ENTRY POINT ---
 document.addEventListener('DOMContentLoaded', () => {
