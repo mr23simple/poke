@@ -69,6 +69,9 @@ const playerDataService = {
                         if (p.pokemonDisplay?.shadow) {
                             score += 1;
                         }
+                        if (p.pokemonDisplay?.purified) {
+                            score += 1.5;
+                        }
                         const pokedexEntry = getPokedexEntry(p);
                         if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
                             score += 8;
@@ -107,6 +110,7 @@ const playerDataService = {
                     isLucky: p.isLucky,
                     isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
                     isShadow: p.pokemonDisplay.shadow,
+                    isPurified: p.pokemonDisplay.purified,
                     isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
                     isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC'
                 }));
