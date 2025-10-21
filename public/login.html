@@ -6,45 +6,39 @@
     <title>Login - P-GO Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-header.css">
+    <style>
+        .or-separator {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+        }
+    </style>
 </head>
 <body class="dashboard-public">
     <div id="header-placeholder"></div>
-    
 
-    <div class="container">
-        <div class="form-container card">
-            <div class="tab-buttons">
-                <button class="tab-button active" onclick="showForm('credentials')">Username/Password</button>
-                <button class="tab-button" onclick="showForm('playerId')">Player ID</button>
-            </div>
-    
-            <!-- Username/Password Login Form -->
-            <form id="form-credentials" class="form-content" action="/login" method="post">
-                <h2>Login with Credentials</h2>
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-    
-            <!-- Player ID Only Login Form -->
-            <form id="form-playerId" class="form-content hidden" action="/login" method="post">
-                <h2>Login with Player ID</h2>
-                <input type="text" name="playerId" placeholder="Player Support ID" required>
-                <button type="submit">Login</button>
-            </form>
-    
-            <a href="/register.html">Create a new account</a>
-        </div>
+    <div class="form-container card">
+        <!-- Username/Password Login Form -->
+        <form id="form-credentials" class="form-content" action="/login" method="post">
+            <h2>Login with Credentials</h2>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="or-separator">OR</div>
+
+        <!-- Player ID Only Login Form -->
+        <form id="form-playerId" class="form-content" action="/login" method="post">
+            <h2>Login with Player ID</h2>
+            <input type="text" name="playerId" placeholder="Player Support ID" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <a href="/register.html">Create a new account</a>
     </div>
 
-    <script>
-        function showForm(formId) {
-            document.getElementById('form-credentials').classList.toggle('hidden', formId !== 'credentials');
-            document.getElementById('form-playerId').classList.toggle('hidden', formId !== 'playerId');
-            document.querySelector('.tab-button[onclick="showForm(\'credentials\')"]').classList.toggle('active', formId === 'credentials');
-            document.querySelector('.tab-button[onclick="showForm(\'playerId\')"]').classList.toggle('active', formId === 'playerId');
-        }
-    </script>
     <script src="/scripts/loadHeader.js"></script>
 </body>
 </html>

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mainTitle.textContent = 'Pokémon GO Player Dashboard';
                 const authStatus = await checkLoginStatus(); // Check login status
                 if (authStatus.loggedIn) {
-                    if (navHome) navHome.parentElement.style.display = 'block';
+                    if (navHome) navHome.parentElement.style.display = 'none';
                     if (navDashboard) navDashboard.parentElement.style.display = 'block';
                     // Hide login/register if logged in
                     if (navLogin) navLogin.parentElement.style.display = 'none';
@@ -59,10 +59,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mainTitle.textContent = 'Login';
                 if (navHome) navHome.parentElement.style.display = 'block';
                 if (navRegister) navRegister.parentElement.style.display = 'block';
-            } else if (path.includes('/me')) {
-                mainTitle.textContent = 'My Profile';
+            } else if (path.includes('/me') || path.includes('private.html')) {
+                const authStatus = await checkLoginStatus();
+                if (authStatus.loggedIn) {
+                    mainTitle.textContent = authStatus.username;
+                } else {
+                    mainTitle.textContent = 'My Profile';
+                }
                 if (navHome) navHome.parentElement.style.display = 'block';
-                if (navDashboard) navDashboard.parentElement.style.display = 'block';
+                if (navDashboard) navDashboard.parentElement.style.display = 'none';
                 if (navLogout) navLogout.parentElement.style.display = 'block';
             } else if (path.includes('register.html')) {
                 mainTitle.textContent = 'Register';

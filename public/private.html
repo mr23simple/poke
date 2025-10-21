@@ -46,7 +46,7 @@
                 <section class="card" id="item-summary">
                     <div class="summary-header">
                         <h2>Item Bag</h2>
-                        <button class="expand-btn" @click="itemsExpanded = !itemsExpanded">
+                        <button class="btn-secondary" @click="itemsExpanded = !itemsExpanded">
                             {{ itemsExpanded ? 'Collapse' : 'Expand All' }}
                         </button>
                     </div>
@@ -78,7 +78,7 @@
                 <section class="card" id="pokemon-summary">
                     <div class="summary-header">
                         <h2>Pokémon Highlights</h2>
-                        <button id="view-all-pokemon-btn" @click="showModal = true">View All</button>
+                        <button id="view-all-pokemon-btn" @click="showModal = true" class="btn-secondary">View All</button>
                     </div>
                     <div id="pokemon-highlights-container">
                         <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)">
