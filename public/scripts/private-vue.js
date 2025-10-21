@@ -1,12 +1,27 @@
+/**
+ * This script contains the complete Vue.js application logic for the private dashboard.
+ */
+
 const { createApp, ref, computed, onMounted } = Vue;
 
 // --- Global Helper Functions ---
+
+/**
+ * Creates the background style (solid color or gradient) for a Pokémon card.
+ * @param {string[]} colors - An array of hex color codes.
+ * @returns {string} The inline CSS style string.
+ */
 function createBackgroundStyle(colors) {
     if (!colors || colors.length === 0) return '';
     if (colors.length === 1) return `background-color: ${colors[0]};`;
     return `background: linear-gradient(135deg, ${colors[0]} 30%, ${colors[1]} 70%);`;
 }
 
+/**
+ * Gets the correct color for an IV bar based on the percentage.
+ * @param {number} iv - The IV percentage.
+ * @returns {string} The hex color code.
+ */
 function getIvColor(iv) {
     if (iv >= 100) return '#ff8000';
     if (iv >= 80) return '#2196f3';
@@ -15,6 +30,10 @@ function getIvColor(iv) {
 }
 
 // --- Vue Components ---
+
+/**
+ * A reusable grid component to display a list of Pokémon cards.
+ */
 const GridComponent = {
     props: ['pokemons'],
     template: `
@@ -41,6 +60,7 @@ const GridComponent = {
             return badgesHTML;
         },
         getCardClass(p) { return p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card'; },
+        // Make global helpers available in this component's template
         createBackgroundStyle,
         getIvColor
     }
@@ -52,7 +72,7 @@ createApp({
         'grid-component': GridComponent
     },
     setup() {
-        // --- State ---
+        // --- Reactive State ---
         const loading = ref(true);
         const allPokemons = ref([]);
         const account = ref({});
@@ -62,26 +82,31 @@ createApp({
         const showModal = ref(false);
         const searchQuery = ref('');
         const sortKey = ref('caughtTime');
+        const itemsExpanded = ref(false);
         const defaultSortDirections = { caughtTime: 'desc', cp: 'desc', pokedex: 'asc', name: 'asc' };
         const sortDirection = ref(defaultSortDirections.caughtTime);
 
-        // --- Computed Properties ---
+        // --- Computed Properties (Derived State) ---
+
         const teamColor = computed(() => {
             const teamColors = { 1: '#3498DB', 2: '#E74C3C', 3: '#F1C40F' };
             return teamColors[account.value.team] || '#ccc';
         });
+
         const xpPercentage = computed(() => {
             if (!player.value.nextLevelExp) return 0;
             const xpForLevel = player.value.nextLevelExp - player.value.prevLevelExp;
             const xpProgress = player.value.experience - player.value.prevLevelExp;
             return Math.max(0, (xpProgress / xpForLevel) * 100);
         });
+
         const xpProgressText = computed(() => {
              if (!player.value.nextLevelExp) return "0 / 0 XP";
             const xpForLevel = player.value.nextLevelExp - player.value.prevLevelExp;
             const xpProgress = player.value.experience - player.value.prevLevelExp;
             return `${Math.max(0, xpProgress).toLocaleString()} / ${xpForLevel.toLocaleString()} XP`;
         });
+
         const stardust = computed(() => account.value.currencyBalance?.find(c => c.currencyType === 'STARDUST')?.quantity || 0);
         const pokecoins = computed(() => account.value.currencyBalance?.find(c => c.currencyType === 'POKECOIN')?.quantity || 0);
         const getIvPercent = (p) => p ? ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1) : 0;
@@ -109,6 +134,10 @@ createApp({
             }, {});
         });
         
+        const totalPokeBalls = computed(() => (groupedItems.value['Poké Balls'] || []).reduce((total, item) => total + item.count, 0));
+        const totalPotions = computed(() => (groupedItems.value['Potions & Revives'] || []).filter(item => item.itemName.includes('Potion')).reduce((total, item) => total + item.count, 0));
+        const totalRevives = computed(() => (groupedItems.value['Potions & Revives'] || []).filter(item => item.itemName.includes('Revive')).reduce((total, item) => total + item.count, 0));
+
         const filteredPokemon = computed(() => {
             let pokemons = [...allPokemons.value];
             const searchTerms = searchQuery.value.toLowerCase().trim().split(',').map(term => term.trim()).filter(term => term);
@@ -119,7 +148,6 @@ createApp({
                         const isNegated = term.startsWith('!');
                         const searchTerm = isNegated ? term.substring(1) : term;
                         let match = false;
-                        
                         const types = (p.typeColors || []).map(color => {
                             for (const type in pokedexService.value.typeColorMap) {
                                 if (pokedexService.value.typeColorMap[type] === color) return type.toLowerCase();
@@ -152,7 +180,6 @@ createApp({
         const toggleSortDirection = () => { sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'; };
         const getItemSprite = (itemId) => `https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Bag/ic_item_${String(itemId).padStart(4, '0')}.png`;
         const getCardClass = (p) => p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
-        // THIS IS THE FIX: The getBadges function is now available to the main template
         const getBadges = (p, name) => {
             let badgesHTML = name;
             if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
@@ -181,11 +208,14 @@ createApp({
             }
         });
 
+        // --- Expose to Template ---
         return {
-            loading, account, player, items, showModal, searchQuery, sortKey, sortDirection,
+            loading, account, player, items, showModal, searchQuery, sortKey, sortDirection, itemsExpanded,
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
+            totalPokeBalls, totalPotions, totalRevives,
             toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges
         };
     }
 }).mount('#app');
+

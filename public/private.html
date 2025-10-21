@@ -16,61 +16,80 @@
             <a href="/logout">Logout</a>
         </header>
 
-        <!-- This will show a loading message until the data is ready -->
         <div v-if="loading" class="card">
             <p>Loading player data...</p>
         </div>
 
-        <!-- The main dashboard layout, shown only after data is loaded -->
-        <main v-else>
-            <section class="card" id="trainer-summary">
-                <h2>Trainer Summary</h2>
-                <div class="trainer-info">
-                    <div class="team-logo" :style="{ backgroundColor: teamColor }"></div>
-                    <div><strong>Lv. {{ player.level }}</strong></div>
-                </div>
-                <div class="xp-bar-container">
-                    <div class="xp-bar" :style="{ width: xpPercentage + '%' }"></div>
-                </div>
-                <p class="xp-text">{{ xpProgressText }}</p>
-                <div class="grid-stats">
-                    <div><span>Stardust</span><strong>{{ stardust.toLocaleString() }}</strong></div>
-                    <div><span>PokéCoins</span><strong>{{ pokecoins.toLocaleString() }}</strong></div>
-                    <div><span>Pokémon Caught</span><strong>{{ player.numPokemonCaptured?.toLocaleString() }}</strong></div>
-                    <div><span>Pokédex Entries</span><strong>{{ player.numUniquePokedexEntries?.toLocaleString() }}</strong></div>
-                    <div><span>Distance Walked</span><strong>{{ parseFloat(player.kmWalked || 0).toFixed(2) }} km</strong></div>
-                    <div><span>PokéStops Visited</span><strong>{{ player.pokeStopVisits?.toLocaleString() }}</strong></div>
-                </div>
-            </section>
+        <!-- The new two-column dashboard layout -->
+        <main v-else class="dashboard-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <section class="card" id="trainer-summary">
+                    <h2>Trainer Summary</h2>
+                    <div class="trainer-info">
+                        <div class="team-logo" :style="{ backgroundColor: teamColor }"></div>
+                        <div><strong>Lv. {{ player.level }}</strong></div>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar" :style="{ width: xpPercentage + '%' }"></div>
+                    </div>
+                    <p class="xp-text">{{ xpProgressText }}</p>
+                    <div class="grid-stats">
+                        <div><span>Stardust</span><strong>{{ stardust.toLocaleString() }}</strong></div>
+                        <div><span>PokéCoins</span><strong>{{ pokecoins.toLocaleString() }}</strong></div>
+                        <div><span>Pokémon Caught</span><strong>{{ player.numPokemonCaptured?.toLocaleString() }}</strong></div>
+                        <div><span>Pokédex Entries</span><strong>{{ player.numUniquePokedexEntries?.toLocaleString() }}</strong></div>
+                        <div><span>Distance Walked</span><strong>{{ parseFloat(player.kmWalked || 0).toFixed(2) }} km</strong></div>
+                        <div><span>PokéStops Visited</span><strong>{{ player.pokeStopVisits?.toLocaleString() }}</strong></div>
+                    </div>
+                </section>
 
-            <section class="card" id="item-summary">
-                <h2>Full Item Bag</h2>
-                <template v-for="category in itemCategoryOrder" :key="category">
-                    <div v-if="groupedItems[category]">
-                        <h3 class="item-category-header">{{ category }}</h3>
-                        <div class="item-grid-container">
-                            <div v-for="item in groupedItems[category]" :key="item.itemName" class="item-card">
-                                <img :src="getItemSprite(item.item)" :alt="item.itemName" loading="lazy" onerror="this.style.display='none'">
-                                <span class="item-count-badge">{{ item.count }}</span>
+                <section class="card" id="item-summary">
+                    <div class="summary-header">
+                        <h2>Item Bag</h2>
+                        <button class="expand-btn" @click="itemsExpanded = !itemsExpanded">
+                            {{ itemsExpanded ? 'Collapse' : 'Expand All' }}
+                        </button>
+                    </div>
+                    <!-- Collapsed View -->
+                    <div v-if="!itemsExpanded" class="item-summary-collapsed">
+                        <p><strong>Poké Balls:</strong> {{ totalPokeBalls.toLocaleString() }}</p>
+                        <p><strong>Potions:</strong> {{ totalPotions.toLocaleString() }}</p>
+                        <p><strong>Revives:</strong> {{ totalRevives.toLocaleString() }}</p>
+                    </div>
+                    <!-- Expanded View -->
+                    <div v-else>
+                        <template v-for="category in itemCategoryOrder" :key="category">
+                            <div v-if="groupedItems[category]">
+                                <h3 class="item-category-header">{{ category }}</h3>
+                                <div class="item-grid-container">
+                                    <div v-for="item in groupedItems[category]" :key="item.itemName" class="item-card">
+                                        <img :src="getItemSprite(item.item)" :alt="item.itemName" loading="lazy" onerror="this.style.display='none'">
+                                        <span class="item-count-badge">{{ item.count }}</span>
+                                    </div>
+                                </div>
                             </div>
+                        </template>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <section class="card" id="pokemon-summary">
+                    <div class="summary-header">
+                        <h2>Pokémon Highlights</h2>
+                        <button id="view-all-pokemon-btn" @click="showModal = true">View All</button>
+                    </div>
+                    <div id="pokemon-highlights-container">
+                        <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)">
+                            <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
+                            <p class="pokemon-name" v-html="getBadges(p, p.nickname || p.name)"></p>
+                            <p class="pokemon-cp">CP {{ p.cp }}</p>
                         </div>
                     </div>
-                </template>
-            </section>
-
-            <section class="card" id="pokemon-summary">
-                <div class="summary-header">
-                    <h2>Pokémon Highlights</h2>
-                    <button id="view-all-pokemon-btn" @click="showModal = true">View All</button>
-                </div>
-                <div id="pokemon-highlights-container">
-                    <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)">
-                        <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
-                        <p class="pokemon-name" v-html="getBadges(p, p.nickname || p.name)"></p>
-                        <p class="pokemon-cp">CP {{ p.cp }}</p>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
         
         <!-- Modal for the full Pokémon list -->
@@ -80,7 +99,6 @@
                     <h2>My Pokémon ({{ filteredPokemon.length }})</h2>
                     <button id="modal-close-btn" @click="showModal = false">&times;</button>
                 </div>
-                
                 <div class="sort-bar">
                     <input type="text" id="search-bar" placeholder="Search: shiny, electric, !legendary, etc." v-model="searchQuery">
                     <div class="sort-controls">
@@ -94,7 +112,6 @@
                         <button id="sort-direction" @click="toggleSortDirection">{{ sortDirection === 'desc' ? '▼ Desc' : '▲ Asc' }}</button>
                     </div>
                 </div>
-    
                 <grid-component :pokemons="filteredPokemon"></grid-component>
             </div>
         </div>
@@ -104,3 +121,4 @@
     <script src="/scripts/private-vue.js"></script>
 </body>
 </html>
+
