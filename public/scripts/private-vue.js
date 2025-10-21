@@ -78,7 +78,7 @@ createApp({
         const account = ref({});
         const player = ref({});
         const items = ref([]);
-        const pokedexService = ref({ typeColorMap: {} });
+        const pokedexService = ref({ typeColorMap: {}, pokedex: null });
         const showModal = ref(false);
         const searchQuery = ref('');
         const sortKey = ref('caughtTime');
@@ -111,11 +111,44 @@ createApp({
         const pokecoins = computed(() => account.value.currencyBalance?.find(c => c.currencyType === 'POKECOIN')?.quantity || 0);
         const getIvPercent = (p) => p ? ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1) : 0;
         
+        const getPokedexEntry = (p) => {
+            if (!pokedexService.value.pokedex || !pokedexService.value.pokedex[p.pokemonId]) return null;
+            const normalEntry = pokedexService.value.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.value.pokedex[p.pokemonId])[0];
+            if (!normalEntry) return null;
+            const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, ""), '').toUpperCase() || 'NORMAL';
+            return pokedexService.value.pokedex[p.pokemonId]?.[formKey] || normalEntry;
+        };
+
         const highlights = computed(() => {
             if (!allPokemons.value || allPokemons.value.length === 0) return [];
-            const sorted = [...allPokemons.value].sort((a, b) => b.cp - a.cp);
-            const uniqueHighlights = [...new Set([...sorted.filter(p => getIvPercent(p) >= 100), ...sorted.filter(p => p.pokemonDisplay?.shiny), ...sorted.filter(p => p.isLucky), ...sorted])];
-            return uniqueHighlights.slice(0, 8);
+
+            const getRarityScore = (p) => {
+                const ivPercent = getIvPercent(p);
+                let score = 0;
+                if (ivPercent >= 100) {
+                    score += 8 + 8 * (p.cp / 10000);
+                }
+                if (p.pokemonDisplay?.shiny) {
+                    score += 4;
+                }
+                if (p.isLucky) {
+                    score += 2;
+                }
+                if (p.pokemonDisplay?.shadow) {
+                    score += 1;
+                }
+                const pokedexEntry = getPokedexEntry(p);
+                if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
+                    score += 8;
+                }
+                return score;
+            };
+
+            const sorted = [...allPokemons.value]
+                .map(p => ({ ...p, rarityScore: getRarityScore(p) }))
+                .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp);
+
+            return sorted.slice(0, 9);
         });
         
         const itemCategoryOrder = ['Poké Balls', 'Potions & Revives', 'Berries', 'Special Items', 'Battle & TMs', 'Miscellaneous'];
@@ -158,6 +191,11 @@ createApp({
                         else if (searchTerm === 'shiny' && p.pokemonDisplay.shiny) match = true;
                         else if (searchTerm === 'lucky' && p.isLucky) match = true;
                         else if (searchTerm === 'perfect' && getIvPercent(p) >= 100) match = true;
+                        else if (searchTerm === 'shadow' && p.pokemonDisplay.shadow) match = true;
+                        else if (searchTerm === 'purified' && p.pokemonDisplay.purified) match = true;
+                        const pokedexEntry = getPokedexEntry(p);
+                        if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' && searchTerm === 'legendary') match = true;
+                        if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC' && searchTerm === 'mythical') match = true;
                         return isNegated ? !match : match;
                     });
                 });
@@ -185,6 +223,11 @@ createApp({
             if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
             if (p.isLucky) badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
             if (getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
+            if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
+            const pokedexEntry = getPokedexEntry(p);
+            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
+            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
             return badgesHTML;
         };
 
@@ -199,7 +242,7 @@ createApp({
                 account.value = responseData.playerData.account || {};
                 player.value = responseData.playerData.player || {};
                 items.value = responseData.playerData.items || [];
-                pokedexService.value = responseData.pokedexService || { typeColorMap: {} };
+                pokedexService.value = responseData.pokedexService || { typeColorMap: {}, pokedex: null };
 
                 // Update the main title with the player's name
                 const mainTitleElement = document.getElementById('main-title');

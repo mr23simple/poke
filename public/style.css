@@ -151,3 +151,7 @@ td img { width: 36px; height: 36px; }
         max-width: 600px;
     }
 }
+.shadow-badge { background-color: #5a2d82; }
+.purified-badge { background-color: #b3a1c8; }
+.legendary-badge { background-color: #d4af37; }
+.mythical-badge { background-color: #ff69b4; }
