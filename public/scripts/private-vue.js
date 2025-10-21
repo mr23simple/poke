@@ -200,6 +200,13 @@ createApp({
                 player.value = responseData.playerData.player || {};
                 items.value = responseData.playerData.items || [];
                 pokedexService.value = responseData.pokedexService || { typeColorMap: {} };
+
+                // Update the main title with the player's name
+                const mainTitleElement = document.getElementById('main-title');
+                if (mainTitleElement && account.value.name) {
+                    mainTitleElement.textContent = `${account.value.name}'s Profile`;
+                }
+
             } catch (error) {
                 console.error('Dashboard Error:', error);
                 document.querySelector('.container').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;

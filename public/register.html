@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - P-GO Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-header.css">
     </head>
-<body>
+<body class="dashboard-public">
+    <div id="header-placeholder"></div>
     <div class="form-container card">
         <h2>Create a Web Account</h2>
         <p style="font-size: 0.9em; color: #666;">You must upload your data from the PGSharp app at least once before you can register.</p>
@@ -18,5 +20,6 @@
         </form>
         <a href="/login.html">Already have an account? Login</a>
     </div>
+    <script src="/scripts/loadHeader.js"></script>
 </body>
 </html>

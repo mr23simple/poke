@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - P-GO Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-header.css">
 </head>
-<body>
-    <header>
-        <h1>Player Dashboard</h1>
-    </header>
+<body class="dashboard-public">
+    <div id="header-placeholder"></div>
+    
 
     <div class="container">
         <div class="form-container card">
@@ -45,5 +45,6 @@
             document.querySelector('.tab-button[onclick="showForm(\'playerId\')"]').classList.toggle('active', formId === 'playerId');
         }
     </script>
+    <script src="/scripts/loadHeader.js"></script>
 </body>
 </html>
