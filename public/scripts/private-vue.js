@@ -57,6 +57,8 @@ const GridComponent = {
             if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
             if (p.isLucky) badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
             if (this.getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
+            if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
             return badgesHTML;
         },
         getCardClass(p) { return p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card'; },

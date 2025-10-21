@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
                     ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                     ${p.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
+                    ${p.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
                     ${p.isLegendary ? '<span class="badge legendary-badge">Legendary</span>' : ''}
                     ${p.isMythical ? '<span class="badge mythical-badge">Mythical</span>' : ''}
                 </td>
