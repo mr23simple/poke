@@ -36,44 +36,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             const navDashboard = document.getElementById('nav-dashboard');
             const navLogout = document.getElementById('nav-logout');
 
-            // Determine current page and show relevant links
+            // Helper to set link visibility
+            const setLinkVisibility = (home = false, login = false, register = false, dashboard = false, logout = false) => {
+                if (navHome) navHome.parentElement.style.display = home ? 'block' : 'none';
+                if (navLogin) navLogin.parentElement.style.display = login ? 'block' : 'none';
+                if (navRegister) navRegister.parentElement.style.display = register ? 'block' : 'none';
+                if (navDashboard) navDashboard.parentElement.style.display = dashboard ? 'block' : 'none';
+                if (navLogout) navLogout.parentElement.style.display = logout ? 'block' : 'none';
+            };
+
             const path = window.location.pathname;
+            const authStatus = await checkLoginStatus();
 
             if (path === '/' || path.includes('index.html')) {
                 mainTitle.textContent = 'Pokémon GO Player Dashboard';
-                const authStatus = await checkLoginStatus(); // Check login status
                 if (authStatus.loggedIn) {
-                    if (navHome) navHome.parentElement.style.display = 'none';
-                    if (navDashboard) navDashboard.parentElement.style.display = 'block';
-                    // Hide login/register if logged in
-                    if (navLogin) navLogin.parentElement.style.display = 'none';
-                    if (navRegister) navRegister.parentElement.style.display = 'none';
+                    setLinkVisibility(false, false, false, true, true); // Dashboard, Logout
                 } else {
-                    if (navHome) navHome.parentElement.style.display = 'block';
-                    if (navLogin) navLogin.parentElement.style.display = 'block';
-                    if (navRegister) navRegister.parentElement.style.display = 'block';
-                    // Hide dashboard if not logged in
-                    if (navDashboard) navDashboard.parentElement.style.display = 'none';
+                    setLinkVisibility(false, true, true, false, false); // Login, Register
                 }
             } else if (path.includes('login.html')) {
                 mainTitle.textContent = 'Login';
-                if (navHome) navHome.parentElement.style.display = 'block';
-                if (navRegister) navRegister.parentElement.style.display = 'block';
-            } else if (path.includes('/me') || path.includes('private.html')) {
-                const authStatus = await checkLoginStatus();
-                if (authStatus.loggedIn) {
-                    mainTitle.textContent = authStatus.username;
-                } else {
-                    mainTitle.textContent = 'My Profile';
-                }
-                if (navHome) navHome.parentElement.style.display = 'block';
-                if (navDashboard) navDashboard.parentElement.style.display = 'none';
-                if (navLogout) navLogout.parentElement.style.display = 'block';
+                setLinkVisibility(true, false, true, false, false); // Home, Register
             } else if (path.includes('register.html')) {
                 mainTitle.textContent = 'Register';
-                if (navHome) navHome.parentElement.style.display = 'block';
-                if (navLogin) navLogin.parentElement.style.display = 'block';
-                if (navRegister) navRegister.parentElement.style.display = 'block';
+                setLinkVisibility(true, true, false, false, false); // Home, Login
+            } else if (path.includes('/me') || path.includes('private.html')) {
+                mainTitle.textContent = authStatus.loggedIn ? authStatus.username : 'My Profile';
+                setLinkVisibility(true, false, false, false, true); // Home, Logout
             }
             console.log('loadHeader.js: Dynamic link visibility logic completed.');
         } catch (error) {

@@ -31,9 +31,7 @@
     gap: 15px;
 }
 
-.main-header .header-nav li {
-    display: none;
-}
+
 
 .main-header .header-nav .nav-link,
 .main-header .header-nav .login-button {

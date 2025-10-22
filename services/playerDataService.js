@@ -1,20 +1,38 @@
 const fs = require('fs/promises');
 const path = require('path');
-const { DATA_PATH, DATA_FOLDER } = require('../config');
+const { DATA_PATH, DATA_FOLDER, RANKINGS_FILE } = require('../config');
 const pokedexService = require('./pokedexService');
 const { readUsers, writeUsers } = require('./userService');
 
 const playerDataService = {
 
-    async getRankings() {
+    async initializeRankings() {
+        try {
+            await fs.access(RANKINGS_FILE);
+            console.log('rankings.json already exists. Skipping initialization.');
+            return;
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                console.log('rankings.json not found. Initializing from player data files...');
+                await this.generateAndSaveRankings();
+            } else {
+                console.error('Error accessing rankings.json:', error);
+                throw error;
+            }
+        }
+    },
+
+    async generateAndSaveRankings() {
         try {
             await fs.access(DATA_PATH);
             const files = await fs.readdir(DATA_PATH);
-            const playerFiles = files.filter(f => f.endsWith('.json'));
+            const playerFiles = files.filter(f => f.endsWith('.json') && f !== 'PGSStats.json'); // Exclude PGSStats.json
 
             const totalPlayers = playerFiles.length;
             if (totalPlayers === 0) {
-                return { recentPlayers: [], strongestPokemon: [], rarestPokemon: [] };
+                const emptyRankings = { recentPlayers: [], strongestPokemon: [], rarestPokemon: [] };
+                await fs.writeFile(RANKINGS_FILE, JSON.stringify(emptyRankings, null, 2));
+                return emptyRankings;
             }
 
             let allPokemon = [];
@@ -24,7 +42,7 @@ const playerDataService = {
                 if (!pokedexService.pokedex || !pokedexService.pokedex[p.pokemonId]) return null;
                 const normalEntry = pokedexService.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.pokedex[p.pokemonId])[0];
                 if (!normalEntry) return null;
-                const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, ""), '').toUpperCase() || 'NORMAL';
+                const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[̀-ͯ]/g, ""), '').toUpperCase() || 'NORMAL';
                 return pokedexService.pokedex[p.pokemonId]?.[formKey] || normalEntry;
             };
 
@@ -115,11 +133,24 @@ const playerDataService = {
                     isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC'
                 }));
 
-            return { recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked };
+            const rankings = { recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked };
+            await fs.writeFile(RANKINGS_FILE, JSON.stringify(rankings, null, 2));
+            return rankings;
 
         } catch (error) {
-            console.error("Error in playerDataService.getRankings:", error);
+            console.error("Error in playerDataService.generateAndSaveRankings:", error);
             throw new Error('Server error processing rankings.');
+        }
+    },
+
+    async getRankings() {
+        await this.initializeRankings(); // Ensure rankings.json exists
+        try {
+            const rankingsContent = await fs.readFile(RANKINGS_FILE, 'utf-8');
+            return JSON.parse(rankingsContent);
+        } catch (error) {
+            console.error("Error reading rankings.json:", error);
+            throw new Error('Server error retrieving rankings.');
         }
     },
 
@@ -259,6 +290,9 @@ const playerDataService = {
             console.log(`- No user record found for ${playerId}. Creating new placeholder user.`);
         }
         await writeUsers(users);
+
+        // After saving individual player data, regenerate and save rankings
+        await this.generateAndSaveRankings();
 
         console.log(`✅ Data for '${name}' was saved successfully.`);
         return { success: true, message: 'Data saved and user profile updated.' };

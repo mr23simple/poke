@@ -1,0 +1,930 @@
+{
+  "recentPlayers": [
+    {
+      "name": "Pikapikurin",
+      "playerId": "05a889b28b5d0f9697f29f6906280ce4ffc7ffa7f128020aa772b8e99b0e7cc6",
+      "buddy": {
+        "name": "Grovyle",
+        "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm253.icon.png"
+      },
+      "kmWalked": "48.4",
+      "pokemonCaught": 1635,
+      "lastUpdate": 1761097686145.5247
+    },
+    {
+      "name": "mr23Rafu",
+      "playerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "buddy": {
+        "name": "Rayquaza",
+        "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png"
+      },
+      "kmWalked": "671.2",
+      "pokemonCaught": 25868,
+      "lastUpdate": 1761034778696.3208
+    }
+  ],
+  "strongestPokemon": [
+    {
+      "name": "Dialga",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm483.fORIGIN.icon.png",
+      "cp": 4613,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Groudon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm383.s.icon.png",
+      "cp": 4469,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 4336,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Regigigas",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm486.icon.png",
+      "cp": 4129,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Salamence",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm373.icon.png",
+      "cp": 4015,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rhyperior",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm464.g2.icon.png",
+      "cp": 3804,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Haxorus",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm612.icon.png",
+      "cp": 3731,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Florges",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm671.fBLUE.s.icon.png",
+      "cp": 3379,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Aggron",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm306.icon.png",
+      "cp": 3311,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Snorlax",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm143.icon.png",
+      "cp": 3246,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Darmanitan",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm555.fSTANDARD.icon.png",
+      "cp": 3125,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Togekiss",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm468.icon.png",
+      "cp": 3118,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Annihilape",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm979.icon.png",
+      "cp": 3035,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Mamoswine",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm473.g2.icon.png",
+      "cp": 3016,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Alakazam",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm65.g2.s.icon.png",
+      "cp": 2992,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Ursaluna",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm901.icon.png",
+      "cp": 2973,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Sneasler",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm903.icon.png",
+      "cp": 2877,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Hippowdon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm450.g2.icon.png",
+      "cp": 2865,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Skeledirge",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm911.icon.png",
+      "cp": 2854,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Incineroar",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm727.icon.png",
+      "cp": 2846,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Gallade",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm475.icon.png",
+      "cp": 2828,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Gyarados",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm130.g2.icon.png",
+      "cp": 2810,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Lucario",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm448.icon.png",
+      "cp": 2806,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Braviary",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm628.icon.png",
+      "cp": 2779,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Tyrantrum",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm697.icon.png",
+      "cp": 2771,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Emboar",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm500.icon.png",
+      "cp": 2769,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Latios",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm381.icon.png",
+      "cp": 2758,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Donphan",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm232.g2.icon.png",
+      "cp": 2755,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Arcanine",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm59.fHISUIAN.icon.png",
+      "cp": 2741,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Golem",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm76.icon.png",
+      "cp": 2738,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Cinderace",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm815.icon.png",
+      "cp": 2738,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Blaziken",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm257.g2.icon.png",
+      "cp": 2726,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2724,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2724,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2723,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "cp": 2721,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "cp": 2718,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2712,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "cp": 2706,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2700,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2700,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2699,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2697,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "cp": 2696,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "cp": 2694,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2694,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2694,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2693,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2690,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "cp": 2689,
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf"
+    }
+  ],
+  "rarestPokemon": [
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Regigigas",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm486.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Florges",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm671.fBLUE.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Alakazam",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm65.g2.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": true,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": true,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Groudon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm383.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Regigigas",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm486.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Regigigas",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm486.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Dialga",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm483.fORIGIN.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Groudon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm383.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Groudon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm383.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Dialga",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm483.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Rayquaza",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm384.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Deoxys",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm386.fSPEED.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": false,
+      "isMythical": true
+    },
+    {
+      "name": "Deoxys",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm386.fSPEED.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": false,
+      "isMythical": true
+    },
+    {
+      "name": "Deoxys",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm386.fATTACK.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": false,
+      "isMythical": true
+    },
+    {
+      "name": "Zapdos",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm145.fGALARIAN.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Deoxys",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm386.fDEFENSE.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": false,
+      "isMythical": true
+    },
+    {
+      "name": "Moltres",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm146.fGALARIAN.s.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": true,
+      "isLucky": false,
+      "isPerfect": false,
+      "isLegendary": true,
+      "isMythical": false
+    },
+    {
+      "name": "Kangaskhan",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm115.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": true,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Salamence",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm373.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Rhyperior",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm464.g2.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Haxorus",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm612.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Aggron",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm306.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Snorlax",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm143.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Darmanitan",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm555.fSTANDARD.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Togekiss",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm468.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Annihilape",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm979.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Ursaluna",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm901.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Sneasler",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm903.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Hippowdon",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm450.g2.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Skeledirge",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm911.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Incineroar",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm727.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Gallade",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm475.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Gyarados",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm130.g2.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Lucario",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm448.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Braviary",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm628.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Tyrantrum",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm697.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Emboar",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm500.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Donphan",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm232.g2.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    },
+    {
+      "name": "Arcanine",
+      "sprite": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Pokemon/Addressable%20Assets/pm59.fHISUIAN.icon.png",
+      "owner": "mr23Rafu",
+      "ownerId": "cc4caddad5da1579d7790fed15aaee339db3d22e850f59079a96200a0ff661bf",
+      "isShiny": false,
+      "isLucky": false,
+      "isPerfect": true,
+      "isLegendary": false,
+      "isMythical": false
+    }
+  ]
+}
