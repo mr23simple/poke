@@ -26,26 +26,42 @@ const playerDataService = {
             this.playerIdToPublicIdMap = new Map(parsedMap.playerIdToPublicIdMap);
         } catch (error) {
             if (error.code === 'ENOENT') {
-                console.log('publicIdMap.json not found. Initializing empty map.');
+                console.log('publicIdMap.json not found. Initializing from users.json.');
             } else {
-                try {
-                    const users = await readUsers();
-                    let mapUpdated = false;
-                    for (const user of users) {
-                        if (user.playerId && !this.playerIdToPublicIdMap.has(user.playerId)) {
-                            const newPublicId = uuidv4();
-                            this.publicIdMap.set(newPublicId, user.playerId);
-                            this.playerIdToPublicIdMap.set(user.playerId, newPublicId);
-                            mapUpdated = true;
+                console.error('Error reading or parsing publicIdMap.json. Re-initializing from users.json.', error);
+            }
+            
+            try {
+                const users = await readUsers();
+                let mapUpdated = false;
+                // Ensure maps are clean before regenerating
+                this.publicIdMap = new Map();
+                this.playerIdToPublicIdMap = new Map();
+
+                for (const user of users) {
+                    if (user.playerId) {
+                        const newPublicId = uuidv4();
+                        this.publicIdMap.set(newPublicId, user.playerId);
+                        this.playerIdToPublicIdMap.set(user.playerId, newPublicId);
+                        mapUpdated = true;
+                    }
+                }
+                if (mapUpdated) {
+                    await this.savePublicIdMap();
+                    console.log('publicIdMap regenerated from users.json.');
+
+                    // Force rankings regeneration by deleting the file
+                    try {
+                        await fs.unlink(RANKINGS_FILE);
+                        console.log('Deleted rankings.json to force regeneration.');
+                    } catch (unlinkError) {
+                        if (unlinkError.code !== 'ENOENT') {
+                            console.error('Error deleting rankings.json:', unlinkError);
                         }
                     }
-                    if (mapUpdated) {
-                        await this.savePublicIdMap();
-                        console.log('publicIdMap updated from users.json.');
-                    }
-                } catch (error) {
-                    console.error('Error updating publicIdMap from users.json:', error);
                 }
+            } catch (recoveryError) {
+                console.error('Failed to regenerate publicIdMap from users.json:', recoveryError);
             }
         }
     },
