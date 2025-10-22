@@ -26,5 +26,6 @@ module.exports = {
     SALT_ROUNDS,
     SESSION_SECRET,
     DATA_PATH: path.join(__dirname, DATA_FOLDER),
-    RANKINGS_FILE
+    RANKINGS_FILE,
+    DATA_DIR
 };
