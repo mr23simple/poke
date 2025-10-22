@@ -26,25 +26,27 @@ const playerDataService = {
             this.playerIdToPublicIdMap = new Map(parsedMap.playerIdToPublicIdMap);
         } catch (error) {
             if (error.code === 'ENOENT') {
+                console.log('publicIdMap.json not found. Initializing empty map.');
             } else {
-        // After loading/initializing publicIdMap, ensure all users from users.json have a publicId
-        try {
-            const users = await readUsers();
-            let mapUpdated = false;
-            for (const user of users) {
-                if (user.playerId && !this.playerIdToPublicIdMap.has(user.playerId)) {
-                    const newPublicId = uuidv4();
-                    this.publicIdMap.set(newPublicId, user.playerId);
-                    this.playerIdToPublicIdMap.set(user.playerId, newPublicId);
-                    mapUpdated = true;
+                try {
+                    const users = await readUsers();
+                    let mapUpdated = false;
+                    for (const user of users) {
+                        if (user.playerId && !this.playerIdToPublicIdMap.has(user.playerId)) {
+                            const newPublicId = uuidv4();
+                            this.publicIdMap.set(newPublicId, user.playerId);
+                            this.playerIdToPublicIdMap.set(user.playerId, newPublicId);
+                            mapUpdated = true;
+                        }
+                    }
+                    if (mapUpdated) {
+                        await this.savePublicIdMap();
+                        console.log('publicIdMap updated from users.json.');
+                    }
+                } catch (error) {
+                    console.error('Error updating publicIdMap from users.json:', error);
                 }
             }
-            if (mapUpdated) {
-                await this.savePublicIdMap();
-                console.log('publicIdMap updated from users.json.');
-            }
-        } catch (error) {
-            console.error('Error updating publicIdMap from users.json:', error);
         }
     },
 
