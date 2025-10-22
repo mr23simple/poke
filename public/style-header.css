@@ -1,10 +1,25 @@
 /* Header Styling */
 .main-header {
-    background-color: #333;
     color: #fff;
     padding: 1rem 0;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     margin-bottom: 20px; /* Add some space below the header */
+}
+
+.main-header.default-bg {
+    background-color: #333;
+}
+
+.main-header.team-valor-bg {
+    background-color: var(--team-valor);
+}
+
+.main-header.team-mystic-bg {
+    background-color: var(--team-mystic);
+}
+
+.main-header.team-instinct-bg {
+    background-color: var(--team-instinct);
 }
 
 .main-header .header-content {

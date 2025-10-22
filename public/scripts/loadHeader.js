@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const navRegister = document.getElementById('nav-register');
             const navDashboard = document.getElementById('nav-dashboard');
             const navLogout = document.getElementById('nav-logout');
+            const mainHeader = document.querySelector('.main-header');
 
             // Helper to set link visibility
             const setLinkVisibility = (home = false, login = false, register = false, dashboard = false, logout = false) => {
@@ -48,27 +49,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             const path = window.location.pathname;
             const authStatus = await checkLoginStatus();
 
-            // Determine background color based on login status and team
+            // Determine background color for body and header based on login status and team
             const body = document.body;
             body.classList.remove('default-bg', 'team-valor-bg', 'team-mystic-bg', 'team-instinct-bg');
+            if (mainHeader) {
+                mainHeader.classList.remove('default-bg', 'team-valor-bg', 'team-mystic-bg', 'team-instinct-bg');
+            }
 
             if (authStatus.loggedIn && authStatus.team) {
                 switch (authStatus.team) {
                     case 1: // Team Mystic
                         body.classList.add('team-mystic-bg');
+                        if (mainHeader) mainHeader.classList.add('team-mystic-bg');
                         break;
                     case 2: // Team Valor
                         body.classList.add('team-valor-bg');
+                        if (mainHeader) mainHeader.classList.add('team-valor-bg');
                         break;
                     case 3: // Team Instinct
                         body.classList.add('team-instinct-bg');
+                        if (mainHeader) mainHeader.classList.add('team-instinct-bg');
                         break;
                     default:
                         body.classList.add('default-bg');
+                        if (mainHeader) mainHeader.classList.add('default-bg');
                         break;
                 }
             } else {
                 body.classList.add('default-bg');
+                if (mainHeader) mainHeader.classList.add('default-bg');
             }
 
             if (path === '/' || path.includes('index.html')) {
