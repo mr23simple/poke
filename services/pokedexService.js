@@ -1,6 +1,7 @@
 const fs = require('fs/promises');
+const path = require('path');
 const fetch = require('node-fetch');
-const { POKEDEX_API_URL, POKEDEX_FILE } = require('../config');
+const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR } = require('../config');
 
 const pokedexService = {
     pokedex: null,
@@ -12,6 +13,22 @@ const pokedexService = {
         DARK: '#705746', STEEL: '#B7B7CE', FAIRY: '#D685AD'
     },
     async initialize() {
+        // Ensure the data directory exists
+        await fs.mkdir(DATA_DIR, { recursive: true });
+
+        // Check for pokedex.json in the root directory and move it if found
+        const oldPokedexPath = path.join(process.cwd(), 'pokedex.json');
+        try {
+            await fs.access(oldPokedexPath);
+            console.log('Found pokedex.json in root directory. Moving to new data directory...');
+            await fs.rename(oldPokedexPath, POKEDEX_FILE);
+            console.log('pokedex.json moved successfully.');
+        } catch (error) {
+            if (error.code !== 'ENOENT') {
+                console.error('Error checking for old pokedex.json:', error);
+            }
+        }
+
         try {
             console.log('🔄 Fetching latest Pokédex data from API...');
             const response = await fetch(POKEDEX_API_URL);

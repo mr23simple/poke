@@ -1,16 +1,4 @@
-/* --- Root Variables & Base Layout --- */
-:root {
-    --card-bg: #ffffff;
-    --text-color: #333;
-    --bg-color: #f4f4f9;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --border-radius: 12px;
-    --team-instinct: #F1C40F;
-    --team-mystic: #3498DB;
-    --team-valor: #E74C3C;
-}
 
-/* --- Root Variables & Base Layout --- */
 :root {
     --card-bg: #ffffff;
     --text-color: #333;
@@ -36,6 +24,32 @@ body {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+/* Team-specific background gradients */
+body.team-valor-bg {
+    background: linear-gradient(45deg, white, var(--team-valor));
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+}
+
+body.team-mystic-bg {
+    background: linear-gradient(45deg, white, var(--team-mystic));
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+}
+
+body.team-instinct-bg {
+    background: linear-gradient(45deg, white, var(--team-instinct));
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+}
+
+/* Default background gradient (white to black) */
+body.default-bg {
+    background: linear-gradient(45deg, white, gray, black);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
 }
 
 /* --- Page-Specific Body Styles --- */

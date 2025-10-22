@@ -57,9 +57,16 @@ router.get('/private-data', isAuthenticated, async (req, res) => {
     }
 });
 
-router.get('/check-auth-status', (req, res) => {
+router.get('/check-auth-status', async (req, res) => {
     if (req.session.user) {
-        res.json({ loggedIn: true, username: req.session.user.username });
+        try {
+            const privateData = await playerDataService.getPrivatePlayerData(req.session.user.playerId);
+            const team = privateData?.playerData?.account?.team;
+            res.json({ loggedIn: true, username: req.session.user.username, team: team });
+        } catch (error) {
+            console.error("Error fetching private data for auth status check:", error);
+            res.json({ loggedIn: true, username: req.session.user.username, team: null }); // Return logged in but no team on error
+        }
     } else {
         res.json({ loggedIn: false });
     }
