@@ -27,8 +27,24 @@ const playerDataService = {
         } catch (error) {
             if (error.code === 'ENOENT') {
             } else {
-                console.error('Error loading publicIdMap.json:', error);
+        // After loading/initializing publicIdMap, ensure all users from users.json have a publicId
+        try {
+            const users = await readUsers();
+            let mapUpdated = false;
+            for (const user of users) {
+                if (user.playerId && !this.playerIdToPublicIdMap.has(user.playerId)) {
+                    const newPublicId = uuidv4();
+                    this.publicIdMap.set(newPublicId, user.playerId);
+                    this.playerIdToPublicIdMap.set(user.playerId, newPublicId);
+                    mapUpdated = true;
+                }
             }
+            if (mapUpdated) {
+                await this.savePublicIdMap();
+                console.log('publicIdMap updated from users.json.');
+            }
+        } catch (error) {
+            console.error('Error updating publicIdMap from users.json:', error);
         }
     },
 
