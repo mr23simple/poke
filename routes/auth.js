@@ -69,14 +69,14 @@ router.post('/login', async (req, res) => {
         
         if (user) {
             req.session.user = { username: user.web_username || user.username, playerId: user.playerId };
-            return res.redirect('/me');
+            return res.json({ success: true });
         }
 
-        res.send('Login failed. Please check your credentials or register. <a href="/login.html">Try again</a>.');
+        res.status(401).json({ success: false, message: 'Login failed. Please check your credentials or register.' });
 
     } catch (error) {
         console.error("Error during login:", error);
-        res.status(500).send('Server error during login.');
+        res.status(500).json({ success: false, message: 'Server error during login.' });
     }
 });
 

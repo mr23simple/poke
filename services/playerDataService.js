@@ -159,6 +159,133 @@ const playerDataService = {
         }
     },
 
+    async updateRankingsForPlayer(playerData) {
+        const playerId = playerData.account.playerSupportId;
+        const playerName = playerData.account.name;
+
+        let rankings = { recentPlayers: [], strongestPokemon: [], rarestPokemon: [] };
+        try {
+            const rankingsContent = await fs.readFile(RANKINGS_FILE, 'utf-8');
+            rankings = JSON.parse(rankingsContent);
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                console.log('rankings.json not found during update, generating new one.');
+                rankings = await this.generateAndSaveRankings();
+            } else {
+                console.error('Error reading rankings.json for update:', error);
+                throw error;
+            }
+        }
+
+        // --- Update Recent Players ---
+        const newRecentPlayerEntry = {
+            name: playerName,
+            playerId: playerId,
+            buddy: playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId) && playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonDisplay ? {
+                name: pokedexService.getPokemonName(playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonId, playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId))
+            } : null,
+            kmWalked: playerData.player.kmWalked.toFixed(1),
+            pokemonCaught: playerData.player.numPokemonCaptured,
+            lastUpdate: Date.now() // Use current time for last update
+        };
+
+        const existingRecentPlayerIndex = rankings.recentPlayers.findIndex(p => p.playerId === playerId);
+        if (existingRecentPlayerIndex > -1) {
+            rankings.recentPlayers[existingRecentPlayerIndex] = newRecentPlayerEntry;
+        } else {
+            rankings.recentPlayers.push(newRecentPlayerEntry);
+        }
+        rankings.recentPlayers = rankings.recentPlayers
+            .sort((a, b) => b.lastUpdate - a.lastUpdate)
+            .slice(0, 50);
+
+        // --- Re-generate Strongest and Rarest Pokemon (for simplicity) ---
+        // In a more complex scenario, this would be incremental too.
+        let allPokemon = [];
+        const files = await fs.readdir(DATA_PATH);
+        const playerFiles = files.filter(f => f.endsWith('.json') && f !== 'PGSStats.json');
+
+        const getPokedexEntry = (p) => {
+            if (!pokedexService.pokedex || !pokedexService.pokedex[p.pokemonId]) return null;
+            const normalEntry = pokedexService.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.pokedex[p.pokemonId])[0];
+            if (!normalEntry) return null;
+            const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[̀-ͯ]/g, ""), '').toUpperCase() || 'NORMAL';
+            return pokedexService.pokedex[p.pokemonId]?.[formKey] || normalEntry;
+        };
+
+        for (const file of playerFiles) {
+            const filePath = path.join(DATA_PATH, file);
+            const content = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+
+            if (!content.account || !content.player || !content.pokemons) continue;
+
+            const currentOwnerName = content.account.name;
+            const currentOwnerId = content.account.playerSupportId;
+
+            content.pokemons.forEach(p => {
+                if (!p.isEgg && p.pokemonDisplay) {
+                    const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
+                    
+                    const ivPercent = getIvPercent();
+                    let score = 0;
+                    if (ivPercent >= 100) {
+                        score += 8 + 8 * (p.cp / 10000);
+                    }
+                    if (p.pokemonDisplay?.shiny) {
+                        score += 4;
+                    }
+                    if (p.isLucky) {
+                        score += 2;
+                    }
+                    if (p.pokemonDisplay?.shadow) {
+                        score += 1;
+                    }
+                    if (p.pokemonDisplay?.purified) {
+                        score += 1.5;
+                    }
+                    const pokedexEntry = getPokedexEntry(p);
+                    if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
+                        score += 8;
+                    }
+
+                    allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, rarityScore: score });
+                }
+            });
+        }
+
+        rankings.strongestPokemon = [...allPokemon]
+            .sort((a, b) => b.cp - a.cp)
+            .slice(0, 50)
+            .map(p => ({
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                cp: p.cp,
+                owner: p.owner,
+                ownerId: p.ownerId
+            }));
+
+        rankings.rarestPokemon = [...allPokemon]
+            .filter(p => p.rarityScore > 0)
+            .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
+            .slice(0, 50)
+            .map(p => ({
+                name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
+                sprite: pokedexService.getPokemonSprite(p),
+                owner: p.owner,
+                ownerId: p.ownerId,
+                isShiny: p.pokemonDisplay.shiny,
+                isLucky: p.isLucky,
+                isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
+                isShadow: p.pokemonDisplay.shadow,
+                isPurified: p.pokemonDisplay.purified,
+                isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
+                isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC'
+            }));
+
+        await fs.writeFile(RANKINGS_FILE, JSON.stringify(rankings, null, 2));
+    },
+
     async getRankings() {
         await this.initializeRankings(); // Ensure rankings.json exists
         try {
@@ -307,8 +434,8 @@ const playerDataService = {
         }
         await writeUsers(users);
 
-        // After saving individual player data, regenerate and save rankings
-        await this.generateAndSaveRankings();
+        // After saving individual player data, update rankings incrementally
+        await this.updateRankingsForPlayer(data);
 
         console.log(`✅ Data for '${name}' was saved successfully.`);
         return { success: true, message: 'Data saved and user profile updated.' };
