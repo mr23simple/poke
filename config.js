@@ -14,7 +14,8 @@ const POKEDEX_API_URL = 'https://pokemon-go-api.github.io/pokemon-go-api/api/pok
 const SALT_ROUNDS = 10;
 const SESSION_SECRET = 'your-secret-key-goes-here'; // IMPORTANT: In production, use an environment variable!
 
-const RANKINGS_FILE = path.join(__dirname, 'rankings.json');
+const DATA_DIR = path.join(__dirname, 'data');
+const RANKINGS_FILE = path.join(DATA_DIR, 'rankings.json');
 
 module.exports = {
     PORT,

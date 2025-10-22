@@ -1,12 +1,28 @@
 const fs = require('fs/promises');
 const path = require('path');
-const { DATA_PATH, DATA_FOLDER, RANKINGS_FILE } = require('../config');
+const { DATA_PATH, DATA_FOLDER, RANKINGS_FILE, DATA_DIR } = require('../config');
 const pokedexService = require('./pokedexService');
 const { readUsers, writeUsers } = require('./userService');
 
 const playerDataService = {
 
     async initializeRankings() {
+        // Ensure the data directory exists
+        await fs.mkdir(DATA_DIR, { recursive: true });
+
+        // Check for rankings.json in the root directory and move it if found
+        const oldRankingsPath = path.join(process.cwd(), 'rankings.json');
+        try {
+            await fs.access(oldRankingsPath);
+            console.log('Found rankings.json in root directory. Moving to new data directory...');
+            await fs.rename(oldRankingsPath, RANKINGS_FILE);
+            console.log('rankings.json moved successfully.');
+        } catch (error) {
+            if (error.code !== 'ENOENT') {
+                console.error('Error checking for old rankings.json:', error);
+            }
+        }
+
         try {
             await fs.access(RANKINGS_FILE);
             console.log('rankings.json already exists. Skipping initialization.');
