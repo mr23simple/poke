@@ -4,6 +4,7 @@ const path = require('path');
 
 const config = require('./config');
 const pokedexService = require('./services/pokedexService');
+const playerDataService = require('./services/playerDataService');
 const authRoutes = require('./routes/auth').router;
 const apiRoutes = require('./routes/api');
 
@@ -28,5 +29,7 @@ app.use('/api', apiRoutes);
 // --- Start Server ---
 (async () => {
     await pokedexService.initialize();
+    await playerDataService.init();
+    await playerDataService.initializeRankings();
     app.listen(config.PORT, () => console.log(`🚀 Server running at http://localhost:${config.PORT}`));
 })();

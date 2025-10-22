@@ -25,9 +25,13 @@ router.get('/public-data', async (req, res) => {
     }
 });
 
-router.get('/player-detail/:playerId', async (req, res) => {
+router.get('/player-detail/:publicId', async (req, res) => {
     try {
-        const { playerId } = req.params;
+        const { publicId } = req.params;
+        const playerId = await playerDataService.getPlayerIdFromPublicId(publicId);
+        if (!playerId) {
+            return res.status(404).json({ message: 'Player not found.' });
+        }
         const playerDetail = await playerDataService.getPlayerDetail(playerId);
         res.json(playerDetail);
     } catch (error) {

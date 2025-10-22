@@ -1,12 +1,69 @@
 const fs = require('fs/promises');
 const path = require('path');
-const { DATA_PATH, DATA_FOLDER, RANKINGS_FILE, DATA_DIR } = require('../config');
+let uuidv4;
+
+const { DATA_PATH, DATA_FOLDER, RANKINGS_FILE, DATA_DIR, PUBLIC_ID_MAP_FILE } = require('../config');
 const pokedexService = require('./pokedexService');
 const { readUsers, writeUsers } = require('./userService');
 
 const playerDataService = {
+    publicIdMap: new Map(), // Stores publicId -> playerId mapping
+    playerIdToPublicIdMap: new Map(), // Stores playerId -> publicId mapping
+
+    async init() {
+        if (!uuidv4) {
+            const uuidModule = await import('uuid');
+            uuidv4 = uuidModule.v4;
+        }
+        // Ensure the data directory exists before trying to access map file
+        await fs.mkdir(DATA_DIR, { recursive: true });
+
+        // Load publicIdMap from file
+        try {
+            const mapContent = await fs.readFile(PUBLIC_ID_MAP_FILE, 'utf-8');
+            const parsedMap = JSON.parse(mapContent);
+            this.publicIdMap = new Map(parsedMap.publicIdMap);
+            this.playerIdToPublicIdMap = new Map(parsedMap.playerIdToPublicIdMap);
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+            } else {
+                console.error('Error loading publicIdMap.json:', error);
+            }
+        }
+    },
+
+    async savePublicIdMap() {
+        const mapData = {
+            publicIdMap: Array.from(this.publicIdMap.entries()),
+            playerIdToPublicIdMap: Array.from(this.playerIdToPublicIdMap.entries()),
+        };
+        try {
+            await fs.writeFile(PUBLIC_ID_MAP_FILE, JSON.stringify(mapData, null, 2));
+        } catch (error) {
+            console.error('Error saving publicIdMap.json:', error);
+        }
+    },
+
+    async generatePublicId(playerId) {
+        await this.init(); // Ensure uuidv4 is loaded
+        if (this.playerIdToPublicIdMap.has(playerId)) {
+            return this.playerIdToPublicIdMap.get(playerId);
+        }
+        const newPublicId = uuidv4();
+        this.publicIdMap.set(newPublicId, playerId);
+        this.playerIdToPublicIdMap.set(playerId, newPublicId);
+        await this.savePublicIdMap(); // Save map after generating new ID
+        return newPublicId;
+    },
+
+    async getPlayerIdFromPublicId(publicId) {
+        await this.init(); // Ensure publicIdMap is loaded
+        const playerId = this.publicIdMap.get(publicId);
+        return playerId;
+    },
 
     async initializeRankings() {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         // Ensure the data directory exists
         await fs.mkdir(DATA_DIR, { recursive: true });
 
@@ -38,6 +95,7 @@ const playerDataService = {
     },
 
     async generateAndSaveRankings() {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         try {
             await fs.access(DATA_PATH);
             const files = await fs.readdir(DATA_PATH);
@@ -47,6 +105,7 @@ const playerDataService = {
             if (totalPlayers === 0) {
                 const emptyRankings = { recentPlayers: [], strongestPokemon: [], rarestPokemon: [] };
                 await fs.writeFile(RANKINGS_FILE, JSON.stringify(emptyRankings, null, 2));
+                await this.savePublicIdMap(); // Save map after generating new ID
                 return emptyRankings;
             }
 
@@ -70,11 +129,13 @@ const playerDataService = {
 
                 const playerName = content.account.name;
                 const playerId = content.account.playerSupportId;
+                const publicId = await this.generatePublicId(playerId); // Generate public ID
 
                 const buddy = content.pokemons.find(p => p.id === content.account.buddyPokemonProto?.buddyPokemonId);
                 recentPlayers.push({
                     name: playerName,
                     playerId: playerId,
+                    publicId: publicId, // Include public ID
                     buddy: buddy && buddy.pokemonDisplay ? {
                         name: pokedexService.getPokemonName(buddy.pokemonId, buddy.pokemonDisplay.formName),
                         sprite: pokedexService.getPokemonSprite(buddy)
@@ -110,7 +171,7 @@ const playerDataService = {
                             score += 8;
                         }
 
-                        allPokemon.push({ ...p, owner: playerName, ownerId: playerId, rarityScore: score });
+                        allPokemon.push({ ...p, owner: playerName, ownerId: playerId, ownerPublicId: publicId, rarityScore: score }); // Include public ID
                     }
                 });
             }
@@ -127,7 +188,8 @@ const playerDataService = {
                     sprite: pokedexService.getPokemonSprite(p),
                     cp: p.cp,
                     owner: p.owner,
-                    ownerId: p.ownerId
+                    ownerId: p.ownerId,
+                    ownerPublicId: p.ownerPublicId // Include public ID
                 }));
 
             const rarestPokemonRanked = [...allPokemon]
@@ -139,6 +201,7 @@ const playerDataService = {
                     sprite: pokedexService.getPokemonSprite(p),
                     owner: p.owner,
                     ownerId: p.ownerId,
+                    ownerPublicId: p.ownerPublicId, // Include public ID
                     isShiny: p.pokemonDisplay.shiny,
                     isLucky: p.isLucky,
                     isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
@@ -150,6 +213,7 @@ const playerDataService = {
 
             const rankings = { recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked };
             await fs.writeFile(RANKINGS_FILE, JSON.stringify(rankings, null, 2));
+            await this.savePublicIdMap(); // Save map after generating new ID
             return rankings;
 
         } catch (error) {
@@ -159,8 +223,10 @@ const playerDataService = {
     },
 
     async updateRankingsForPlayer(playerData) {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         const playerId = playerData.account.playerSupportId;
         const playerName = playerData.account.name;
+        const publicId = await this.generatePublicId(playerId); // Generate public ID
 
         let rankings = { recentPlayers: [], strongestPokemon: [], rarestPokemon: [] };
         try {
@@ -180,6 +246,7 @@ const playerDataService = {
         const newRecentPlayerEntry = {
             name: playerName,
             playerId: playerId,
+            publicId: publicId, // Include public ID
             buddy: playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId) && playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonDisplay ? {
                 name: pokedexService.getPokemonName(playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonId, playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId).pokemonDisplay.formName),
                 sprite: pokedexService.getPokemonSprite(playerData.pokemons.find(p => p.id === playerData.account.buddyPokemonProto?.buddyPokemonId))
@@ -221,6 +288,7 @@ const playerDataService = {
 
             const currentOwnerName = content.account.name;
             const currentOwnerId = content.account.playerSupportId;
+            const currentOwnerPublicId = await this.generatePublicId(currentOwnerId); // Generate public ID
 
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
@@ -237,9 +305,6 @@ const playerDataService = {
                     if (p.isLucky) {
                         score += 2;
                     }
-                    if (p.pokemonDisplay?.shadow) {
-                        score += 1;
-                    }
                     if (p.pokemonDisplay?.purified) {
                         score += 1.5;
                     }
@@ -248,7 +313,7 @@ const playerDataService = {
                         score += 8;
                     }
 
-                    allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, rarityScore: score });
+                    allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, ownerPublicId: currentOwnerPublicId, rarityScore: score }); // Include public ID
                 }
             });
         }
@@ -261,7 +326,8 @@ const playerDataService = {
                 sprite: pokedexService.getPokemonSprite(p),
                 cp: p.cp,
                 owner: p.owner,
-                ownerId: p.ownerId
+                ownerId: p.ownerId,
+                ownerPublicId: p.ownerPublicId // Include public ID
             }));
 
         rankings.rarestPokemon = [...allPokemon]
@@ -273,6 +339,7 @@ const playerDataService = {
                 sprite: pokedexService.getPokemonSprite(p),
                 owner: p.owner,
                 ownerId: p.ownerId,
+                ownerPublicId: p.ownerPublicId, // Include public ID
                 isShiny: p.pokemonDisplay.shiny,
                 isLucky: p.isLucky,
                 isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
@@ -286,6 +353,7 @@ const playerDataService = {
     },
 
     async getRankings() {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         await this.initializeRankings(); // Ensure rankings.json exists
         try {
             const rankingsContent = await fs.readFile(RANKINGS_FILE, 'utf-8');
@@ -297,6 +365,7 @@ const playerDataService = {
     },
 
     async getPublicPlayerSummaries() {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         try {
             await fs.access(DATA_PATH);
             const files = await fs.readdir(DATA_PATH);
@@ -323,13 +392,17 @@ const playerDataService = {
                         };
                     }
 
+                    const playerId = content.account.playerSupportId;
+                    const publicId = await this.generatePublicId(playerId); // Generate public ID
+
                     return {
                         name: content.account.name,
                         level: content.player.level,
                         team: content.account.team,
                         kmWalked: content.player.kmWalked.toFixed(1),
                         displayPokemon: displayPokemonInfo,
-                        playerId: content.account.playerSupportId
+                        playerId: playerId,
+                        publicId: publicId // Include public ID
                     };
                 })
             );
@@ -341,8 +414,9 @@ const playerDataService = {
     },
 
     async getPlayerDetail(playerId) {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         try {
-            const filePath = path.join(DATA_PATH, `${path.basename(playerId)}.json`);
+            const filePath = path.join(DATA_PATH, `${playerId}.json`);
             const fileContent = await fs.readFile(filePath, 'utf-8');
             const content = JSON.parse(fileContent);
 
@@ -398,6 +472,7 @@ const playerDataService = {
     },
 
     async savePlayerData(data) {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         const name = data?.account?.name;
         const playerId = data?.account?.playerSupportId;
 
@@ -441,6 +516,7 @@ const playerDataService = {
     },
 
     async getPrivatePlayerData(playerId) {
+        await this.init(); // Ensure uuidv4 and publicIdMap are loaded
         try {
             const filePath = path.join(DATA_PATH, `${playerId}.json`);
             const fileContent = await fs.readFile(filePath, 'utf-8');

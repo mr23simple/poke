@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 1. Populate "Recent Player Activity" Table
         const recentBody = document.getElementById('recent-players-body');
         recentBody.innerHTML = rankings.recentPlayers.map(player => `
-            <tr class="clickable-row" data-player-id="${player.playerId}">
+            <tr class="clickable-row" data-player-id="${player.publicId}">
                 <td><strong>${maskUsername(player.name)}</strong></td>
                 <td>
                     ${player.buddy ? `<img src="${player.buddy.sprite}" alt="${player.buddy.name}" title="${player.buddy.name}">` : 'N/A'}
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Populate "Top 50 Strongest Pokémon" Table
         const strongestBody = document.getElementById('strongest-pokemon-body');
         strongestBody.innerHTML = rankings.strongestPokemon.map((p, index) => `
-            <tr class="clickable-row" data-player-id="${p.ownerId}">
+            <tr class="clickable-row" data-player-id="${p.ownerPublicId}">
                 <td>${index + 1}</td>
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3. Populate "Rarest Pokémon Showcase" Table (THIS IS THE FIX)
         const rarestBody = document.getElementById('rarest-pokemon-body');
         rarestBody.innerHTML = rankings.rarestPokemon.map(p => `
-            <tr class="clickable-row" data-player-id="${p.ownerId}">
+            <tr class="clickable-row" data-player-id="${p.ownerPublicId}">
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
                     <span>${p.name}</span>
