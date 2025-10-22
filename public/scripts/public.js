@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalContent.innerHTML = `
                 <button id="modal-close-btn">&times;</button>
                 <h2>${maskUsername(details.name)}</h2>
-                <p>Start Date: ${details.startDate}</p>
                 <div class="grid-stats">
                     <div><span>Total XP</span><strong>${details.totalXp.toLocaleString()}</strong></div>
                     <div><span>Pokémon Caught</span><strong>${details.pokemonCaught.toLocaleString()}</strong></div>
