@@ -25,7 +25,6 @@ const playerDataService = {
 
         try {
             await fs.access(RANKINGS_FILE);
-            console.log('rankings.json already exists. Skipping initialization.');
             return;
         } catch (error) {
             if (error.code === 'ENOENT') {

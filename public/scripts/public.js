@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalContent = document.getElementById('modal-content');
 
+    // Function to mask username
+    const maskUsername = (username) => {
+        if (!username || username.length <= 2) {
+            return username;
+        }
+        return username.charAt(0) + '*'.repeat(username.length - 2) + username.charAt(username.length - 1);
+    };
+
     // --- HELPER FUNCTIONS ---
 
     /**
@@ -74,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const recentBody = document.getElementById('recent-players-body');
         recentBody.innerHTML = rankings.recentPlayers.map(player => `
             <tr class="clickable-row" data-player-id="${player.playerId}">
-                <td><strong>${player.name}</strong></td>
+                <td><strong>${maskUsername(player.name)}</strong></td>
                 <td>
                     ${player.buddy ? `<img src="${player.buddy.sprite}" alt="${player.buddy.name}" title="${player.buddy.name}">` : 'N/A'}
                 </td>
@@ -93,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span>${p.name}</span>
                 </td>
                 <td><strong>${p.cp.toLocaleString()}</strong></td>
-                <td>${p.owner}</td>
+                <td>${maskUsername(p.owner)}</td>
             </tr>
         `).join('');
 
@@ -114,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${p.isLegendary ? '<span class="badge legendary-badge">Legendary</span>' : ''}
                     ${p.isMythical ? '<span class="badge mythical-badge">Mythical</span>' : ''}
                 </td>
-                <td>${p.owner}</td>
+                <td>${maskUsername(p.owner)}</td>
             </tr>
         `).join('');
 

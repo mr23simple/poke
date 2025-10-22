@@ -14,20 +14,15 @@ async function checkLoginStatus() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('loadHeader.js: DOMContentLoaded fired.');
     const headerPlaceholder = document.getElementById('header-placeholder');
     if (headerPlaceholder) {
-        console.log('loadHeader.js: header-placeholder found.');
         try {
-            console.log('loadHeader.js: Fetching /components/header.html...');
             const response = await fetch('/components/header.html');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const headerHtml = await response.text();
-            console.log('loadHeader.js: header.html fetched successfully. Injecting HTML...');
             headerPlaceholder.innerHTML = headerHtml;
-            console.log('loadHeader.js: HTML injected. Starting dynamic link visibility logic.');
 
             const mainTitle = document.getElementById('main-title');
             const navHome = document.getElementById('nav-home');
@@ -48,6 +43,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const path = window.location.pathname;
             const authStatus = await checkLoginStatus();
+
+            // Function to mask username
+            const maskUsername = (username) => {
+                if (!username || username.length <= 2) {
+                    return username;
+                }
+                return username.charAt(0) + '*'.repeat(username.length - 2) + username.charAt(username.length - 1);
+            };
 
             // Determine background color for body and header based on login status and team
             const body = document.body;
@@ -97,11 +100,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mainTitle.textContent = authStatus.loggedIn ? authStatus.username : 'My Profile';
                 setLinkVisibility(true, false, false, false, true); // Home, Logout
             }
-            console.log('loadHeader.js: Dynamic link visibility logic completed.');
         } catch (error) {
             console.error('loadHeader.js: Failed to load header:', error);
         }
-    } else {
-        console.error('loadHeader.js: header-placeholder not found!');
     }
 });
