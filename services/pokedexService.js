@@ -182,15 +182,42 @@ const pokedexService = {
 
         const formNameUpper = p.pokemonDisplay.formName.toUpperCase();
         const baseNameUpper = basePokemon.names.English.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-        const key = formNameUpper.replace(baseNameUpper, '').replace(/_/g, '').trim();
+        let formKey = formNameUpper.replace(baseNameUpper, '').replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+        if (formKey === "" || formKey === "NORMAL") formKey = null;
 
-        let foundAsset = basePokemon.assetForms.find(asset =>
-            (asset.form && asset.form.toUpperCase() === key) ||
-            (asset.costume && asset.costume.toUpperCase() === key)
-        );
-        if (!foundAsset) {
-            foundAsset = basePokemon.assetForms.find(asset => asset.form === null && asset.costume === null);
+        let costumeKey = null;
+        const costumeId = p.pokemonDisplay.costume;
+        if (costumeId && this.costumeIdMap[costumeId]) {
+            costumeKey = this.costumeIdMap[costumeId].toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
         }
+
+        let foundAsset = null;
+
+        // 1. Perfect match: costume and form
+        if (costumeKey && formKey) {
+            foundAsset = basePokemon.assetForms.find(asset => asset.costume === costumeKey && asset.form === formKey);
+        }
+
+        // 2. Costume match, no form
+        if (!foundAsset && costumeKey) {
+            foundAsset = basePokemon.assetForms.find(asset => asset.costume === costumeKey && !asset.form);
+        }
+
+        // 3. Form match, no costume
+        if (!foundAsset && formKey) {
+            foundAsset = basePokemon.assetForms.find(asset => asset.form === formKey && !asset.costume);
+        }
+
+        // 4. Default: no costume, no form
+        if (!foundAsset) {
+            foundAsset = basePokemon.assetForms.find(asset => !asset.costume && !asset.form);
+        }
+        
+        // 5. Fallback to normal form, no costume
+        if (!foundAsset) {
+            foundAsset = basePokemon.assetForms.find(asset => asset.form === 'NORMAL' && !asset.costume);
+        }
+
         return foundAsset?.[targetSprite] || (p.pokemonDisplay.shiny ? shinySprite : defaultSprite);
     },
     getPokemonTypeColors(pokedexEntry) {
