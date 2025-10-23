@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokemon GO | Dashboard</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-header.css">
 </head>
@@ -71,11 +76,17 @@
                             <h4>Rarity Calculation</h4>
                             <p>Rarity is calculated by multiplying the odds of a Pokémon's rarest traits.</p>
                             <ul>
-                                <li><strong>Lucky Odds:</strong> 1 in 20 (from trades).</li>
-                                <li><strong>Perfect IV Odds:</strong> 1 in 64 (if Lucky) to 1 in 4,096 (if Wild).</li>
-                                <li><strong>Shiny Odds:</strong> 1 in 20 (Legendary) to 1 in 500 (Standard).</li>
+                                <li><strong>Lucky Trade Odds:</strong> 1 in 20.</li>
+                                <li><strong>Shiny Odds:</strong> ~1 in 20 to ~1 in 500.</li>
                             </ul>
-                            <p>A higher score means the Pokémon is rarer.</p>
+                            <p><strong>Perfect IV Odds depend on how it was acquired:</strong></p>
+                            <ul>
+                                <li>1 in 64 (Lucky Trade)</li>
+                                <li>1 in 216 (Raid/Egg/Research)</li>
+                                <li>1 in 1,331 (Best Friend Trade)</li>
+                                <li>1 in 1,728 (Weather Boost)</li>
+                                <li>1 in 4,096 (Wild Catch)</li>
+                            </ul>
                         </div>
                     </div>
                 </h2>

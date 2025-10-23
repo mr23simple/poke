@@ -171,7 +171,7 @@ td img {
 .pokemon-card small { font-size: 0.75em; }
 .badge { font-size: 0.7em; padding: 3px 7px; border-radius: 10px; color: white; flex-shrink: 0; }
 .shiny-badge { background-color: #d4af37; }
-.lucky-badge { background-color: #ff69b4; }
+.lucky-badge { background-color: #FFD700; color: #333; text-shadow: none; }
 .perfect-badge { background-color: #e74c3c; }
 .iv-bar-container { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; margin: 8px 0; }
 .iv-bar { height: 100%; border-radius: 4px; }
@@ -195,8 +195,9 @@ td img {
 }
 .shadow-badge { background-color: #5a2d82; }
 .purified-badge { background-color: #b3a1c8; }
-.legendary-badge { background-color: #d4af37; }
+.legendary-badge { background-color: #8E44AD; }
 .mythical-badge { background-color: #ff69b4; }
+.traded-badge { background-color: #3498DB; }
 
 
 /* --- Rankings Expansion for Mobile --- */

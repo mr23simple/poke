@@ -187,10 +187,16 @@ const playerDataService = {
                         };
 
                         if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
-                            let ivFloor = 0;
-                            if (p.isLucky) { ivFloor = 12; }
-                            else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { ivFloor = 10; }
-                            else if (p.pokemonDisplay?.weatherBoostedCondition) { ivFloor = 4; }
+                            let ivFloor = 0; // Default for wild catch
+                            if (p.isLucky) {
+                                ivFloor = 12;
+                            } else if (p.tradedTimeMs > 0) { // Non-lucky trade (assuming Best Friend)
+                                ivFloor = 5;
+                            } else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { // Raid, Egg, Research
+                                ivFloor = 10;
+                            } else if (p.pokemonDisplay?.weatherBoostedCondition) {
+                                ivFloor = 4;
+                            }
                             const possibleValues = 16 - ivFloor;
                             rarity.breakdown.iv = Math.pow(possibleValues, 3);
                         }
@@ -243,7 +249,8 @@ const playerDataService = {
                     isShadow: p.pokemonDisplay.shadow,
                     isPurified: p.pokemonDisplay.purified,
                     isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
-                    isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC'
+                    isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
+                    isTraded: p.tradedTimeMs > 0
                 }));
 
             const rankings = { recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked };
@@ -333,10 +340,16 @@ const playerDataService = {
                     };
 
                     if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
-                        let ivFloor = 0;
-                        if (p.isLucky) { ivFloor = 12; }
-                        else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { ivFloor = 10; }
-                        else if (p.pokemonDisplay?.weatherBoostedCondition) { ivFloor = 4; }
+                        let ivFloor = 0; // Default for wild catch
+                        if (p.isLucky) {
+                            ivFloor = 12;
+                        } else if (p.tradedTimeMs > 0) { // Non-lucky trade (assuming Best Friend)
+                            ivFloor = 5;
+                        } else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { // Raid, Egg, Research
+                            ivFloor = 10;
+                        } else if (p.pokemonDisplay?.weatherBoostedCondition) {
+                            ivFloor = 4;
+                        }
                         const possibleValues = 16 - ivFloor;
                         rarity.breakdown.iv = Math.pow(possibleValues, 3);
                     }
@@ -385,7 +398,8 @@ const playerDataService = {
                 isShadow: p.pokemonDisplay.shadow,
                 isPurified: p.pokemonDisplay.purified,
                 isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
-                isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC'
+                isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
+                isTraded: p.tradedTimeMs > 0
             }));
 
         await fs.writeFile(RANKINGS_FILE, JSON.stringify(rankings, null, 2));

@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </td>
                 <td class="badges-cell">
                     ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
-                    ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : ''}
+                    ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (p.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
                     ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                     ${p.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
                     ${p.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}

@@ -55,7 +55,11 @@ const GridComponent = {
         getBadges(p, name) {
             let badgesHTML = name;
             if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
-            if (p.isLucky) badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+            if (p.isLucky) {
+                badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+            } else if (p.tradedTimeMs > 0) {
+                badgesHTML += ' <span class="badge traded-badge">Traded</span>';
+            }
             if (this.getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
             if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
             if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
@@ -223,7 +227,11 @@ createApp({
         const getBadges = (p, name) => {
             let badgesHTML = name;
             if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
-            if (p.isLucky) badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+            if (p.isLucky) {
+                badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+            } else if (p.tradedTimeMs > 0) {
+                badgesHTML += ' <span class="badge traded-badge">Traded</span>';
+            }
             if (getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
             if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
             if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
