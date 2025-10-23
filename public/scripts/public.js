@@ -17,6 +17,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         return username.charAt(0) + '*'.repeat(username.length - 2) + username.charAt(username.length - 1);
     };
 
+    function openRarityCalculationModal(pokemon) {
+        const getStatChip = (label, isTrue) => {
+            if (!isTrue) return '';
+            const className = label.toLowerCase().replace(/\s\/\s/g, '-').replace(/\s/g, '-');
+            return `<div class="stat-chip ${className}">${label}</div>`;
+        };
+
+        modalContent.innerHTML = `
+            <button id="modal-close-btn">&times;</button>
+            <div class="rarity-modal-header">
+                <img src="${pokemon.sprite}" alt="${pokemon.name}">
+                <div class="pokemon-info">
+                    <h2>${pokemon.name}</h2>
+                    <p>Owner: ${maskUsername(pokemon.owner)}</p>
+                </div>
+            </div>
+            <div class="rarity-modal-score">
+                <h3>Rarity Score: ${pokemon.rarityScore.toFixed(2)}</h3>
+            </div>
+            <div class="rarity-modal-body">
+                <h4>Contributing Factors</h4>
+                <div class="stat-chips-container">
+                    ${getStatChip('Perfect IVs', pokemon.isPerfect)}
+                    ${getStatChip('Shiny', pokemon.isShiny)}
+                    ${getStatChip('Lucky', pokemon.isLucky)}
+                    ${getStatChip('Legendary / Mythic', pokemon.isLegendary || pokemon.isMythical)}
+                    ${getStatChip('Shadow', pokemon.isShadow)}
+                    ${getStatChip('Purified', pokemon.isPurified)}
+                </div>
+            </div>
+        `;
+        modalBackdrop.classList.remove('hidden');
+        document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
+    }
+
     // --- HELPER FUNCTIONS ---
 
     /**
@@ -104,10 +139,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             </tr>
         `).join('');
 
-        // 3. Populate "Rarest Pokémon Showcase" Table (THIS IS THE FIX)
+        // 3. Populate "Rarest Pokémon Showcase" Table
         const rarestBody = document.getElementById('rarest-pokemon-body');
-        rarestBody.innerHTML = rankings.rarestPokemon.map(p => `
-            <tr class="clickable-row" data-player-id="${p.ownerPublicId}">
+        const rarityData = rankings.rarestPokemon; // Store data
+        rarestBody.innerHTML = rarityData.map((p, index) => `
+            <tr class="clickable-rarity-row" data-index="${index}">
+                <td><strong>${p.rarityScore ? p.rarityScore.toFixed(2) : 'N/A'}</strong></td>
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
                     <span>${p.name}</span>
@@ -126,18 +163,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
 
         // 4. Add Click Event Listeners to all generated rows
-        document.querySelectorAll('.clickable-row').forEach(row => {
-            row.addEventListener('click', () => {
-                const playerId = row.dataset.playerId;
+        document.getElementById('rankings-grid').addEventListener('click', (event) => {
+            const playerRow = event.target.closest('.clickable-row');
+            if (playerRow) {
+                const playerId = playerRow.dataset.playerId;
                 if (playerId) {
                     openPlayerModal(playerId);
                 }
-            });
+                return;
+            }
+
+            const rarityRow = event.target.closest('.clickable-rarity-row');
+            if (rarityRow) {
+                const index = rarityRow.dataset.index;
+                const pokemon = rarityData[index];
+                if (pokemon) {
+                    openRarityCalculationModal(pokemon);
+                }
+            }
         });
 
         // Hide loading message and show the rankings grid
         loadingMessage.classList.add('hidden');
         rankingsGrid.classList.remove('hidden');
+
+        // --- Rarity Info Tooltip Logic ---
+        const infoBtn = document.querySelector('.info-btn');
+        if (infoBtn) {
+            const infoTooltip = infoBtn.nextElementSibling;
+
+            infoBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                infoTooltip.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!infoTooltip.classList.contains('hidden') && !infoBtn.contains(event.target)) {
+                    infoTooltip.classList.add('hidden');
+                }
+            });
+        }
 
     } catch (error) {
         console.error('Failed to initialize public dashboard:', error);

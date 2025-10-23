@@ -244,7 +244,7 @@ td img {
     }
 
     .table-container.expanded {
-        max-height: 2000px; /* A large value to show all content */
+        max-height: 5000px; /* A very large value to ensure all content is visible */
     }
 
     .ranking-column.expanded .show-more-btn {
@@ -259,4 +259,155 @@ td img {
 /* Prevent body scroll when modal is open */
 body.modal-open {
     overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .pokemon-cell span {
+        display: none;
+    }
+    .pokemon-cell {
+        justify-content: center;
+    }
+}
+
+/* --- Rarity Calculation Modal --- */
+.rarity-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--bg-color);
+}
+.rarity-modal-header img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    background-color: #f4f4f9;
+    border-radius: 50%;
+}
+.rarity-modal-header .pokemon-info h2 {
+    margin: 0;
+    border: none;
+}
+.rarity-modal-header .pokemon-info p {
+    margin: 5px 0 0;
+    color: #666;
+}
+.rarity-modal-score {
+    text-align: center;
+    margin: 20px 0;
+}
+.rarity-modal-score h3 {
+    font-size: 1.8em;
+    margin: 0;
+}
+.rarity-modal-body h4 {
+    text-align: center;
+    font-size: 1em;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+.stat-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+.stat-chip {
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: white;
+}
+
+/* Coloring the chips */
+.stat-chip.perfect-ivs { background-color: #e74c3c; } /* same as perfect-badge */
+.stat-chip.shiny { background-color: #d4af37; } /* same as shiny-badge */
+.stat-chip.lucky { background-color: #ff69b4; } /* same as lucky-badge */
+.stat-chip.legendary-mythic { background-color: #d4af37; } /* same as legendary-badge */
+.stat-chip.shadow { background-color: #5a2d82; } /* same as shadow-badge */
+.stat-chip.purified { background-color: #b3a1c8; } /* same as purified-badge */
+
+/* --- Info Tooltip for Rarity Ranking --- */
+h2.ranking-title-with-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-tooltip-container {
+    position: relative;
+}
+
+.info-btn {
+    background: #e0e0e0;
+    color: #666;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+.info-btn:hover {
+    background: #ccc;
+}
+
+.info-tooltip {
+    position: absolute;
+    bottom: 140%; /* Position above the button */
+    left: 50%;
+    transform: translateX(-95%); /* Adjust to be more to the right */
+    width: 240px;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 1rem; /* Reset font size from h2 */
+    font-weight: normal; /* Reset font weight from h2 */
+}
+
+/* Arrow for the tooltip */
+.info-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 15px; /* Align arrow to the right */
+    border-width: 6px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.info-tooltip h4 {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    border-bottom: 1px solid #555;
+    padding-bottom: 8px;
+    font-weight: bold;
+}
+
+.info-tooltip ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.info-tooltip ul li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    padding: 5px 0;
+}
+.info-tooltip ul li span:last-child {
+    font-weight: bold;
 }

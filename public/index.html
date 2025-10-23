@@ -63,11 +63,28 @@
 
             <!-- THIS SECTION IS UPDATED TO USE A TABLE -->
             <div class="card ranking-column">
-                <h2>Rarest Pokémon Showcase</h2>
+                <h2 class="ranking-title-with-info">
+                    <span>Rarest Pokémon Showcase</span>
+                    <div class="info-tooltip-container">
+                        <button class="info-btn" aria-label="Show rarity calculation info">?</button>
+                        <div class="info-tooltip hidden">
+                            <h4>Rarity Score</h4>
+                            <ul>
+                                <li><span>Shiny</span><span>+8</span></li>
+                                <li><span>Lucky</span><span>+4</span></li>
+                                <li><span>Legendary/Mythic</span><span>+2</span></li>
+                                <li><span>Perfect IVs</span><span>+8</span></li>
+                                <li><span>Purified</span><span>+1.5</span></li>
+                                <li><span>Shadow</span><span>+1</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </h2>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
+                                <th>Score</th>
                                 <th>Pokémon</th>
                                 <th>Attributes</th>
                                 <th>Owner</th>

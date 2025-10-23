@@ -189,10 +189,10 @@ const playerDataService = {
                             score += 8 + 8 * (p.cp / 10000);
                         }
                         if (p.pokemonDisplay?.shiny) {
-                            score += 4;
+                            score += 8;
                         }
                         if (p.isLucky) {
-                            score += 2;
+                            score += 4;
                         }
                         if (p.pokemonDisplay?.shadow) {
                             score += 1;
@@ -202,7 +202,7 @@ const playerDataService = {
                         }
                         const pokedexEntry = getPokedexEntry(p);
                         if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
-                            score += 8;
+                            score += 2;
                         }
 
                         allPokemon.push({ ...p, owner: playerName, ownerId: playerId, ownerPublicId: publicId, rarityScore: score }); // Include public ID
@@ -231,6 +231,7 @@ const playerDataService = {
                 .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
                 .slice(0, 50)
                 .map(p => ({
+                    rarityScore: p.rarityScore,
                     name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                     sprite: pokedexService.getPokemonSprite(p),
                     owner: p.owner,
@@ -334,17 +335,20 @@ const playerDataService = {
                         score += 8 + 8 * (p.cp / 10000);
                     }
                     if (p.pokemonDisplay?.shiny) {
-                        score += 4;
+                        score += 8;
                     }
                     if (p.isLucky) {
-                        score += 2;
+                        score += 4;
+                    }
+                    if (p.pokemonDisplay?.shadow) {
+                        score += 1;
                     }
                     if (p.pokemonDisplay?.purified) {
                         score += 1.5;
                     }
                     const pokedexEntry = getPokedexEntry(p);
                     if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
-                        score += 8;
+                        score += 2;
                     }
 
                     allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, ownerPublicId: currentOwnerPublicId, rarityScore: score }); // Include public ID
@@ -369,6 +373,7 @@ const playerDataService = {
             .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
             .slice(0, 50)
             .map(p => ({
+                rarityScore: p.rarityScore,
                 name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                 sprite: pokedexService.getPokemonSprite(p),
                 owner: p.owner,
