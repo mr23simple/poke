@@ -1,10 +1,13 @@
 const fs = require('fs/promises');
 const path = require('path');
 const fetch = require('node-fetch');
-const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR } = require('../config');
+const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR, SHINY_RATES_FILE } = require('../config');
 
 const pokedexService = {
     pokedex: null,
+    shinyRates: null,
+    shinyPokemonTiers: null,
+    defaultShinyTier: 'standard',
     // NEW muted/matte color palette
     typeColorMap: {
         NORMAL: '#A8A77A', FIRE: '#EE8130', WATER: '#6390F0', GRASS: '#7AC74C', ELECTRIC: '#F7D02C',
@@ -56,6 +59,24 @@ const pokedexService = {
             console.error('❌ CRITICAL: Could not load Pokédex from local file.', error);
             this.pokedex = {};
         }
+
+        try {
+            const shinyRatesContent = await fs.readFile(SHINY_RATES_FILE, 'utf-8');
+            const shinyRatesData = JSON.parse(shinyRatesContent);
+            this.shinyRates = shinyRatesData.rates;
+            this.shinyPokemonTiers = shinyRatesData.pokemon;
+            this.defaultShinyTier = shinyRatesData.default_tier;
+            console.log('Shiny rates loaded successfully.');
+        } catch (error) {
+            console.error('Could not load shinyRates.json. Shiny rates will not be available.', error);
+            this.shinyRates = {};
+            this.shinyPokemonTiers = {};
+        }
+    },
+    getShinyRate(pokemonId) {
+        if (!this.shinyRates) return this.shinyRates?.['standard'] || 500;
+        const tier = this.shinyPokemonTiers[pokemonId] || this.defaultShinyTier;
+        return this.shinyRates[tier] || this.shinyRates[this.defaultShinyTier] || 500;
     },
     getPokemonName(dexNr, formName) {
         const defaultName = `Pokedex #${dexNr}`;

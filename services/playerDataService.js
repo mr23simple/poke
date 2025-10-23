@@ -181,31 +181,31 @@ const playerDataService = {
 
                 content.pokemons.forEach(p => {
                     if (!p.isEgg && p.pokemonDisplay) {
-                        const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
-                        
-                        const ivPercent = getIvPercent();
-                        let score = 0;
-                        if (ivPercent >= 100) {
-                            score += 8 + 8 * (p.cp / 10000);
-                        }
-                        if (p.pokemonDisplay?.shiny) {
-                            score += 8;
-                        }
-                        if (p.isLucky) {
-                            score += 4;
-                        }
-                        if (p.pokemonDisplay?.shadow) {
-                            score += 1;
-                        }
-                        if (p.pokemonDisplay?.purified) {
-                            score += 1.5;
-                        }
-                        const pokedexEntry = getPokedexEntry(p);
-                        if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
-                            score += 2;
+                        const rarity = {
+                            score: 1,
+                            breakdown: { iv: 1, shiny: 1, lucky: 1 }
+                        };
+
+                        if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
+                            let ivFloor = 0;
+                            if (p.isLucky) { ivFloor = 12; }
+                            else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { ivFloor = 10; }
+                            else if (p.pokemonDisplay?.weatherBoostedCondition) { ivFloor = 4; }
+                            const possibleValues = 16 - ivFloor;
+                            rarity.breakdown.iv = Math.pow(possibleValues, 3);
                         }
 
-                        allPokemon.push({ ...p, owner: playerName, ownerId: playerId, ownerPublicId: publicId, rarityScore: score }); // Include public ID
+                        if (p.pokemonDisplay?.shiny) {
+                            rarity.breakdown.shiny = pokedexService.getShinyRate(p.pokemonId);
+                        }
+
+                        if (p.isLucky) {
+                            rarity.breakdown.lucky = 20;
+                        }
+                        
+                        rarity.score = rarity.breakdown.iv * rarity.breakdown.shiny * rarity.breakdown.lucky;
+
+                        allPokemon.push({ ...p, owner: playerName, ownerId: playerId, ownerPublicId: publicId, rarity: rarity }); // Include public ID
                     }
                 });
             }
@@ -227,11 +227,11 @@ const playerDataService = {
                 }));
 
             const rarestPokemonRanked = [...allPokemon]
-                .filter(p => p.rarityScore > 0)
-                .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
+                .filter(p => p.rarity.score > 1)
+                .sort((a, b) => b.rarity.score - a.rarity.score || b.cp - a.cp)
                 .slice(0, 50)
                 .map(p => ({
-                    rarityScore: p.rarityScore,
+                    rarity: p.rarity,
                     name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                     sprite: pokedexService.getPokemonSprite(p),
                     owner: p.owner,
@@ -327,31 +327,31 @@ const playerDataService = {
 
             content.pokemons.forEach(p => {
                 if (!p.isEgg && p.pokemonDisplay) {
-                    const getIvPercent = () => ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100);
-                    
-                    const ivPercent = getIvPercent();
-                    let score = 0;
-                    if (ivPercent >= 100) {
-                        score += 8 + 8 * (p.cp / 10000);
-                    }
-                    if (p.pokemonDisplay?.shiny) {
-                        score += 8;
-                    }
-                    if (p.isLucky) {
-                        score += 4;
-                    }
-                    if (p.pokemonDisplay?.shadow) {
-                        score += 1;
-                    }
-                    if (p.pokemonDisplay?.purified) {
-                        score += 1.5;
-                    }
-                    const pokedexEntry = getPokedexEntry(p);
-                    if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
-                        score += 2;
+                    const rarity = {
+                        score: 1,
+                        breakdown: { iv: 1, shiny: 1, lucky: 1 }
+                    };
+
+                    if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
+                        let ivFloor = 0;
+                        if (p.isLucky) { ivFloor = 12; }
+                        else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { ivFloor = 10; }
+                        else if (p.pokemonDisplay?.weatherBoostedCondition) { ivFloor = 4; }
+                        const possibleValues = 16 - ivFloor;
+                        rarity.breakdown.iv = Math.pow(possibleValues, 3);
                     }
 
-                    allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, ownerPublicId: currentOwnerPublicId, rarityScore: score }); // Include public ID
+                    if (p.pokemonDisplay?.shiny) {
+                        rarity.breakdown.shiny = pokedexService.getShinyRate(p.pokemonId);
+                    }
+
+                    if (p.isLucky) {
+                        rarity.breakdown.lucky = 20;
+                    }
+                    
+                    rarity.score = rarity.breakdown.iv * rarity.breakdown.shiny * rarity.breakdown.lucky;
+
+                    allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, ownerPublicId: currentOwnerPublicId, rarity: rarity }); // Include public ID
                 }
             });
         }
@@ -369,11 +369,11 @@ const playerDataService = {
             }));
 
         rankings.rarestPokemon = [...allPokemon]
-            .filter(p => p.rarityScore > 0)
-            .sort((a, b) => b.rarityScore - a.rarityScore || b.cp - a.cp)
+            .filter(p => p.rarity.score > 1)
+            .sort((a, b) => b.rarity.score - a.rarity.score || b.cp - a.cp)
             .slice(0, 50)
             .map(p => ({
-                rarityScore: p.rarityScore,
+                rarity: p.rarity,
                 name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                 sprite: pokedexService.getPokemonSprite(p),
                 owner: p.owner,

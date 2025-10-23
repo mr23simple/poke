@@ -4,6 +4,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const RANKINGS_FILE = path.join(DATA_DIR, 'rankings.json');
 const POKEDEX_FILE = path.join(DATA_DIR, 'pokedex.json');
 const PUBLIC_ID_MAP_FILE = path.join(DATA_DIR, 'publicIdMap.json');
+const SHINY_RATES_FILE = path.join(DATA_DIR, 'shinyRates.json');
 
 /**
  * For a production environment, it's highly recommended to use environment variables
@@ -29,5 +30,6 @@ module.exports = {
     DATA_PATH: path.join(__dirname, DATA_FOLDER),
     RANKINGS_FILE,
     DATA_DIR,
-    PUBLIC_ID_MAP_FILE
+    PUBLIC_ID_MAP_FILE,
+    SHINY_RATES_FILE
 };

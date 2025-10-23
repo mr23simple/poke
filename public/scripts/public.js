@@ -18,10 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     function openRarityCalculationModal(pokemon) {
-        const getStatChip = (label, isTrue) => {
-            if (!isTrue) return '';
-            const className = label.toLowerCase().replace(/\s\/\s/g, '-').replace(/\s/g, '-');
-            return `<div class="stat-chip ${className}">${label}</div>`;
+        const getStatLine = (label, score) => {
+            if (!score || score <= 1) return '';
+            return `<li><span>${label}</span><span>1 in ${Math.round(score).toLocaleString()}</span></li>`;
         };
 
         modalContent.innerHTML = `
@@ -34,18 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
             <div class="rarity-modal-score">
-                <h3>Rarity Score: ${pokemon.rarityScore.toFixed(2)}</h3>
+                <h3>Total Rarity: 1 in ${Math.round(pokemon.rarity.score).toLocaleString()}</h3>
             </div>
             <div class="rarity-modal-body">
-                <h4>Contributing Factors</h4>
-                <div class="stat-chips-container">
-                    ${getStatChip('Perfect IVs', pokemon.isPerfect)}
-                    ${getStatChip('Shiny', pokemon.isShiny)}
-                    ${getStatChip('Lucky', pokemon.isLucky)}
-                    ${getStatChip('Legendary / Mythic', pokemon.isLegendary || pokemon.isMythical)}
-                    ${getStatChip('Shadow', pokemon.isShadow)}
-                    ${getStatChip('Purified', pokemon.isPurified)}
-                </div>
+                <h4>Rarity Factors</h4>
+                <ul class="stat-breakdown-list">
+                    ${getStatLine('Perfect IVs', pokemon.rarity.breakdown.iv)}
+                    ${getStatLine('Shiny', pokemon.rarity.breakdown.shiny)}
+                    ${getStatLine('Lucky', pokemon.rarity.breakdown.lucky)}
+                </ul>
             </div>
         `;
         modalBackdrop.classList.remove('hidden');
@@ -144,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rarityData = rankings.rarestPokemon; // Store data
         rarestBody.innerHTML = rarityData.map((p, index) => `
             <tr class="clickable-rarity-row" data-index="${index}">
-                <td><strong>${p.rarityScore ? p.rarityScore.toFixed(2) : 'N/A'}</strong></td>
+                <td><strong>${p.rarity ? Math.round(p.rarity.score).toLocaleString() : 'N/A'}</strong></td>
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
                     <span>${p.name}</span>
