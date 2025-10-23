@@ -1,0 +1,24 @@
+{
+  "rates": {
+    "standard": 500,
+    "permaboosted": 64,
+    "legendary": 20,
+    "community-day": 25,
+    "raid-day": 10
+  },
+  "pokemon": {
+    "95": "permaboosted",  
+    "144": "legendary",    
+    "145": "legendary",    
+    "146": "legendary",    
+    "150": "legendary",    
+    "215": "permaboosted", 
+    "243": "legendary",    
+    "244": "legendary",    
+    "245": "legendary",    
+    "249": "legendary",    
+    "250": "legendary",    
+    "303": "permaboosted" 
+  },
+  "default_tier": "standard"
+}

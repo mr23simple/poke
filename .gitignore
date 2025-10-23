@@ -12,7 +12,10 @@ pokedex.json
 # This folder contains sensitive, user-specific data and should not be committed.
 pgsharp_player_data/*
 users.json
-data/
+data/pokedex_raw.json
+data/pokedex.json
+data/publicIdMap.json
+data/rankings.json
 
 # Environment Variables (Good Practice)
 # Contains sensitive information like API keys or secrets.
