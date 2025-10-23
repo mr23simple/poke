@@ -1,13 +1,14 @@
 const fs = require('fs/promises');
 const path = require('path');
 const fetch = require('node-fetch');
-const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR, SHINY_RATES_FILE, POKEDEX_RAW_FILE } = require('../config');
+const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR, SHINY_RATES_FILE, POKEDEX_RAW_FILE, COSTUME_ID_MAP_FILE } = require('../config');
 
 const pokedexService = {
     pokedex: null,
     shinyRates: null,
     shinyPokemonTiers: null,
     defaultShinyTier: 'standard',
+    costumeIdMap: {},
     // NEW muted/matte color palette
     typeColorMap: {
         NORMAL: '#A8A77A', FIRE: '#EE8130', WATER: '#6390F0', GRASS: '#7AC74C', ELECTRIC: '#F7D02C',
@@ -93,11 +94,39 @@ const pokedexService = {
             data.forEach(pokemon => {
                 const dexKey = pokemon.dexNr;
                 if (!this.pokedex[dexKey]) this.pokedex[dexKey] = {};
-                // formId is already normalized in the file now
-                this.pokedex[dexKey][pokemon.formId] = pokemon;
 
-                // AssetForms are also normalized in the file, but we only store the main formId.
-                // The getPokedexEntry will handle finding the correct form from the assetForms array.
+                let formKey = pokemon.formId;
+                // Normalize the formKey from pokedex.json
+                formKey = formKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+                if (!formKey || formKey === 'UNSET') {
+                    formKey = 'NORMAL';
+                }
+                this.pokedex[dexKey][formKey] = pokemon;
+
+                // Process assetForms for additional forms/costumes
+                if (pokemon.assetForms && Array.isArray(pokemon.assetForms)) {
+                    pokemon.assetForms.forEach(assetForm => {
+                        let assetFormKey = assetForm.form || assetForm.costume;
+                        if (assetFormKey) {
+                            assetFormKey = assetFormKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+                            if (!assetFormKey || assetFormKey === 'UNSET') {
+                                assetFormKey = 'NORMAL';
+                            }
+                            // Only add if it's not already there from the main formId
+                            if (!this.pokedex[dexKey][assetFormKey]) {
+                                // Combine base pokemon data with assetForm's specific assets
+                                const combinedPokemonData = {
+                                    ...pokemon,
+                                    assets: {
+                                        image: assetForm.image,
+                                        shinyImage: assetForm.shinyImage
+                                    }
+                                };
+                                this.pokedex[dexKey][assetFormKey] = combinedPokemonData;
+                            }
+                        }
+                    });
+                }
             });
             console.log(`👍 Pokédex is now loaded with ${Object.keys(this.pokedex).length} entries.`);
         } catch (error) {
@@ -113,9 +142,18 @@ const pokedexService = {
             this.defaultShinyTier = shinyRatesData.default_tier;
             console.log('Shiny rates loaded successfully.');
         } catch (error) {
-            console.error('Could not load shinyRates.json. Shiny rates will not be available.', error);
+            console.warn(`⚠️ Could not load shinyRates.json: ${error.message}`);
             this.shinyRates = {};
             this.shinyPokemonTiers = {};
+        }
+
+        try {
+            const costumeMapContent = await fs.readFile(COSTUME_ID_MAP_FILE, 'utf-8');
+            this.costumeIdMap = JSON.parse(costumeMapContent);
+            console.log('Costume ID map loaded successfully.');
+        } catch (error) {
+            console.warn(`⚠️ Could not load costumeIdMap.json: ${error.message}`);
+            this.costumeIdMap = {};
         }
     },
     getShinyRate(pokemonId) {
