@@ -100,6 +100,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mainTitle.textContent = authStatus.loggedIn ? authStatus.username : 'My Profile';
                 setLinkVisibility(true, false, false, false, true); // Home, Logout
             }
+
+            // --- Burger Menu Logic ---
+            const burgerMenu = document.querySelector('.burger-menu');
+            const mainNav = document.querySelector('.main-nav');
+
+            if (burgerMenu && mainNav) {
+                burgerMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mainNav.classList.toggle('open');
+                });
+
+                // Close menu when a link inside is clicked
+                mainNav.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('nav-link')) {
+                        mainNav.classList.remove('open');
+                    }
+                });
+            }
+            
+            // Close menu when clicking outside of it
+            document.addEventListener('click', (e) => {
+                if (mainNav && mainNav.classList.contains('open')) {
+                    const isClickInsideNav = mainNav.contains(e.target);
+                    const isClickOnBurger = burgerMenu.contains(e.target);
+                    if (!isClickInsideNav && !isClickOnBurger) {
+                        mainNav.classList.remove('open');
+                    }
+                }
+            });
+
         } catch (error) {
             console.error('loadHeader.js: Failed to load header:', error);
         }

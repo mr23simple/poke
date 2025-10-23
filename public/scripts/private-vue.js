@@ -2,7 +2,7 @@
  * This script contains the complete Vue.js application logic for the private dashboard.
  */
 
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, watch } = Vue;
 
 // --- Global Helper Functions ---
 
@@ -232,6 +232,11 @@ createApp({
             if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
             return badgesHTML;
         };
+
+        // --- Watchers ---
+        watch(showModal, (isModalVisible) => {
+            document.body.classList.toggle('modal-open', isModalVisible);
+        });
 
         // --- Lifecycle Hook ---
         onMounted(async () => {

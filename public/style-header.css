@@ -69,3 +69,81 @@
 .main-header .login-button:hover {
     background-color: #0056b3;
 }
+
+/* --- Burger Menu & Sidebar --- */
+.burger-menu {
+    display: none; /* Hidden on desktop */
+    flex-direction: column;
+    justify-content: space-around;
+    width: 2rem;
+    height: 2rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1002; /* Above everything */
+}
+
+.burger-menu span {
+    width: 2rem;
+    height: 0.25rem;
+    background: white;
+    border-radius: 10px;
+    transition: all 0.3s linear;
+    position: relative;
+    transform-origin: 1px;
+}
+
+@media (max-width: 768px) {
+    /* Show burger and hide normal nav */
+    .burger-menu {
+        display: flex;
+    }
+    .main-header .header-nav {
+        display: none;
+    }
+
+    /* Sidebar styles */
+    .main-nav {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Start off-screen */
+        width: 250px;
+        height: 100vh;
+        background: rgba(51, 51, 51, 0.8); /* Default dark glass */
+        backdrop-filter: blur(10px);
+        padding-top: 5rem;
+        transition: right 0.3s ease-in-out;
+        z-index: 1001;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    }
+
+    .main-header.team-valor-bg .main-nav {
+        background: rgba(231, 76, 60, 0.8);
+    }
+    .main-header.team-mystic-bg .main-nav {
+        background: rgba(52, 152, 219, 0.8);
+    }
+    .main-header.team-instinct-bg .main-nav {
+        background: rgba(241, 196, 15, 0.8);
+    }
+
+    .main-nav.open {
+        right: 0; /* Slide in */
+    }
+
+    /* When sidebar is open, show nav links as a column */
+    .main-nav.open .header-nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .main-nav.open .header-nav .nav-link {
+        font-size: 1.2rem;
+        width: 100%;
+        text-align: center;
+    }
+}
