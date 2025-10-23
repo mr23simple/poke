@@ -63,6 +63,9 @@ const GridComponent = {
             if (this.getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
             if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
             if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
+            if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
+            if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
+            if (p.isMaxLevel) badgesHTML += ' <span class="badge max-level-badge">Max</span>';
             return badgesHTML;
         },
         getCardClass(p) { return p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card'; },
@@ -119,10 +122,27 @@ createApp({
         
         const getPokedexEntry = (p) => {
             if (!pokedexService.value.pokedex || !pokedexService.value.pokedex[p.pokemonId]) return null;
-            const normalEntry = pokedexService.value.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.value.pokedex[p.pokemonId])[0];
+            const allFormsForPokemon = pokedexService.value.pokedex[p.pokemonId];
+            const normalEntry = allFormsForPokemon['NORMAL'] || Object.values(allFormsForPokemon)[0];
             if (!normalEntry) return null;
-            const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, ""), '').toUpperCase() || 'NORMAL';
-            return pokedexService.value.pokedex[p.pokemonId]?.[formKey] || normalEntry;
+
+            const playerFormName = p.pokemonDisplay.formName;
+            if (!playerFormName || playerFormName === 'Unset' || playerFormName.toUpperCase().includes('NORMAL')) {
+                return normalEntry;
+            }
+
+            const normalizedPlayerForm = playerFormName.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+            for (const formKey in allFormsForPokemon) {
+                const pokedexForm = allFormsForPokemon[formKey];
+                const normalizedPokedexForm = formKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+                if (normalizedPlayerForm.includes(normalizedPokedexForm)) {
+                    return pokedexForm;
+                }
+            }
+
+            return normalEntry;
         };
 
         const highlights = computed(() => {
@@ -238,6 +258,7 @@ createApp({
             const pokedexEntry = getPokedexEntry(p);
             if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
             if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
+            if (p.isMaxLevel) badgesHTML += ' <span class="badge max-level-badge">Max</span>';
             return badgesHTML;
         };
 
@@ -270,6 +291,7 @@ createApp({
                 document.querySelector('.container').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
             } finally {
                 loading.value = false;
+                document.getElementById('app').classList.add('is-loaded');
             }
         });
 

@@ -198,6 +198,7 @@ td img {
 .legendary-badge { background-color: #8E44AD; }
 .mythical-badge { background-color: #ff69b4; }
 .traded-badge { background-color: #3498DB; }
+.max-level-badge { background-color: #B0B0B0; color: #333; text-shadow: none; }
 
 
 /* --- Rankings Expansion for Mobile --- */
@@ -412,4 +413,12 @@ h2.ranking-title-with-info {
 }
 .info-tooltip ul li span:last-child {
     font-weight: bold;
+}
+
+/* FOUC Fix for Private Dashboard */
+#app {
+    visibility: hidden;
+}
+#app.is-loaded {
+    visibility: visible;
 }

@@ -101,6 +101,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setLinkVisibility(true, false, false, false, true); // Home, Logout
             }
 
+            // All visibility is set, now make the nav visible to prevent FOUC
+            const headerNav = document.querySelector('.header-nav');
+            if (headerNav) {
+                headerNav.classList.add('nav-ready');
+            }
+
             // --- Burger Menu Logic ---
             const burgerMenu = document.querySelector('.burger-menu');
             const mainNav = document.querySelector('.main-nav');

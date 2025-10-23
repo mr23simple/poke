@@ -3,6 +3,7 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, 'data');
 const RANKINGS_FILE = path.join(DATA_DIR, 'rankings.json');
 const POKEDEX_FILE = path.join(DATA_DIR, 'pokedex.json');
+const POKEDEX_RAW_FILE = path.join(DATA_DIR, 'pokedex_raw.json');
 const PUBLIC_ID_MAP_FILE = path.join(DATA_DIR, 'publicIdMap.json');
 const SHINY_RATES_FILE = path.join(DATA_DIR, 'shinyRates.json');
 
@@ -31,5 +32,6 @@ module.exports = {
     RANKINGS_FILE,
     DATA_DIR,
     PUBLIC_ID_MAP_FILE,
-    SHINY_RATES_FILE
+    SHINY_RATES_FILE,
+    POKEDEX_RAW_FILE
 };

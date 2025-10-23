@@ -145,13 +145,29 @@ const playerDataService = {
 
             let allPokemon = [];
             let recentPlayers = [];
-
             const getPokedexEntry = (p) => {
                 if (!pokedexService.pokedex || !pokedexService.pokedex[p.pokemonId]) return null;
-                const normalEntry = pokedexService.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.pokedex[p.pokemonId])[0];
+                const allFormsForPokemon = pokedexService.pokedex[p.pokemonId];
+                const normalEntry = allFormsForPokemon['NORMAL'] || Object.values(allFormsForPokemon)[0];
                 if (!normalEntry) return null;
-                const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[̀-ͯ]/g, ""), '').toUpperCase() || 'NORMAL';
-                return pokedexService.pokedex[p.pokemonId]?.[formKey] || normalEntry;
+
+                const playerFormName = p.pokemonDisplay.formName;
+                if (!playerFormName || playerFormName === 'Unset' || playerFormName.toUpperCase().includes('NORMAL')) {
+                    return normalEntry;
+                }
+
+                const normalizedPlayerForm = playerFormName.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+                for (const formKey in allFormsForPokemon) {
+                    const pokedexForm = allFormsForPokemon[formKey];
+                    const normalizedPokedexForm = formKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+                    if (normalizedPlayerForm.includes(normalizedPokedexForm)) {
+                        return pokedexForm;
+                    }
+                }
+
+                return normalEntry;
             };
 
             for (const file of playerFiles) {
@@ -250,7 +266,8 @@ const playerDataService = {
                     isPurified: p.pokemonDisplay.purified,
                     isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
                     isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
-                    isTraded: p.tradedTimeMs > 0
+                    isTraded: p.tradedTimeMs > 0,
+                    isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
                 }));
 
             const rankings = { recentPlayers: sortedRecentPlayers, strongestPokemon, rarestPokemon: rarestPokemonRanked };
@@ -316,10 +333,27 @@ const playerDataService = {
 
         const getPokedexEntry = (p) => {
             if (!pokedexService.pokedex || !pokedexService.pokedex[p.pokemonId]) return null;
-            const normalEntry = pokedexService.pokedex[p.pokemonId]['NORMAL'] || Object.values(pokedexService.pokedex[p.pokemonId])[0];
+            const allFormsForPokemon = pokedexService.pokedex[p.pokemonId];
+            const normalEntry = allFormsForPokemon['NORMAL'] || Object.values(allFormsForPokemon)[0];
             if (!normalEntry) return null;
-            const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[̀-ͯ]/g, ""), '').toUpperCase() || 'NORMAL';
-            return pokedexService.pokedex[p.pokemonId]?.[formKey] || normalEntry;
+
+            const playerFormName = p.pokemonDisplay.formName;
+            if (!playerFormName || playerFormName === 'Unset' || playerFormName.toUpperCase().includes('NORMAL')) {
+                return normalEntry;
+            }
+
+            const normalizedPlayerForm = playerFormName.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+            for (const formKey in allFormsForPokemon) {
+                const pokedexForm = allFormsForPokemon[formKey];
+                const normalizedPokedexForm = formKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '');
+
+                if (normalizedPlayerForm.includes(normalizedPokedexForm)) {
+                    return pokedexForm;
+                }
+            }
+
+            return normalEntry;
         };
 
         for (const file of playerFiles) {
@@ -399,7 +433,8 @@ const playerDataService = {
                 isPurified: p.pokemonDisplay.purified,
                 isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
                 isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
-                isTraded: p.tradedTimeMs > 0
+                isTraded: p.tradedTimeMs > 0,
+                isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
             }));
 
         await fs.writeFile(RANKINGS_FILE, JSON.stringify(rankings, null, 2));
@@ -575,16 +610,32 @@ const playerDataService = {
             const fileContent = await fs.readFile(filePath, 'utf-8');
             const data = JSON.parse(fileContent);
 
+            const getPokedexEntry = (p) => {
+                if (!pokedexService.pokedex || !pokedexService.pokedex[p.pokemonId]) return null;
+                const allFormsForPokemon = pokedexService.pokedex[p.pokemonId];
+                const normalEntry = allFormsForPokemon['NORMAL'] || Object.values(allFormsForPokemon)[0];
+                if (!normalEntry) return null;
+
+                if (!p.pokemonDisplay.formName || p.pokemonDisplay.formName === 'Unset' || p.pokemonDisplay.formName.toUpperCase().includes('NORMAL')) {
+                    return normalEntry;
+                }
+                
+                const formKey = p.pokemonDisplay.formName.replace(normalEntry.names.English.normalize("NFD").replace(/[\u0300-\u036f]/g, ""), '').toUpperCase().trim() || 'NORMAL';
+                return allFormsForPokemon[formKey] || normalEntry;
+            };
+
             data.pokemons = data.pokemons.map(p => {
                 if (p.isEgg || !p.pokemonDisplay) {
                     return p;
                 }
-                const pokedexEntry = Object.values(pokedexService.pokedex[p.pokemonId] || {})[0];
+                const pokedexEntry = getPokedexEntry(p);
                 return {
                     ...p,
                     name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                     sprite: pokedexService.getPokemonSprite(p),
-                    typeColors: pokedexService.getPokemonTypeColors(pokedexEntry)
+                    typeColors: pokedexService.getPokemonTypeColors(pokedexEntry),
+                    pokemonClass: pokedexEntry?.pokemonClass,
+                    isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
                 };
             });
             

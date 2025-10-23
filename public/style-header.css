@@ -44,6 +44,11 @@
     padding: 0;
     display: flex;
     gap: 15px;
+    visibility: hidden; /* Hide nav until JS is ready */
+}
+
+.main-header .header-nav.nav-ready {
+    visibility: visible;
 }
 
 

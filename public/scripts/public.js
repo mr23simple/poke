@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${p.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
                     ${p.isLegendary ? '<span class="badge legendary-badge">Legendary</span>' : ''}
                     ${p.isMythical ? '<span class="badge mythical-badge">Mythical</span>' : ''}
+                    ${p.isMaxLevel ? '<span class="badge max-level-badge">Max</span>' : ''}
                 </td>
                 <td>${maskUsername(p.owner)}</td>
             </tr>

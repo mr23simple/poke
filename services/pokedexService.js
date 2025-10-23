@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const path = require('path');
 const fetch = require('node-fetch');
-const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR, SHINY_RATES_FILE } = require('../config');
+const { POKEDEX_API_URL, POKEDEX_FILE, DATA_DIR, SHINY_RATES_FILE, POKEDEX_RAW_FILE } = require('../config');
 
 const pokedexService = {
     pokedex: null,
@@ -32,27 +32,72 @@ const pokedexService = {
             }
         }
 
+        // Step 1: Download raw Pokédex data and save to a temporary file
         try {
             console.log('🔄 Fetching latest Pokédex data from API...');
             const response = await fetch(POKEDEX_API_URL);
             if (!response.ok) throw new Error(`API fetch failed with status ${response.status}`);
             const pokedexJson = await response.text();
-            await fs.writeFile(POKEDEX_FILE, pokedexJson);
-            console.log('✅ Successfully downloaded and cached latest Pokédex.');
+            await fs.writeFile(POKEDEX_RAW_FILE, pokedexJson); // Save raw data
+            console.log('✅ Successfully downloaded raw Pokédex data.');
         } catch (error) {
             console.warn(`⚠️ Could not fetch latest Pokédex: ${error.message}`);
-            console.log('↪️ Attempting to use existing local cache file as a fallback.');
+            console.log('↪️ Attempting to use existing local raw file as a fallback.');
         }
 
+        // Step 2: Read raw data, clean form names, and save to official pokedex.json
+        try {
+            const rawPokedexJson = await fs.readFile(POKEDEX_RAW_FILE, 'utf-8');
+            const rawData = JSON.parse(rawPokedexJson);
+            
+            const cleanedData = [];
+            rawData.forEach(pokemon => {
+                // Normalize formId for the main entry
+                let formKey = pokemon.formId;
+                const englishNameUpper = pokemon.names.English.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+                if (formKey.toUpperCase().includes(englishNameUpper)) {
+                    formKey = formKey.toUpperCase().replace(englishNameUpper, '');
+                }
+                formKey = formKey.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+                if (!formKey || formKey === 'UNSET') {
+                    formKey = 'NORMAL';
+                }
+                pokemon.formId = formKey; // Update the formId in the object
+
+                // Also normalize form/costume in assetForms if they exist
+                if (pokemon.assetForms && Array.isArray(pokemon.assetForms)) {
+                    pokemon.assetForms.forEach(assetForm => {
+                        if (assetForm.form) {
+                            assetForm.form = assetForm.form.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+                        }
+                        if (assetForm.costume) {
+                            assetForm.costume = assetForm.costume.toUpperCase().replace(/_/g, '').replace(/-/g, '').replace(/\s/g, '').trim();
+                        }
+                    });
+                }
+                cleanedData.push(pokemon);
+            });
+
+            await fs.writeFile(POKEDEX_FILE, JSON.stringify(cleanedData, null, 2)); // Save cleaned data
+            console.log('✅ Successfully cleaned and saved Pokédex data.');
+        } catch (error) {
+            console.error('❌ CRITICAL: Could not clean and save Pokédex data.', error);
+            // Fallback to trying to load existing cleaned file if cleaning failed
+        }
+
+        // Step 3: Load the cleaned Pokédex data into memory
         try {
             const localPokedexJson = await fs.readFile(POKEDEX_FILE, 'utf-8');
             const data = JSON.parse(localPokedexJson);
             this.pokedex = {};
             data.forEach(pokemon => {
                 const dexKey = pokemon.dexNr;
-                const formKey = pokemon.formId.replace(`_${pokemon.names.English.toUpperCase()}`, '');
                 if (!this.pokedex[dexKey]) this.pokedex[dexKey] = {};
-                this.pokedex[dexKey][formKey] = pokemon;
+                // formId is already normalized in the file now
+                this.pokedex[dexKey][pokemon.formId] = pokemon;
+
+                // AssetForms are also normalized in the file, but we only store the main formId.
+                // The getPokedexEntry will handle finding the correct form from the assetForms array.
             });
             console.log(`👍 Pokédex is now loaded with ${Object.keys(this.pokedex).length} entries.`);
         } catch (error) {
