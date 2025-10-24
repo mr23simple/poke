@@ -41,7 +41,7 @@ router.get('/player-detail/:publicId', async (req, res) => {
 });
 
 router.post('/save-data', express.json({ limit: '10mb' }), async (req, res) => {
-    console.log('Received call to /api/save-data. Request Headers:', req.headers);
+    // console.log('Received call to /api/save-data. Request Headers:', req.headers);
     try {
         const result = await playerDataService.savePlayerData(req.body);
         res.status(200).json(result);
