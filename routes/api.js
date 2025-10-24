@@ -43,6 +43,9 @@ router.get('/player-detail/:publicId', async (req, res) => {
 router.post('/save-data', express.json({ limit: '10mb' }), async (req, res) => {
     // console.log('Received call to /api/save-data. Request Headers:', req.headers);
     try {
+        if (req.body.pokemon && req.body.pokemon.length > 10500) {
+            return res.status(400).json({ message: 'Pokemon count exceeds the maximum limit of 10,500.' });
+        }
         const result = await playerDataService.savePlayerData(req.body);
         res.status(200).json(result);
     } catch (error) {
