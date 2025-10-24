@@ -60,7 +60,11 @@ const GridComponent = {
             } else if (p.tradedTimeMs > 0) {
                 badgesHTML += ' <span class="badge traded-badge">Traded</span>';
             }
-            if (this.getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            if (p.isZeroIv) {
+                badgesHTML += ' <span class="badge zero-iv-badge">0 IV</span>';
+            } else if (this.getIvPercent(p) >= 100) {
+                badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            }
             if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
             if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
             if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
@@ -252,7 +256,11 @@ createApp({
             } else if (p.tradedTimeMs > 0) {
                 badgesHTML += ' <span class="badge traded-badge">Traded</span>';
             }
-            if (getIvPercent(p) >= 100) badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            if (p.isZeroIv) {
+                badgesHTML += ' <span class="badge zero-iv-badge">0 IV</span>';
+            } else if (getIvPercent(p) >= 100) {
+                badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+            }
             if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
             if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
             const pokedexEntry = getPokedexEntry(p);

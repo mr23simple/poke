@@ -201,6 +201,8 @@ td img {
 .traded-badge { background-color: #3498DB; }
 .max-level-badge { background-color: #B0B0B0; color: #333; text-shadow: none; }
 
+.zero-iv-badge { background-color: #34495e; }
+
 
 /* --- Rankings Expansion for Mobile --- */
 .ranking-footer {

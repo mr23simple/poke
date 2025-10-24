@@ -208,7 +208,10 @@ const playerDataService = {
                         };
 
                         // IV Rarity
-                        if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
+                        if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
+                            rarity.breakdown.iv.value = 4097; // Prioritize 0 IV as rarer than Perfect IV (highest Perfect IV is 4096)
+                            rarity.breakdown.iv.text = '0 IV';
+                        } else if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
                             const origin = p.originDetail?.originDetailCase;
                             if (p.isLucky) {
                                 rarity.breakdown.iv.value = 64;
@@ -287,6 +290,7 @@ const playerDataService = {
                     isShiny: p.pokemonDisplay.shiny,
                     isLucky: p.isLucky,
                     isPerfect: p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15,
+                    isZeroIv: p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0,
                     isShadow: p.pokemonDisplay.shadow,
                     isPurified: p.pokemonDisplay.purified,
                     isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
@@ -309,6 +313,7 @@ const playerDataService = {
                     isShiny: p.pokemonDisplay.shiny,
                     isLucky: p.isLucky,
                     isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
+                    isZeroIv: p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0,
                     isShadow: p.pokemonDisplay.shadow,
                     isPurified: p.pokemonDisplay.purified,
                     isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
@@ -426,7 +431,10 @@ const playerDataService = {
                     };
 
                     // IV Rarity
-                    if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
+                    if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
+                        rarity.breakdown.iv.value = 4097; // Prioritize 0 IV as rarer than Perfect IV (highest Perfect IV is 4096)
+                        rarity.breakdown.iv.text = '0 IV';
+                    } else if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
                         const origin = p.originDetail?.originDetailCase;
                         if (p.isLucky) {
                             rarity.breakdown.iv.value = 64;
@@ -497,6 +505,7 @@ const playerDataService = {
                 isShiny: p.pokemonDisplay.shiny,
                 isLucky: p.isLucky,
                 isPerfect: p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15,
+                isZeroIv: p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0,
                 isShadow: p.pokemonDisplay.shadow,
                 isPurified: p.pokemonDisplay.purified,
                 isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
@@ -519,6 +528,7 @@ const playerDataService = {
                 isShiny: p.pokemonDisplay.shiny,
                 isLucky: p.isLucky,
                 isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
+                isZeroIv: p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0,
                 isShadow: p.pokemonDisplay.shadow,
                 isPurified: p.pokemonDisplay.purified,
                 isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',

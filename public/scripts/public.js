@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span class="badges-container">
                             ${pokemon.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
                             ${pokemon.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (pokemon.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
+                            ${pokemon.isZeroIv ? '<span class="badge zero-iv-badge">0 IV</span>' : ''}
                             ${pokemon.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                             ${pokemon.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
                             ${pokemon.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
@@ -117,6 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span class="badges-container">
                             ${pokemon.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
                             ${pokemon.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (pokemon.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
+                            ${pokemon.isZeroIv ? '<span class="badge zero-iv-badge">0 IV</span>' : ''}
                             ${pokemon.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                             ${pokemon.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
                             ${pokemon.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
@@ -278,6 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="badges-cell">
                     ${p.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
                     ${p.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (p.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
+                    ${p.isZeroIv ? '<span class="badge zero-iv-badge">0 IV</span>' : ''}
                     ${p.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
                     ${p.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
                     ${p.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
