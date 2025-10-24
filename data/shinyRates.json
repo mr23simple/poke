@@ -1,10 +1,13 @@
 {
   "rates": {
-    "standard": 500,
+    "standard": 512,
     "permaboosted": 64,
     "legendary": 20,
     "community-day": 25,
-    "raid-day": 10
+    "raid-day": 10,
+    "mega": 128,
+    "rocket-leader": 64,
+    "rocket-grunt": 256
   },
   "pokemon": {
     "95": "permaboosted",  

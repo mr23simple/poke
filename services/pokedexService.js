@@ -156,10 +156,30 @@ const pokedexService = {
             this.costumeIdMap = {};
         }
     },
-    getShinyRate(pokemonId) {
-        if (!this.shinyRates) return this.shinyRates?.['standard'] || 500;
+    getShinyRate(pokemonId, origin, pokemonClass, originEvents) {
+        if (!this.shinyRates) return this.shinyRates?.['standard'] || 512;
+
+        // Priority for event-based rates
+        if (originEvents && originEvents.some(event => event.includes('community_day'))) {
+            return this.shinyRates['community-day'];
+        }
+
+        // Priority for origin-based rates
+        if (origin === 14 || origin === 3) { // Raid or GO (which can be raid)
+            if (pokemonClass === 'POKEMON_CLASS_LEGENDARY' || pokemonClass === 'POKEMON_CLASS_MYTHIC') {
+                return this.shinyRates['legendary'];
+            }
+        }
+        if (origin === 26 || origin === 28) { // Rocket Leader/Boss
+            return this.shinyRates['rocket-leader'];
+        }
+        if (origin === 27) { // Rocket Grunt
+            return this.shinyRates['rocket-grunt'];
+        }
+
+        // Fallback to pokemon-specific rates
         const tier = this.shinyPokemonTiers[pokemonId] || this.defaultShinyTier;
-        return this.shinyRates[tier] || this.shinyRates[this.defaultShinyTier] || 500;
+        return this.shinyRates[tier] || this.shinyRates[this.defaultShinyTier] || 512;
     },
     getPokemonName(dexNr, formName) {
         const defaultName = `Pokedex #${dexNr}`;

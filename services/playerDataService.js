@@ -199,33 +199,65 @@ const playerDataService = {
                     if (!p.isEgg && p.pokemonDisplay) {
                         const rarity = {
                             score: 1,
-                            breakdown: { iv: 1, shiny: 1, lucky: 1 }
+                            breakdown: {
+                                iv: { value: 1, text: '' },
+                                shiny: { value: 1, text: '' },
+                                lucky: { value: 1, text: '' },
+                                origin: { value: 1, text: '' }
+                            }
                         };
 
+                        // IV Rarity
                         if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
-                            let ivFloor = 0; // Default for wild catch
+                            const origin = p.originDetail?.originDetailCase;
                             if (p.isLucky) {
-                                ivFloor = 12;
-                            } else if (p.tradedTimeMs > 0) { // Non-lucky trade (assuming Best Friend)
-                                ivFloor = 5;
-                            } else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { // Raid, Egg, Research
-                                ivFloor = 10;
+                                rarity.breakdown.iv.value = 64;
+                                rarity.breakdown.iv.text = 'Lucky Trade';
+                            } else if (p.tradedTimeMs > 0) {
+                                rarity.breakdown.iv.value = 1331; // Assuming Best Friend trade
+                                rarity.breakdown.iv.text = 'Trade';
+                            } else if (origin === 3 || origin === 13 || origin === 14 || origin === 15 || origin === 10 || origin === 24) { // GO, Egg, Raid, Research, GBL
+                                rarity.breakdown.iv.value = 216;
+                                rarity.breakdown.iv.text = 'Egg/Raid/Research';
+                            } else if (origin === 28) { // Giovanni
+                                rarity.breakdown.iv.value = 1000;
+                                rarity.breakdown.iv.text = 'Giovanni';
                             } else if (p.pokemonDisplay?.weatherBoostedCondition) {
-                                ivFloor = 4;
+                                rarity.breakdown.iv.value = 1728;
+                                rarity.breakdown.iv.text = 'Weather Boosted';
+                            } else { // Wild
+                                rarity.breakdown.iv.value = 4096;
+                                rarity.breakdown.iv.text = 'Wild';
                             }
-                            const possibleValues = 16 - ivFloor;
-                            rarity.breakdown.iv = Math.pow(possibleValues, 3);
                         }
 
+                        // Shiny Rarity
                         if (p.pokemonDisplay?.shiny) {
-                            rarity.breakdown.shiny = pokedexService.getShinyRate(p.pokemonId);
+                            const shinyRate = pokedexService.getShinyRate(p.pokemonId, p.originDetail?.originDetailCase, getPokedexEntry(p)?.pokemonClass, p.originEvents);
+                            rarity.breakdown.shiny.value = shinyRate;
+                            if (p.originEvents && p.originEvents.some(event => event.includes('community_day'))) {
+                                rarity.breakdown.shiny.text = 'Community Day';
+                            } else {
+                                rarity.breakdown.shiny.text = 'Shiny';
+                            }
                         }
 
+                        // Lucky Rarity
                         if (p.isLucky) {
-                            rarity.breakdown.lucky = 20;
+                            rarity.breakdown.lucky.value = 20;
+                            rarity.breakdown.lucky.text = 'Lucky';
+                        }
+
+                        // Origin Rarity (e.g. shadow is rarer)
+                        if (p.pokemonDisplay?.shadow) {
+                            rarity.breakdown.origin.value = 2; // Arbitrary multiplier for shadow
+                            rarity.breakdown.origin.text = 'Shadow';
+                        } else if (p.pokemonDisplay?.purified) {
+                            rarity.breakdown.origin.value = 1.5; // Arbitrary multiplier for purified
+                            rarity.breakdown.origin.text = 'Purified';
                         }
                         
-                        rarity.score = rarity.breakdown.iv * rarity.breakdown.shiny * rarity.breakdown.lucky;
+                        rarity.score = rarity.breakdown.iv.value * rarity.breakdown.shiny.value * rarity.breakdown.lucky.value * rarity.breakdown.origin.value;
 
                         allPokemon.push({ ...p, owner: playerName, ownerId: playerId, ownerPublicId: publicId, rarity: rarity }); // Include public ID
                     }
@@ -245,7 +277,22 @@ const playerDataService = {
                     cp: p.cp,
                     owner: p.owner,
                     ownerId: p.ownerId,
-                    ownerPublicId: p.ownerPublicId // Include public ID
+                    ownerPublicId: p.ownerPublicId, // Include public ID
+                    iv: {
+                        attack: p.individualAttack,
+                        defense: p.individualDefense,
+                        stamina: p.individualStamina
+                    },
+                    cpm: p.cpMultiplier + (p.additionalCpMultiplier || 0),
+                    isShiny: p.pokemonDisplay.shiny,
+                    isLucky: p.isLucky,
+                    isPerfect: p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15,
+                    isShadow: p.pokemonDisplay.shadow,
+                    isPurified: p.pokemonDisplay.purified,
+                    isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
+                    isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
+                    isTraded: p.tradedTimeMs > 0,
+                    isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
                 }));
 
             const rarestPokemonRanked = [...allPokemon]
@@ -370,33 +417,61 @@ const playerDataService = {
                 if (!p.isEgg && p.pokemonDisplay) {
                     const rarity = {
                         score: 1,
-                        breakdown: { iv: 1, shiny: 1, lucky: 1 }
+                        breakdown: {
+                            iv: { value: 1, text: '' },
+                            shiny: { value: 1, text: '' },
+                            lucky: { value: 1, text: '' },
+                            origin: { value: 1, text: '' }
+                        }
                     };
 
+                    // IV Rarity
                     if (p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15) {
-                        let ivFloor = 0; // Default for wild catch
+                        const origin = p.originDetail?.originDetailCase;
                         if (p.isLucky) {
-                            ivFloor = 12;
-                        } else if (p.tradedTimeMs > 0) { // Non-lucky trade (assuming Best Friend)
-                            ivFloor = 5;
-                        } else if (p.originDetail?.originDetailCase === 3 || p.hatchedFromEgg) { // Raid, Egg, Research
-                            ivFloor = 10;
+                            rarity.breakdown.iv.value = 64;
+                            rarity.breakdown.iv.text = 'Lucky Trade';
+                        } else if (p.tradedTimeMs > 0) {
+                            rarity.breakdown.iv.value = 1331; // Assuming Best Friend trade
+                            rarity.breakdown.iv.text = 'Trade';
+                        } else if (origin === 3 || origin === 13 || origin === 14 || origin === 15 || origin === 10 || origin === 24) { // GO, Egg, Raid, Research, GBL
+                            rarity.breakdown.iv.value = 216;
+                            rarity.breakdown.iv.text = 'Egg/Raid/Research';
+                        } else if (origin === 28) { // Giovanni
+                            rarity.breakdown.iv.value = 1000;
+                            rarity.breakdown.iv.text = 'Giovanni';
                         } else if (p.pokemonDisplay?.weatherBoostedCondition) {
-                            ivFloor = 4;
+                            rarity.breakdown.iv.value = 1728;
+                            rarity.breakdown.iv.text = 'Weather Boosted';
+                        } else { // Wild
+                            rarity.breakdown.iv.value = 4096;
+                            rarity.breakdown.iv.text = 'Wild';
                         }
-                        const possibleValues = 16 - ivFloor;
-                        rarity.breakdown.iv = Math.pow(possibleValues, 3);
                     }
 
+                    // Shiny Rarity
                     if (p.pokemonDisplay?.shiny) {
-                        rarity.breakdown.shiny = pokedexService.getShinyRate(p.pokemonId);
+                        const shinyRate = pokedexService.getShinyRate(p.pokemonId, p.originDetail?.originDetailCase, getPokedexEntry(p)?.pokemonClass);
+                        rarity.breakdown.shiny.value = shinyRate;
+                        rarity.breakdown.shiny.text = 'Shiny';
                     }
 
+                    // Lucky Rarity
                     if (p.isLucky) {
-                        rarity.breakdown.lucky = 20;
+                        rarity.breakdown.lucky.value = 20;
+                        rarity.breakdown.lucky.text = 'Lucky';
+                    }
+
+                    // Origin Rarity (e.g. shadow is rarer)
+                    if (p.pokemonDisplay?.shadow) {
+                        rarity.breakdown.origin.value = 2; // Arbitrary multiplier for shadow
+                        rarity.breakdown.origin.text = 'Shadow';
+                    } else if (p.pokemonDisplay?.purified) {
+                        rarity.breakdown.origin.value = 1.5; // Arbitrary multiplier for purified
+                        rarity.breakdown.origin.text = 'Purified';
                     }
                     
-                    rarity.score = rarity.breakdown.iv * rarity.breakdown.shiny * rarity.breakdown.lucky;
+                    rarity.score = rarity.breakdown.iv.value * rarity.breakdown.shiny.value * rarity.breakdown.lucky.value * rarity.breakdown.origin.value;
 
                     allPokemon.push({ ...p, owner: currentOwnerName, ownerId: currentOwnerId, ownerPublicId: currentOwnerPublicId, rarity: rarity }); // Include public ID
                 }
@@ -412,7 +487,22 @@ const playerDataService = {
                 cp: p.cp,
                 owner: p.owner,
                 ownerId: p.ownerId,
-                ownerPublicId: p.ownerPublicId // Include public ID
+                ownerPublicId: p.ownerPublicId, // Include public ID
+                iv: {
+                    attack: p.individualAttack,
+                    defense: p.individualDefense,
+                    stamina: p.individualStamina
+                },
+                cpm: p.cpMultiplier + (p.additionalCpMultiplier || 0),
+                isShiny: p.pokemonDisplay.shiny,
+                isLucky: p.isLucky,
+                isPerfect: p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15,
+                isShadow: p.pokemonDisplay.shadow,
+                isPurified: p.pokemonDisplay.purified,
+                isLegendary: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_LEGENDARY',
+                isMythical: getPokedexEntry(p)?.pokemonClass === 'POKEMON_CLASS_MYTHIC',
+                isTraded: p.tradedTimeMs > 0,
+                isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
             }));
 
         rankings.rarestPokemon = [...allPokemon]
