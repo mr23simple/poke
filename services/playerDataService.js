@@ -459,9 +459,13 @@ const playerDataService = {
 
                     // Shiny Rarity
                     if (p.pokemonDisplay?.shiny) {
-                        const shinyRate = pokedexService.getShinyRate(p.pokemonId, p.originDetail?.originDetailCase, getPokedexEntry(p)?.pokemonClass);
+                        const shinyRate = pokedexService.getShinyRate(p.pokemonId, p.originDetail?.originDetailCase, getPokedexEntry(p)?.pokemonClass, p.originEvents);
                         rarity.breakdown.shiny.value = shinyRate;
-                        rarity.breakdown.shiny.text = 'Shiny';
+                        if (p.originEvents && p.originEvents.some(event => event.includes('community_day'))) {
+                            rarity.breakdown.shiny.text = 'Community Day';
+                        } else {
+                            rarity.breakdown.shiny.text = 'Shiny';
+                        }
                     }
 
                     // Lucky Rarity
