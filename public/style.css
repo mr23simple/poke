@@ -419,9 +419,6 @@ h2.ranking-title-with-info {
 }
 
 /* FOUC Fix for Private Dashboard */
-#app {
-    visibility: hidden;
-}
 #app.is-loaded {
     visibility: visible;
 }

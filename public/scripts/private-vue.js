@@ -299,7 +299,6 @@ createApp({
                 document.querySelector('.container').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
             } finally {
                 loading.value = false;
-                document.getElementById('app').classList.add('is-loaded');
             }
         });
 
