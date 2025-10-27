@@ -18,8 +18,10 @@
     
 
     <div class="container" id="rankings-container">
-        <!-- Loading message -->
-        <div id="loading-message" class="card"><p>Loading rankings...</p></div>
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p class="loading-message">Loading rankings...</p>
+        </div>
 
         <!-- This is where the 3 columns will be rendered -->
         <div id="rankings-grid" class="hidden">
@@ -124,4 +126,3 @@
     <script src="/scripts/rankings.js"></script>
 </body>
 </html>
-

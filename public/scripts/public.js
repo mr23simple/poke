@@ -4,7 +4,7 @@
  */
 document.addEventListener('DOMContentLoaded', async () => {
     // --- ELEMENT REFERENCES ---
-    const loadingMessage = document.getElementById('loading-message');
+    const loadingOverlay = document.getElementById('loading-overlay');
     const rankingsGrid = document.getElementById('rankings-grid');
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalContent = document.getElementById('modal-content');
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Hide loading message and show the rankings grid
-        loadingMessage.classList.add('hidden');
+        loadingOverlay.classList.add('hidden');
         rankingsGrid.classList.remove('hidden');
 
         // --- Rarity Info Tooltip Logic ---
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Failed to initialize public dashboard:', error);
-        loadingMessage.innerHTML = '<p>Could not load ranking data. Please try again later.</p>';
+        loadingOverlay.innerHTML = '<p>Could not load ranking data. Please try again later.</p>';
     }
 
     // Add a single event listener to the modal backdrop to handle closing
