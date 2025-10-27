@@ -1,0 +1,172 @@
+/* Private Dashboard Specific Styles */
+
+/* --- Page-Specific Body Styles --- */
+body.dashboard-private, body:not([class]) {
+    overflow-y: auto; /* Default scroll behavior for login, register, and private dashboard */
+}
+
+/* --- Trainer & Item Summaries --- */
+.trainer-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.team-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e0e0e0;
+}
+#trainerLevel {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.xp-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+.xp-bar {
+    height: 20px;
+    background-color: #4caf50;
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+}
+.xp-text {
+    font-size: 0.8em;
+    color: #555;
+    text-align: center;
+    margin: 0 0 15px 0;
+}
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.item-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.item-list li:last-child {
+    border-bottom: none;
+}
+.item-count {
+    font-weight: bold;
+}
+
+/* --- Responsive Layout --- */
+@media (min-width: 992px) {
+    .dashboard-container {
+        flex-wrap: nowrap;
+    }
+    #trainer-summary {
+        flex-basis: 35%;
+    }
+    #item-summary {
+        flex-basis: 25%;
+    }
+    #pokemon-summary {
+        flex-basis: 40%;
+    }
+}
+
+#item-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+#item-summary .item-list {
+    overflow-y: auto; /* This makes the card scroll if content is too long */
+}
+
+.item-category-header {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #6c757d;
+    font-weight: bold;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+#item-summary > h3:first-of-type {
+    margin-top: 0;
+}
+
+.item-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 12px;
+}
+
+.item-card {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+}
+
+.item-card img {
+    width: 75%;
+    height: 75%;
+    object-fit: contain;
+}
+
+.item-count-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: rgba(33, 37, 41, 0.8);
+    color: white;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 0.75em;
+    font-weight: bold;
+    border: 1px solid white;
+}
+
+/* --- Private Dashboard Layout --- */
+.dashboard-private .container { max-width: 1200px; }
+.dashboard-private main { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 992px) {
+    .dashboard-private main { grid-template-columns: 1fr 1fr; align-items: flex-start; }
+    .dashboard-private .left-column { grid-column: 1 / 2; }
+    .dashboard-private .right-column { grid-column: 2 / 3; grid-row: 1 / 3; }
+    .dashboard-private #pokemon-summary { height: 100%; }
+}
+.left-column, .right-column { display: flex; flex-direction: column; gap: 20px; }
+
+
+/* --- Private Dashboard Components --- */
+.trainer-info { display: flex; align-items: center; gap: 15px; }
+.team-logo { width: 60px; height: 60px; border-radius: 50%; }
+#trainerLevel { font-size: 1.5em; font-weight: bold; }
+.xp-bar-container { width: 100%; background-color: #e9ecef; border-radius: 10px; margin-top: 15px; }
+.xp-bar { height: 20px; background-color: #4caf50; border-radius: 10px; }
+.xp-text { font-size: 0.8em; color: #555; text-align: center; margin-top: 5px; }
+.item-category-header { font-size: 0.9em; text-transform: uppercase; margin-top: 20px; margin-bottom: 10px; color: #6c757d; font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #eee; }
+#item-summary > div:first-of-type > h3, #item-summary > h3:first-of-type { margin-top: 0; }
+.item-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 15px; }
+.item-card { position: relative; width: 60px; height: 60px; background-color: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dee2e6; }
+.item-card img { width: 75%; height: 75%; object-fit: contain; }
+.item-count-badge { position: absolute; bottom: -5px; right: -5px; background-color: rgba(33, 37, 41, 0.8); color: white; border-radius: 10px; padding: 1px 6px; font-size: 0.75em; font-weight: bold; border: 1px solid white; }
+.item-summary-collapsed p { margin: 10px 0; font-size: 1em; }
+.item-summary-collapsed strong { display: inline-block; width: 100px; }
+.btn-secondary { padding: 6px 12px; font-size: 0.8em; background-color: #e9e9e9; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+
+/* FOUC Fix for Private Dashboard */
+#app.is-loaded {
+    visibility: visible;
+}

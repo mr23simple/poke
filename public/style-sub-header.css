@@ -1,0 +1,31 @@
+
+.sub-header {
+    background-color: #444; /* Lighter default */
+    padding: 0.5rem 0;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.sub-header a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.sub-header a:hover {
+    background-color: #555;
+}
+.sub-header a.active {
+    background-color: #555;
+}
+
+.main-header.team-valor-bg + .sub-header {
+    background-color: #ed6a5e; /* Lighter valor */
+}
+.main-header.team-mystic-bg + .sub-header {
+    background-color: #5dade2; /* Lighter mystic */
+}
+.main-header.team-instinct-bg + .sub-header {
+    background-color: #f3d03e; /* Lighter instinct */
+}

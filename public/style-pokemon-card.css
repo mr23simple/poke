@@ -1,0 +1,88 @@
+/* Pokémon Card Specific Styles (Shared) */
+
+/* --- Pokémon Highlights & Modal List (UNIFIED STYLE) --- */
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--bg-color);
+    margin-bottom: 15px;
+}
+.summary-header h2 {
+    border-bottom: none;
+    margin-bottom: 10px;
+}
+#view-all-pokemon-btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+    background-color: #e9e9e9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#view-all-pokemon-btn:hover {
+    background-color: #ddd;
+}
+
+/* This single rule now applies the grid to BOTH the highlights and the modal list */
+#pokemon-highlights-container, #all-pokemon-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+/* Unified Pokémon Card Style */
+.pokemon-card {
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    padding: 10px;
+    text-align: center;
+    background: linear-gradient(145deg, #f9f9f9, #e6e6e6);
+}
+.pokemon-card img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+.pokemon-name {
+    font-weight: bold;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+.pokemon-cp {
+    font-size: 0.9em;
+    color: #555;
+}
+.iv-bar-container {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    margin: 8px 0;
+}
+.iv-bar {
+    height: 100%;
+    background-color: var(--team-instinct);
+    border-radius: 4px;
+}
+.pokemon-card small {
+    font-size: 0.75em;
+    color: #666;
+}
+.badge {
+    font-size: 0.7em;
+    padding: 2px 6px;
+    border-radius: 10px;
+    color: white;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+.shiny-badge {
+    background-color: #d4af37;
+}
+.lucky-badge {
+    background-color: #ff69b4;
+}
+.perfect-badge {
+    background-color: #e74c3c;
+}
