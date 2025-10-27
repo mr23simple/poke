@@ -20,8 +20,9 @@
     <div id="app" class="container">
         
 
-        <div v-if="loading" class="card">
-            <p>Loading player data...</p>
+        <div v-if="loading" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p class="loading-message">Loading player data...</p>
         </div>
 
         <!-- The new two-column dashboard layout -->
