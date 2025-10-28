@@ -16,6 +16,8 @@ data/pokedex_raw.json
 data/pokedex.json
 data/publicIdMap.json
 data/rankings.json
+data/charged_moves.json
+data/fast_moves.json
 
 # Environment Variables (Good Practice)
 # Contains sensitive information like API keys or secrets.
