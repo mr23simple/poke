@@ -320,3 +320,17 @@ h2.ranking-title-with-info {
 .info-tooltip ul li span:last-child {
     font-weight: bold;
 }
+
+/* Styles moved from login.html */
+.or-separator {
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+    color: #666;
+}
+.error-message {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    display: none;
+}

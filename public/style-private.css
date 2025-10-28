@@ -170,3 +170,27 @@ body.dashboard-private, body:not([class]) {
 #app.is-loaded {
     visibility: visible;
 }
+
+/* Styles for the new Pokemon tab view */
+#pokemon-section {
+    display: flex;
+    flex-direction: column;
+    /* The .card class already provides padding and background */
+}
+
+#pokemon-section .summary-header {
+    border-bottom: 2px solid var(--bg-color);
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+#pokemon-section .sort-bar {
+    flex-shrink: 0;
+}
+
+#pokemon-section #all-pokemon-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin: 0 -10px; /* Counteract card padding for full bleed scroll */
+    padding: 0 10px;
+}

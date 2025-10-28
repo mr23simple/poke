@@ -92,7 +92,7 @@ createApp({
         const player = ref({});
         const items = ref([]);
         const pokedexService = ref({ typeColorMap: {}, pokedex: null });
-        const showModal = ref(false);
+        const activeTab = ref('character'); // New state for active tab
         const searchQuery = ref('');
         const sortKey = ref('caughtTime');
         const itemsExpanded = ref(false);
@@ -270,10 +270,25 @@ createApp({
             return badgesHTML;
         };
 
-        // --- Watchers ---
-        watch(showModal, (isModalVisible) => {
-            document.body.classList.toggle('modal-open', isModalVisible);
-        });
+        // --- Tab Navigation ---
+        const updateActiveTabFromHash = () => {
+            const hash = window.location.hash.replace('#', '');
+            const validTabs = ['character', 'pokemon', 'statistics'];
+            if (validTabs.includes(hash)) {
+                activeTab.value = hash;
+            } else {
+                activeTab.value = 'character';
+            }
+            // Update active class on subheader links
+            document.querySelectorAll('.sub-header a').forEach(link => {
+                if (link.id === `nav-${activeTab.value}`) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        };
+
 
         // --- Lifecycle Hook ---
         onMounted(async () => {
@@ -294,6 +309,10 @@ createApp({
                     mainTitleElement.textContent = `${account.value.name}'s Profile`;
                 }
 
+                // Set up tab navigation
+                updateActiveTabFromHash();
+                window.addEventListener('hashchange', updateActiveTabFromHash);
+
             } catch (error) {
                 console.error('Dashboard Error:', error);
                 document.querySelector('.container').innerHTML = `<div class="card"><p>Could not load your player data. Reason: ${error.message}</p></div>`;
@@ -304,7 +323,7 @@ createApp({
 
         // --- Expose to Template ---
         return {
-            loading, account, player, items, showModal, searchQuery, sortKey, sortDirection, itemsExpanded,
+            loading, account, player, items, activeTab, searchQuery, sortKey, sortDirection, itemsExpanded,
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
             totalPokeBalls, totalPotions, totalRevives,

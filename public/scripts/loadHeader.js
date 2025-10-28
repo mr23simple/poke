@@ -24,6 +24,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const headerHtml = await response.text();
             headerPlaceholder.innerHTML = headerHtml;
 
+            // Load sub-header
+            const subheaderPlaceholder = document.getElementById('subheader-placeholder');
+            if (subheaderPlaceholder) {
+                try {
+                    const subheaderResponse = await fetch('/components/subheader.html');
+                    if (subheaderResponse.ok) {
+                        subheaderPlaceholder.innerHTML = await subheaderResponse.text();
+                    }
+                } catch (error) {
+                    console.error('Failed to load sub-header:', error);
+                }
+            }
+
             const mainTitle = document.getElementById('main-title');
             const navHome = document.getElementById('nav-home');
             const navLogin = document.getElementById('nav-login');
