@@ -113,8 +113,8 @@ td img {
 .list-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: 10px; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; }
 .list-row:last-child { border-bottom: none; }
 .owner-cell { font-size: 0.9em; }
-.pokemon-cell { display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
-.badges-cell { flex-direction: column; align-items: flex-start; gap: 4px; }
+.pokemon-cell { display: flex; align-items: center; line-height: normal;}
+.badges-cell { flex-direction: column; align-items: flex-start; line-height: normal;}
 .clickable-row { cursor: pointer; }
 .clickable-pokemon-row { cursor: pointer; }
 

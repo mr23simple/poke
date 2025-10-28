@@ -87,6 +87,11 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
 .shiny-badge { background-color: #d4af37; }
 .lucky-badge { background-color: #FFD700; color: #333; text-shadow: none; }
 .perfect-badge { background-color: #e74c3c; }
+.shundo-badge { background: linear-gradient(45deg, #d4af37, #e74c3c); }
+.shnundo-badge { background: linear-gradient(45deg, #d4af37, #34495e); }
+.max-badge { background: linear-gradient(45deg, #e74c3c, #B0B0B0); }
+.lundo-badge { background: linear-gradient(45deg, #FFD700, #e74c3c); }
+.shlundo-badge { background: linear-gradient(45deg, #d4af37, #FFD700, #e74c3c); }
 .iv-bar-container { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; margin: 8px 0; }
 .iv-bar { height: 100%; border-radius: 4px; }
 .shadow-badge { background-color: #5a2d82; }
