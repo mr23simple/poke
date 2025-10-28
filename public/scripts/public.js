@@ -314,7 +314,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${index + 1}</td>
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
-                    <span>${p.name}</span>
                 </td>
                 <td><strong>${p.cp.toLocaleString()}</strong></td>
                 <td class="hide-on-mobile">${maskUsername(p.owner)}</td>
@@ -329,7 +328,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td><strong>${index + 1}</strong></td>
                 <td class="pokemon-cell">
                     <img src="${p.sprite}" alt="${p.name}">
-                    <span>${p.name}</span>
                 </td>
                 <td class="badges-cell">
                     ${generateBadges(p)}
