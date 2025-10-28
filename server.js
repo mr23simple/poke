@@ -20,6 +20,7 @@ app.use(session({
     cookie: { maxAge: 86400000 }
 }));
 app.use(express.static('public'));
+app.use('/data', express.static(path.join(__dirname, 'data')));
 app.use('/data', express.static('data'));
 
 // --- Routes ---

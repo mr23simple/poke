@@ -80,4 +80,13 @@ router.get('/check-auth-status', async (req, res) => {
     }
 });
 
+router.get('/moves', (req, res) => {
+    try {
+        res.json(pokedexService.moveMap);
+    } catch (error) {
+        console.error("Error in /api/moves:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

@@ -7,6 +7,9 @@ const POKEDEX_RAW_FILE = path.join(DATA_DIR, 'pokedex_raw.json');
 const COSTUME_ID_MAP_FILE = path.join(DATA_DIR, 'costumeIdMap.json');
 const PUBLIC_ID_MAP_FILE = path.join(DATA_DIR, 'publicIdMap.json');
 const SHINY_RATES_FILE = path.join(DATA_DIR, 'shinyRates.json');
+const MOVE_ID_MAP_FILE = path.join(DATA_DIR, 'moveIdMap.json');
+const FAST_MOVES_FILE = path.join(DATA_DIR, 'fast_moves.json');
+const CHARGED_MOVES_FILE = path.join(DATA_DIR, 'charged_moves.json');
 
 /**
  * For a production environment, it's highly recommended to use environment variables
@@ -35,5 +38,8 @@ module.exports = {
     PUBLIC_ID_MAP_FILE,
     SHINY_RATES_FILE,
     POKEDEX_RAW_FILE,
-    COSTUME_ID_MAP_FILE
+    COSTUME_ID_MAP_FILE,
+    MOVE_ID_MAP_FILE,
+    FAST_MOVES_FILE,
+    CHARGED_MOVES_FILE
 };

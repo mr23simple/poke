@@ -458,95 +458,55 @@ createApp({
             return name;
         };
 
-                const getMoveName = (moveId) => moveMap.value[moveId] || moveId;
+                                const displayMove = (moveId) => moveMap.value[moveId] || moveId;
 
-        
+                        
 
-                        const openPokemonModal = (pokemon) => {
+                                const openPokemonModal = (pokemon) => {
 
-        
+                                    selectedPokemon.value = pokemon;
 
-                            selectedPokemon.value = pokemon;
+                                    setTimeout(() => {
 
-        
+                                        const attackBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="attack"]');
 
-                            setTimeout(() => {
+                                        const defenseBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="defense"]');
 
-        
+                                        const staminaBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="stamina"]');
 
-                                const attackBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="attack"]');
+                        
 
-        
+                                        if (attackBar) {
 
-                                const defenseBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="defense"]');
+                                            attackBar.style.width = `${(pokemon.individualAttack / 15) * 100}%`;
 
-        
+                                            attackBar.style.backgroundColor = pokemon.individualAttack === 15 ? '#da7a79' : '#f79513';
 
-                                const staminaBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="stamina"]');
+                                        }
 
-        
+                                        if (defenseBar) {
+
+                                            defenseBar.style.width = `${(pokemon.individualDefense / 15) * 100}%`;
+
+                                            defenseBar.style.backgroundColor = pokemon.individualDefense === 15 ? '#da7a79' : '#f79513';
+
+                                        }
+
+                                        if (staminaBar) {
+
+                                            staminaBar.style.width = `${(pokemon.individualStamina / 15) * 100}%`;
+
+                                            staminaBar.style.backgroundColor = pokemon.individualStamina === 15 ? '#da7a79' : '#f79513';
+
+                                        }
+
+                                    }, 100);
+
+                                };
 
                 
 
-        
-
-                                if (attackBar) {
-
-        
-
-                                    attackBar.style.width = `${(pokemon.individualAttack / 15) * 100}%`;
-
-        
-
-                                    attackBar.style.backgroundColor = pokemon.individualAttack === 15 ? '#da7a79' : '#f79513';
-
-        
-
-                                }
-
-        
-
-                                if (defenseBar) {
-
-        
-
-                                    defenseBar.style.width = `${(pokemon.individualDefense / 15) * 100}%`;
-
-        
-
-                                    defenseBar.style.backgroundColor = pokemon.individualDefense === 15 ? '#da7a79' : '#f79513';
-
-        
-
-                                }
-
-        
-
-                                if (staminaBar) {
-
-        
-
-                                    staminaBar.style.width = `${(pokemon.individualStamina / 15) * 100}%`;
-
-        
-
-                                    staminaBar.style.backgroundColor = pokemon.individualStamina === 15 ? '#da7a79' : '#f79513';
-
-        
-
-                                }
-
-        
-
-                            }, 100);
-
-        
-
-                        };
-
-        
-
-                // --- Tab Navigation ---
+                        // --- Tab Navigation ---
         const updateActiveTabFromHash = () => {
             const hash = window.location.hash.replace('#', '');
             const validTabs = ['character', 'pokemon', 'statistics'];
@@ -582,18 +542,10 @@ createApp({
 
                 allPokemons.value = rawPokemons;
 
-                // Fetch pokedex data to build move map
-                const pokedexResponse = await fetch('/data/pokedex.json');
-                if (pokedexResponse.ok) {
-                    const pokedexData = await pokedexResponse.json();
-                    const newMoveMap = {};
-                    pokedexData.forEach(pokemon => {
-                        Object.values(pokemon.quickMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
-                        Object.values(pokemon.cinematicMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
-                        Object.values(pokemon.eliteQuickMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
-                        Object.values(pokemon.eliteCinematicMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
-                    });
-                    moveMap.value = newMoveMap;
+                // Fetch move map data from the new API endpoint
+                const movesResponse = await fetch('/api/moves');
+                if (movesResponse.ok) {
+                    moveMap.value = await movesResponse.json();
                 }
 
                 // Update the main title with the player's name
@@ -620,7 +572,7 @@ createApp({
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
             totalPokeBalls, totalPotions, totalRevives,
-            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges, getLevelFromCpm, getMoveName, openPokemonModal,
+            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges, getLevelFromCpm, openPokemonModal, displayMove,
             // Statistics
             stats_shinyRate,
             stats_perfectNundo,

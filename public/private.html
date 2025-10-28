@@ -70,8 +70,9 @@
 
                     <h4>Combat</h4>
                     <div class="grid-stats">
-                        <div><span>Fast Move</span><strong>{{ getMoveName(selectedPokemon.move1) }}</strong></div>
-                        <div><span>Charged Move</span><strong>{{ getMoveName(selectedPokemon.move2) }}</strong></div>
+                        <div><span>Fast Move</span><strong>{{ displayMove(selectedPokemon.move1) }}</strong></div>
+                        <div><span>Charged Move</span><strong>{{ displayMove(selectedPokemon.move2) }}</strong></div>
+                        <div v-if="selectedPokemon.move3"><span>Charged Move 2</span><strong>{{ displayMove(selectedPokemon.move3) }}</strong></div>
                     </div>
 
                     <h4>Details</h4>
