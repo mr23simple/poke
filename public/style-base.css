@@ -80,7 +80,7 @@ h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--bg-colo
     object-fit: contain;
 }
 .pokemon-card.colored { color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); }
-.pokemon-name { font-weight: bold; font-size: 0.9em; margin: 5px 0; display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; }
+.pokemon-name { font-weight: bold; font-size: 0.9em; margin: 5px 0; display: block; }
 .pokemon-cp { font-size: 0.9em; }
 .pokemon-card small { font-size: 0.75em; }
 .badge { font-size: 0.7em; padding: 3px 7px; border-radius: 10px; color: white; flex-shrink: 0; }

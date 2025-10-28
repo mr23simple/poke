@@ -22,6 +22,69 @@
     <!-- This is the main container for our Vue app -->
     <div id="app" class="container">
         
+        <!-- Pokémon Detail Modal -->
+        <div id="modal-backdrop" v-if="selectedPokemon" @click.self="selectedPokemon = null">
+            <div id="modal-content" class="card">
+                <button id="modal-close-btn" @click="selectedPokemon = null">&times;</button>
+                
+                <div class="pokemon-modal-header">
+                    <img :src="selectedPokemon.sprite" :alt="selectedPokemon.nickname || selectedPokemon.name">
+                    <div class="pokemon-info">
+                        <h2>
+                            {{ selectedPokemon.nickname || selectedPokemon.name }}
+                            <span class="badges-container" v-html="getBadges(selectedPokemon, '')"></span>
+                        </h2>
+                        <div class="pokemon-stats-grid">
+                            <div><span>CP</span><strong>{{ selectedPokemon.cp }}</strong></div>
+                            <div><span>Level</span><strong>{{ getLevelFromCpm(selectedPokemon.cpMultiplier) }}</strong></div>
+                            <div><span>IV %</span><strong>{{ getIvPercent(selectedPokemon) }}%</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pokemon-modal-body">
+                    <h4>IV Stats</h4>
+                    <div class="iv-stats">
+                        <div class="stat-bar-container">
+                            <span class="stat-label">Attack</span>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" data-stat="attack"></div>
+                            </div>
+                            <span class="stat-value">{{ selectedPokemon.individualAttack }}/15</span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <span class="stat-label">Defense</span>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" data-stat="defense"></div>
+                            </div>
+                            <span class="stat-value">{{ selectedPokemon.individualDefense }}/15</span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <span class="stat-label">Stamina</span>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" data-stat="stamina"></div>
+                            </div>
+                            <span class="stat-value">{{ selectedPokemon.individualStamina }}/15</span>
+                        </div>
+                    </div>
+
+                    <h4>Combat</h4>
+                    <div class="grid-stats">
+                        <div><span>Fast Move</span><strong>{{ getMoveName(selectedPokemon.move1) }}</strong></div>
+                        <div><span>Charged Move</span><strong>{{ getMoveName(selectedPokemon.move2) }}</strong></div>
+                    </div>
+
+                    <h4>Details</h4>
+                    <div class="grid-stats">
+                        <div><span>Height</span><strong>{{ selectedPokemon.heightM.toFixed(2) }} m</strong></div>
+                        <div><span>Weight</span><strong>{{ selectedPokemon.weightKg.toFixed(2) }} kg</strong></div>
+                        <div><span>Caught</span><strong>{{ new Date(selectedPokemon.creationTimeMs).toLocaleDateString() }}</strong></div>
+                        <div v-if="selectedPokemon.tradedTimeMs > 0"><span>Traded</span><strong>{{ new Date(selectedPokemon.tradedTimeMs).toLocaleDateString() }}</strong></div>
+                        <div v-if="selectedPokemon.hasMegaEvolved"><span>Mega Evolved</span><strong>Yes</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div v-if="loading" class="loading-overlay">
             <div class="loading-spinner"></div>
@@ -91,7 +154,7 @@
                                 <h2>Pokémon Highlights</h2>
                             </div>
                             <div id="pokemon-highlights-container">
-                                <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)">
+                                <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)" @click="openPokemonModal(p)">
                                     <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
                                     <p class="pokemon-name" v-html="getBadges(p, p.nickname || p.name)"></p>
                                     <p class="pokemon-cp">CP {{ p.cp }}</p>
@@ -120,7 +183,7 @@
                         <button id="sort-direction" @click="toggleSortDirection">{{ sortDirection === 'desc' ? '▼ Desc' : '▲ Asc' }}</button>
                     </div>
                 </div>
-                <grid-component :pokemons="filteredPokemon"></grid-component>
+                <grid-component :pokemons="filteredPokemon" @pokemon-clicked="openPokemonModal($event)"></grid-component>
             </section>
 
             <!-- Statistics Tab -->

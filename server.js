@@ -20,6 +20,7 @@ app.use(session({
     cookie: { maxAge: 86400000 }
 }));
 app.use(express.static('public'));
+app.use('/data', express.static('data'));
 
 // --- Routes ---
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

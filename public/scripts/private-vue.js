@@ -4,6 +4,21 @@
 
 const { createApp, ref, computed, onMounted, watch } = Vue;
 
+// --- CPM Table for Level Calculation ---
+const cpmTable = { 1: 0.094, 1.5: 0.13513743, 2: 0.16639787, 2.5: 0.19265091, 3: 0.21573247, 3.5: 0.23657266, 4: 0.25572005, 4.5: 0.27353038, 5: 0.29024988, 5.5: 0.30605737, 6: 0.3210876, 6.5: 0.33544503, 7: 0.34921268, 7.5: 0.36245775, 8: 0.3752356, 8.5: 0.38759241, 9: 0.39956728, 9.5: 0.41119355, 10: 0.4225, 10.5: 0.4329264, 11: 0.44310755, 11.5: 0.45305995, 12: 0.4627984, 12.5: 0.47233609, 13: 0.48168495, 13.5: 0.4908558, 14: 0.49985844, 14.5: 0.50870176, 15: 0.51739395, 15.5: 0.52594251, 16: 0.5343543, 16.5: 0.54263573, 17: 0.5507927, 17.5: 0.55883058, 18: 0.5667545, 18.5: 0.57456913, 19: 0.5822789, 19.5: 0.5898879, 20: 0.5974, 20.5: 0.60482366, 21: 0.6121573, 21.5: 0.61940412, 22: 0.6265671, 22.5: 0.63364914, 23: 0.64065295, 23.5: 0.64758096, 24: 0.65443563, 24.5: 0.66121925, 25: 0.667934, 25.5: 0.67458189, 26: 0.6811649, 26.5: 0.6876849, 27: 0.69414365, 27.5: 0.70054287, 28: 0.7068842, 28.5: 0.7131691, 29: 0.7193991, 29.5: 0.72557561, 30: 0.7317, 30.5: 0.734741, 31: 0.73776948, 31.5: 0.7407895, 32: 0.74378943, 32.5: 0.74677015, 33: 0.7497256, 33.5: 0.75266097, 34: 0.75557274, 34.5: 0.75847129, 35: 0.76138438, 35.5: 0.76418652, 36: 0.76698068, 36.5: 0.76975685, 37: 0.7725421, 37.5: 0.77529827, 38: 0.77803515, 38.5: 0.78076949, 39: 0.7835, 39.5: 0.78623275, 40: 0.7903, 40.5: 0.7928, 41: 0.7953, 41.5: 0.7978, 42: 0.8003, 42.5: 0.8028, 43: 0.8053, 43.5: 0.8078, 44: 0.8103, 44.5: 0.8128, 45: 0.8153, 45.5: 0.8178, 46: 0.8203, 46.5: 0.8228, 47: 0.8253, 47.5: 0.8278, 48: 0.8303, 48.5: 0.8328, 49: 0.8353, 49.5: 0.8378, 50: 0.8403, 50.5: 0.8428, 51: 0.8453 };
+function getLevelFromCpm(cpm) {
+    let closestLevel = null;
+    let minDifference = Infinity;
+    for (const level in cpmTable) {
+        const difference = Math.abs(cpmTable[level] - cpm);
+        if (difference < minDifference) {
+            minDifference = difference;
+            closestLevel = level;
+        }
+    }
+    return closestLevel;
+}
+
 // --- Global Helper Functions ---
 
 /**
@@ -36,9 +51,10 @@ function getIvColor(iv) {
  */
 const GridComponent = {
     props: ['pokemons'],
+    emits: ['pokemon-clicked'],
     template: `
         <div id="all-pokemon-list">
-            <div v-for="p in pokemons" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)">
+            <div v-for="p in pokemons" :key="p.id" :class="getCardClass(p)" :style="createBackgroundStyle(p.typeColors)" @click="$emit('pokemon-clicked', p)">
                 <img :src="p.sprite" :alt="displayName(p)" loading="lazy">
                 <p class="pokemon-name" v-html="getBadges(p, displayName(p))"></p>
                 <p class="pokemon-cp">CP {{ p.cp }}</p>
@@ -53,24 +69,28 @@ const GridComponent = {
         getIvPercent(p) { return p ? ((p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100).toFixed(1) : 0; },
         displayName(p) { return p.nickname || p.name; },
         getBadges(p, name) {
-            let badgesHTML = name;
-            if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
+            const badges = [];
+            if (p.pokemonDisplay?.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
             if (p.isLucky) {
-                badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+                badges.push('<span class="badge lucky-badge">Lucky</span>');
             } else if (p.tradedTimeMs > 0) {
-                badgesHTML += ' <span class="badge traded-badge">Traded</span>';
+                badges.push('<span class="badge traded-badge">Traded</span>');
             }
             if (p.isZeroIv) {
-                badgesHTML += ' <span class="badge zero-iv-badge">0 IV</span>';
+                badges.push('<span class="badge zero-iv-badge">0 IV</span>');
             } else if (this.getIvPercent(p) >= 100) {
-                badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+                badges.push('<span class="badge perfect-badge">Perfect</span>');
             }
-            if (p.pokemonDisplay?.alignment === 1) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
-            if (p.pokemonDisplay?.alignment === 2) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
-            if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
-            if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
-            if (p.isMaxLevel) badgesHTML += ' <span class="badge max-level-badge">Max</span>';
-            return badgesHTML;
+            if (p.pokemonDisplay?.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
+            if (p.pokemonDisplay?.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+            if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
+            if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
+            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+            
+            if (badges.length > 0) {
+                return `${name}<br>${badges.join(' ')}`;
+            }
+            return name;
         },
         getCardClass(p) { return p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card'; },
         // Make global helpers available in this component's template
@@ -98,6 +118,8 @@ createApp({
         const itemsExpanded = ref(false);
         const defaultSortDirections = { caughtTime: 'desc', cp: 'desc', pokedex: 'asc', name: 'asc' };
         const sortDirection = ref(defaultSortDirections.caughtTime);
+        const selectedPokemon = ref(null);
+        const moveMap = ref({});
 
         // --- Statistics Computed Properties ---
         const stats_shinyRate = computed(() => {
@@ -411,28 +433,120 @@ createApp({
         const getItemSprite = (itemId) => `https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Item_${String(itemId).padStart(4, '0')}.png`;
         const getCardClass = (p) => p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
         const getBadges = (p, name) => {
-            let badgesHTML = name;
-            if (p.pokemonDisplay?.shiny) badgesHTML += ' <span class="badge shiny-badge">Shiny</span>';
+            const badges = [];
+            if (p.pokemonDisplay?.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
             if (p.isLucky) {
-                badgesHTML += ' <span class="badge lucky-badge">Lucky</span>';
+                badges.push('<span class="badge lucky-badge">Lucky</span>');
             } else if (p.tradedTimeMs > 0) {
-                badgesHTML += ' <span class="badge traded-badge">Traded</span>';
+                badges.push('<span class="badge traded-badge">Traded</span>');
             }
             if (p.isZeroIv) {
-                badgesHTML += ' <span class="badge zero-iv-badge">0 IV</span>';
+                badges.push('<span class="badge zero-iv-badge">0 IV</span>');
             } else if (getIvPercent(p) >= 100) {
-                badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
+                badges.push('<span class="badge perfect-badge">Perfect</span>');
             }
-            if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
-            if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
+            if (p.pokemonDisplay?.shadow) badges.push('<span class="badge shadow-badge">Shadow</span>');
+            if (p.pokemonDisplay?.purified) badges.push('<span class="badge purified-badge">Purified</span>');
             const pokedexEntry = getPokedexEntry(p);
-            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
-            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
-            if (p.isMaxLevel) badgesHTML += ' <span class="badge max-level-badge">Max</span>';
-            return badgesHTML;
+            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
+            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
+            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+            
+            if (badges.length > 0) {
+                return `${name}<br>${badges.join(' ')}`;
+            }
+            return name;
         };
 
-        // --- Tab Navigation ---
+                const getMoveName = (moveId) => moveMap.value[moveId] || moveId;
+
+        
+
+                        const openPokemonModal = (pokemon) => {
+
+        
+
+                            selectedPokemon.value = pokemon;
+
+        
+
+                            setTimeout(() => {
+
+        
+
+                                const attackBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="attack"]');
+
+        
+
+                                const defenseBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="defense"]');
+
+        
+
+                                const staminaBar = document.querySelector('#modal-content .stat-bar-fill[data-stat="stamina"]');
+
+        
+
+                
+
+        
+
+                                if (attackBar) {
+
+        
+
+                                    attackBar.style.width = `${(pokemon.individualAttack / 15) * 100}%`;
+
+        
+
+                                    attackBar.style.backgroundColor = pokemon.individualAttack === 15 ? '#da7a79' : '#f79513';
+
+        
+
+                                }
+
+        
+
+                                if (defenseBar) {
+
+        
+
+                                    defenseBar.style.width = `${(pokemon.individualDefense / 15) * 100}%`;
+
+        
+
+                                    defenseBar.style.backgroundColor = pokemon.individualDefense === 15 ? '#da7a79' : '#f79513';
+
+        
+
+                                }
+
+        
+
+                                if (staminaBar) {
+
+        
+
+                                    staminaBar.style.width = `${(pokemon.individualStamina / 15) * 100}%`;
+
+        
+
+                                    staminaBar.style.backgroundColor = pokemon.individualStamina === 15 ? '#da7a79' : '#f79513';
+
+        
+
+                                }
+
+        
+
+                            }, 100);
+
+        
+
+                        };
+
+        
+
+                // --- Tab Navigation ---
         const updateActiveTabFromHash = () => {
             const hash = window.location.hash.replace('#', '');
             const validTabs = ['character', 'pokemon', 'statistics'];
@@ -455,6 +569,7 @@ createApp({
         // --- Lifecycle Hook ---
         onMounted(async () => {
             try {
+                // Fetch primary player data
                 const response = await fetch('/api/private-data');
                 if (!response.ok) throw new Error((await response.json()).message || 'Could not load data.');
                 const responseData = await response.json();
@@ -466,6 +581,20 @@ createApp({
                 pokedexService.value = responseData.pokedexService || { typeColorMap: {}, pokedex: null };
 
                 allPokemons.value = rawPokemons;
+
+                // Fetch pokedex data to build move map
+                const pokedexResponse = await fetch('/data/pokedex.json');
+                if (pokedexResponse.ok) {
+                    const pokedexData = await pokedexResponse.json();
+                    const newMoveMap = {};
+                    pokedexData.forEach(pokemon => {
+                        Object.values(pokemon.quickMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
+                        Object.values(pokemon.cinematicMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
+                        Object.values(pokemon.eliteQuickMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
+                        Object.values(pokemon.eliteCinematicMoves || {}).forEach(move => newMoveMap[move.id] = move.names.English);
+                    });
+                    moveMap.value = newMoveMap;
+                }
 
                 // Update the main title with the player's name
                 const mainTitleElement = document.getElementById('main-title');
@@ -487,11 +616,11 @@ createApp({
 
         // --- Expose to Template ---
         return {
-            loading, account, player, items, activeTab, searchQuery, sortKey, sortDirection, itemsExpanded,
+            loading, account, player, items, activeTab, searchQuery, sortKey, sortDirection, itemsExpanded, selectedPokemon, moveMap,
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
             totalPokeBalls, totalPotions, totalRevives,
-            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges,
+            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges, getLevelFromCpm, getMoveName, openPokemonModal,
             // Statistics
             stats_shinyRate,
             stats_perfectNundo,
