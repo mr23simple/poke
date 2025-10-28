@@ -124,9 +124,117 @@
             </section>
 
             <!-- Statistics Tab -->
-            <section id="statistics-section" v-show="activeTab === 'statistics'" class="card">
-                <h2>Statistics</h2>
-                <p>Statistics and other visualizations will be available in a future update.</p>
+            <section id="statistics-section" v-show="activeTab === 'statistics'">
+                <div class="stats-grid">
+                    <!-- 1. IV Distribution (Histogram) -->
+                    <div class="stat-card card">
+                        <h4>IV Distribution</h4>
+                        <div class="chart-placeholder bar-chart">
+                            <div v-for="bucket in stats_ivDistribution" class="bar" :style="{ height: `${bucket.height}%` }"><span class="label">{{ bucket.label }}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Perfect vs. Nundo Counts (Bar Chart) -->
+                    <div class="stat-card card">
+                        <h4>Perfect (100%) vs Nundo (0%)</h4>
+                        <div class="chart-placeholder bar-chart-horizontal">
+                            <div class="bar-h-container">
+                                <div class="bar-h" :style="{ width: `${stats_perfectNundo.perfectPerc || 1}%`, backgroundColor: '#e74c3c' }"></div>
+                                <span class="label">Perfect ({{ stats_perfectNundo.perfect }})</span>
+                            </div>
+                            <div class="bar-h-container">
+                                <div class="bar-h" :style="{ width: `${stats_perfectNundo.nundoPerc || 1}%`, backgroundColor: '#34495e' }"></div>
+                                <span class="label">Nundo ({{ stats_perfectNundo.nundo }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Shiny Collection Rate (Donut Chart) -->
+                    <div class="stat-card card">
+                        <h4>Shiny Collection Rate</h4>
+                        <div class="chart-placeholder donut-chart-container">
+                            <div class="donut-chart" :style="{ background: `conic-gradient(#d4af37 0% ${stats_shinyRate.percent}%, #e9ecef ${stats_shinyRate.percent}% 100%)` }">
+                                <div class="donut-hole">
+                                    <span>{{ stats_shinyRate.percent }}%</span>
+                                    <small>{{ stats_shinyRate.shinyCount }} / {{ stats_shinyRate.totalCount }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Lucky Pokémon Percentage (Gauge/Pie Chart) -->
+                    <div class="stat-card card">
+                        <h4>Lucky Pokémon Rate</h4>
+                        <div class="chart-placeholder pie-chart-container">
+                            <div class="pie-chart" :style="{ background: `conic-gradient(#FFD700 0% ${stats_luckyRate.percent}%, #e9ecef ${stats_luckyRate.percent}% 100%)` }"></div>
+                            <div class="pie-legend legend-lucky">
+                                <span>Lucky ({{ stats_luckyRate.luckyCount }})</span>
+                                <span>Not Lucky ({{ stats_luckyRate.tradedCount - stats_luckyRate.luckyCount }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Legendary & Mythical Ratio (Pie Chart) -->
+                    <div class="stat-card card">
+                        <h4>Legendary & Mythical Ratio</h4>
+                        <div class="chart-placeholder pie-chart-container">
+                            <div class="pie-chart" :style="{ background: `conic-gradient(#8E44AD 0% ${stats_legendaryRatio.percent}%, #e9ecef ${stats_legendaryRatio.percent}% 100%)` }"></div>
+                            <div class="pie-legend legend-legendary">
+                                <span>Lgnd/Mythic ({{ stats_legendaryRatio.legendaryMythicalCount }})</span>
+                                <span>Regular ({{ stats_legendaryRatio.totalCount - stats_legendaryRatio.legendaryMythicalCount }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. CP Distribution (Histogram) -->
+                    <div class="stat-card card">
+                        <h4>CP Distribution</h4>
+                        <div class="chart-placeholder bar-chart">
+                            <div v-for="bucket in stats_cpDistribution" class="bar" :style="{ height: `${bucket.height}%`, backgroundColor: '#2ecc71' }"><span class="label">{{ bucket.label }}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Pokémon by Capture Year (Bar Chart) -->
+                    <div class="stat-card card">
+                        <h4>Pokémon by Capture Year</h4>
+                        <div class="chart-placeholder bar-chart">
+                            <div v-for="year in stats_captureByYear" class="bar" :style="{ height: `${year.height}%`, backgroundColor: '#9b59b6' }"><span class="label">{{ year.label }}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 9. Top 10 Most Common Species (Horizontal Bar Chart) -->
+                    <div class="stat-card card">
+                        <h4>Most Common Pokémon</h4>
+                        <div class="chart-placeholder bar-chart-horizontal">
+                            <div v-for="p in stats_mostCommon" class="bar-h-container">
+                                <div class="bar-h" :style="{ width: `${p.width || 1}%` }"></div>
+                                <span class="label">{{ p.name }} ({{p.count}})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 13. Pokémon by Acquisition Type (Pie Chart) -->
+                    <div class="stat-card card">
+                        <h4>Acquisition Type</h4>
+                        <div class="chart-placeholder pie-chart-container">
+                            <div class="pie-chart" :style="{ background: `conic-gradient(#2ecc71 0% ${stats_acquisitionType.wildEnd}%, #3498db ${stats_acquisitionType.wildEnd}% ${stats_acquisitionType.hatchedEnd}%, #e74c3c ${stats_acquisitionType.hatchedEnd}% ${stats_acquisitionType.raidEnd}%, #9b59b6 ${stats_acquisitionType.raidEnd}% 100%)` }"></div>
+                            <div class="pie-legend legend-acq">
+                                <span>Wild ({{ stats_acquisitionType.wild }})</span>
+                                <span>Hatched ({{ stats_acquisitionType.hatched }})</span>
+                                <span>Raid ({{ stats_acquisitionType.raid }})</span>
+                                <span>Trade ({{ stats_acquisitionType.trade }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card card">
+                        <h4>Mega Evolution</h4>
+                        <div class="chart-placeholder metric-container">
+                            <span class="metric-value">{{ stats_megaHistory }}</span>
+                            <span class="metric-label">Unique Species Mega-Evolved</span>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
     </div>

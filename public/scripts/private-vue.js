@@ -99,6 +99,152 @@ createApp({
         const defaultSortDirections = { caughtTime: 'desc', cp: 'desc', pokedex: 'asc', name: 'asc' };
         const sortDirection = ref(defaultSortDirections.caughtTime);
 
+        // --- Statistics Computed Properties ---
+        const stats_shinyRate = computed(() => {
+            if (!allPokemons.value || allPokemons.value.length === 0) {
+                return { percent: 0, shinyCount: 0, totalCount: 0 };
+            }
+            const totalCount = allPokemons.value.length;
+            const shinyCount = allPokemons.value.filter(p => p.pokemonDisplay?.shiny).length;
+            const percent = totalCount > 0 ? Math.round((shinyCount / totalCount) * 100) : 0;
+            return { percent, shinyCount, totalCount };
+        });
+
+        const stats_perfectNundo = computed(() => {
+            const perfect = allPokemons.value.filter(p => p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15).length;
+            const nundo = allPokemons.value.filter(p => p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0).length;
+            const total = perfect + nundo;
+            const perfectPerc = total > 0 ? Math.round((perfect / total) * 100) : 1;
+            const nundoPerc = total > 0 ? Math.round((nundo / total) * 100) : 1;
+            return { perfect, nundo, perfectPerc, nundoPerc };
+        });
+
+        const stats_megaHistory = computed(() => {
+            return player.value.numUniqueMegaEvolutions || 0;
+        });
+
+        const stats_ivDistribution = computed(() => {
+            const buckets = Array(10).fill(0);
+            allPokemons.value.forEach(p => {
+                const ivPercent = (p.individualAttack + p.individualDefense + p.individualStamina) / 45 * 100;
+                const bucketIndex = Math.min(9, Math.floor(ivPercent / 10));
+                buckets[bucketIndex]++;
+            });
+            const max = Math.max(...buckets);
+            const labels = ['0-10', '11-20', '21-30', '31-40', '41-50', '51-60', '61-70', '71-80', '81-90', '91-100'];
+            return buckets.map((count, i) => ({
+                label: labels[i],
+                count: count,
+                height: max > 0 ? (count / max) * 100 : 0
+            }));
+        });
+
+        const stats_luckyRate = computed(() => {
+            const traded = allPokemons.value.filter(p => p.tradedTimeMs > 0);
+            if (traded.length === 0) return { percent: 0, luckyCount: 0, tradedCount: 0 };
+            const luckyCount = traded.filter(p => p.isLucky).length;
+            return {
+                percent: Math.round((luckyCount / traded.length) * 100),
+                luckyCount: luckyCount,
+                tradedCount: traded.length
+            };
+        });
+
+        const stats_legendaryRatio = computed(() => {
+            let legendaryMythicalCount = 0;
+            allPokemons.value.forEach(p => {
+                const entry = getPokedexEntry(p);
+                if (entry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' || entry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') {
+                    legendaryMythicalCount++;
+                }
+            });
+            const total = allPokemons.value.length;
+            if (total === 0) return { percent: 0, legendaryMythicalCount: 0, totalCount: 0 };
+            return {
+                percent: Math.round((legendaryMythicalCount / total) * 100),
+                legendaryMythicalCount: legendaryMythicalCount,
+                totalCount: total
+            };
+        });
+
+        const stats_cpDistribution = computed(() => {
+            const buckets = { '0-1k': 0, '1k-2k': 0, '2k-3k': 0, '3k-4k': 0, '4k+': 0 };
+            allPokemons.value.forEach(p => {
+                if (p.cp <= 1000) buckets['0-1k']++;
+                else if (p.cp <= 2000) buckets['1k-2k']++;
+                else if (p.cp <= 3000) buckets['2k-3k']++;
+                else if (p.cp <= 4000) buckets['3k-4k']++;
+                else buckets['4k+']++;
+            });
+            const max = Math.max(...Object.values(buckets));
+            return Object.entries(buckets).map(([label, count]) => ({
+                label,
+                count,
+                height: max > 0 ? (count / max) * 100 : 0
+            }));
+        });
+
+        const stats_captureByYear = computed(() => {
+            const buckets = {};
+            allPokemons.value.forEach(p => {
+                const year = new Date(p.creationTimeMs).getFullYear();
+                buckets[year] = (buckets[year] || 0) + 1;
+            });
+            const max = Math.max(...Object.values(buckets));
+            return Object.entries(buckets).sort(([yearA], [yearB]) => yearA - yearB).map(([label, count]) => ({
+                label,
+                count,
+                height: max > 0 ? (count / max) * 100 : 0
+            }));
+        });
+
+        const stats_mostCommon = computed(() => {
+            if (!pokedexService.value.pokedex || allPokemons.value.length === 0) {
+                return [];
+            }
+
+            const counts = allPokemons.value.reduce((acc, p) => {
+                acc[p.pokemonId] = (acc[p.pokemonId] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sorted = Object.entries(counts).sort(([, countA], [, countB]) => countB - countA);
+            const top5 = sorted.slice(0, 5);
+            const max = top5.length > 0 ? top5[0][1] : 0;
+
+            return top5.map(([id, count]) => {
+                let name = `ID ${id}`; // Default fallback
+                const pokemonData = pokedexService.value.pokedex[id];
+                if (pokemonData) {
+                    const formEntry = pokemonData['NORMAL'] || Object.values(pokemonData)[0];
+                    if (formEntry && formEntry.names && formEntry.names.English) {
+                        name = formEntry.names.English;
+                    }
+                }
+                return {
+                    name,
+                    count,
+                    width: max > 0 ? (count / max) * 100 : 0
+                };
+            });
+        });
+
+        const stats_acquisitionType = computed(() => {
+            let wild = 0, hatched = 0, raid = 0, trade = 0;
+            allPokemons.value.forEach(p => {
+                if (p.tradedTimeMs > 0) trade++;
+                else if (p.hatchedFromEgg) hatched++;
+                else if (p.originDetail?.originDetailCase === 3) raid++; // Case 3 is Raid
+                else wild++;
+            });
+            const total = allPokemons.value.length;
+            if (total === 0) return { wildEnd: 0, hatchedEnd: 0, raidEnd: 0, wild, hatched, raid, trade };
+            const wildEnd = Math.round((wild / total) * 100);
+            const hatchedEnd = wildEnd + Math.round((hatched / total) * 100);
+            const raidEnd = hatchedEnd + Math.round((raid / total) * 100);
+            return { wildEnd, hatchedEnd, raidEnd, wild, hatched, raid, trade };
+        });
+
         // --- Computed Properties (Derived State) ---
 
         const teamColor = computed(() => {
@@ -296,12 +442,14 @@ createApp({
                 const response = await fetch('/api/private-data');
                 if (!response.ok) throw new Error((await response.json()).message || 'Could not load data.');
                 const responseData = await response.json();
-                
-                allPokemons.value = responseData.playerData.pokemons.filter(p => !p.isEgg && p.pokemonId !== 0);
+
                 account.value = responseData.playerData.account || {};
                 player.value = responseData.playerData.player || {};
                 items.value = responseData.playerData.items || [];
+                const rawPokemons = responseData.playerData.pokemons.filter(p => !p.isEgg && p.pokemonId !== 0);
                 pokedexService.value = responseData.pokedexService || { typeColorMap: {}, pokedex: null };
+
+                allPokemons.value = rawPokemons;
 
                 // Update the main title with the player's name
                 const mainTitleElement = document.getElementById('main-title');
@@ -327,7 +475,18 @@ createApp({
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
             totalPokeBalls, totalPotions, totalRevives,
-            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges
+            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges,
+            // Statistics
+            stats_shinyRate,
+            stats_perfectNundo,
+            stats_megaHistory,
+            stats_ivDistribution,
+            stats_luckyRate,
+            stats_legendaryRatio,
+            stats_cpDistribution,
+            stats_captureByYear,
+            stats_mostCommon,
+            stats_acquisitionType
         };
     }
 }).mount('#app');
