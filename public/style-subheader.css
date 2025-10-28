@@ -19,13 +19,12 @@
     background-color: #555;
 }
 
-/* Using adjacent sibling selector to style .sub-header based on .main-header's class */
-.main-header.team-valor-bg + .sub-header {
+body.team-valor-bg .sub-header {
     background-color: #C0392B; /* Darker Valor Red */
 }
-.main-header.team-mystic-bg + .sub-header {
+body.team-mystic-bg .sub-header {
     background-color: #2980B9; /* Darker Mystic Blue */
 }
-.main-header.team-instinct-bg + .sub-header {
+body.team-instinct-bg .sub-header {
     background-color: #D4AC0D; /* Darker Instinct Yellow */
 }

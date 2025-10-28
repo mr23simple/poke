@@ -227,11 +227,15 @@
                         </div>
                     </div>
 
+                    <!-- 15. Mega Evolution History (Icon Grid) -->
                     <div class="stat-card card">
-                        <h4>Mega Evolution</h4>
-                        <div class="chart-placeholder metric-container">
-                            <span class="metric-value">{{ stats_megaHistory }}</span>
-                            <span class="metric-label">Unique Species Mega-Evolved</span>
+                        <h4>Mega-Evolved Species ({{ stats_megaEvolvedList.length }})</h4>
+                        <div class="chart-placeholder icon-grid-container">
+                            <div class="mega-icon-grid">
+                                <div v-for="p in stats_megaEvolvedList" :key="p.id" class="mega-icon">
+                                    <img :src="p.sprite" :alt="`Pokemon ID ${p.id}`" loading="lazy">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

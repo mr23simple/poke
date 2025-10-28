@@ -119,8 +119,24 @@ createApp({
             return { perfect, nundo, perfectPerc, nundoPerc };
         });
 
-        const stats_megaHistory = computed(() => {
-            return player.value.numUniqueMegaEvolutions || 0;
+        const stats_megaEvolvedList = computed(() => {
+            if (!pokedexService.value.pokedex) return [];
+
+            const megaEvolvedIds = new Set();
+            allPokemons.value.forEach(p => {
+                if (p.hasMegaEvolved) {
+                    megaEvolvedIds.add(p.pokemonId);
+                }
+            });
+
+            return Array.from(megaEvolvedIds).map(id => {
+                const allForms = pokedexService.value.pokedex[id];
+                const entry = allForms?.['NORMAL'] || Object.values(allForms || {})[0];
+                return {
+                    id: id,
+                    sprite: entry?.assets?.image || '' // Get default image from pokedex data
+                };
+            });
         });
 
         const stats_ivDistribution = computed(() => {
@@ -392,7 +408,7 @@ createApp({
 
         // --- Methods ---
         const toggleSortDirection = () => { sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'; };
-        const getItemSprite = (itemId) => `https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Bag/ic_item_${String(itemId).padStart(4, '0')}.png`;
+        const getItemSprite = (itemId) => `https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Images/Items/Item_${String(itemId).padStart(4, '0')}.png`;
         const getCardClass = (p) => p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
         const getBadges = (p, name) => {
             let badgesHTML = name;
@@ -479,7 +495,7 @@ createApp({
             // Statistics
             stats_shinyRate,
             stats_perfectNundo,
-            stats_megaHistory,
+            stats_megaEvolvedList,
             stats_ivDistribution,
             stats_luckyRate,
             stats_legendaryRatio,
