@@ -287,6 +287,7 @@ const playerDataService = {
                         stamina: p.individualStamina
                     },
                     cpm: p.cpMultiplier + (p.additionalCpMultiplier || 0),
+                    pokemonDisplay: p.pokemonDisplay,
                     isShiny: p.pokemonDisplay.shiny,
                     isLucky: p.isLucky,
                     isPerfect: p.individualAttack === 15 && p.individualDefense === 15 && p.individualStamina === 15,
@@ -310,6 +311,7 @@ const playerDataService = {
                     owner: p.owner,
                     ownerId: p.ownerId,
                     ownerPublicId: p.ownerPublicId, // Include public ID
+                    pokemonDisplay: p.pokemonDisplay,
                     isShiny: p.pokemonDisplay.shiny,
                     isLucky: p.isLucky,
                     isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,
@@ -529,6 +531,7 @@ const playerDataService = {
                 owner: p.owner,
                 ownerId: p.ownerId,
                 ownerPublicId: p.ownerPublicId, // Include public ID
+                pokemonDisplay: p.pokemonDisplay,
                 isShiny: p.pokemonDisplay.shiny,
                 isLucky: p.isLucky,
                 isPerfect: ((p.individualAttack + p.individualDefense + p.individualStamina) / 45) >= 1,

@@ -65,8 +65,8 @@ const GridComponent = {
             } else if (this.getIvPercent(p) >= 100) {
                 badgesHTML += ' <span class="badge perfect-badge">Perfect</span>';
             }
-            if (p.pokemonDisplay?.shadow) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
-            if (p.pokemonDisplay?.purified) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
+            if (p.pokemonDisplay?.alignment === 1) badgesHTML += ' <span class="badge shadow-badge">Shadow</span>';
+            if (p.pokemonDisplay?.alignment === 2) badgesHTML += ' <span class="badge purified-badge">Purified</span>';
             if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badgesHTML += ' <span class="badge legendary-badge">Legendary</span>';
             if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badgesHTML += ' <span class="badge mythical-badge">Mythical</span>';
             if (p.isMaxLevel) badgesHTML += ' <span class="badge max-level-badge">Max</span>';

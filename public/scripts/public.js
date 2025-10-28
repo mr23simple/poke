@@ -69,15 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h2>
                         ${pokemon.name}
                         <span class="badges-container">
-                            ${pokemon.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
-                            ${pokemon.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (pokemon.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
-                            ${pokemon.isZeroIv ? '<span class="badge zero-iv-badge">0 IV</span>' : ''}
-                            ${pokemon.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
-                            ${pokemon.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
-                            ${pokemon.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
-                            ${pokemon.isLegendary ? '<span class="badge legendary-badge">Legendary</span>' : ''}
-                            ${pokemon.isMythical ? '<span class="badge mythical-badge">Mythical</span>' : ''}
-                            ${pokemon.isMaxLevel ? '<span class="badge max-level-badge">Max</span>' : ''}
+                            ${generateBadges(pokemon)}
                         </span>
                     </h2>
                     <div class="pokemon-stats-grid">
@@ -140,11 +132,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!hasMaxLevelCombo && p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
 
-        // Other non-conflicting badges
-        if (p.isShadow) badges.push('<span class="badge shadow-badge">Shadow</span>');
-        if (p.isPurified) badges.push('<span class="badge purified-badge">Purified</span>');
-        if (p.isLegendary) badges.push('<span class="badge legendary-badge">Legendary</span>');
-        if (p.isMythical) badges.push('<span class="badge mythical-badge">Mythical</span>');
+                                // Other non-conflicting badges
+                                if (p.pokemonDisplay?.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
+                                if (p.pokemonDisplay?.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+                                if (p.isLegendary) badges.push('<span class="badge legendary-badge">Legendary</span>');        if (p.isMythical) badges.push('<span class="badge mythical-badge">Mythical</span>');
 
         return badges.join(' ');
     }
@@ -275,6 +266,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- MAIN EXECUTION ---
 
+    function openRarityInfoModal() {
+        modalContent.innerHTML = `
+            <button id="modal-close-btn">&times;</button>
+            <h4>Rarity Calculation</h4>
+            <p>Rarity is calculated by multiplying the odds of a Pokémon's rarest traits.</p>
+            <ul>
+                <li><strong>Lucky Trade Odds:</strong> 1 in 20.</li>
+                <li><strong>Shiny Odds:</strong> ~1 in 20 to ~1 in 500.</li>
+            </ul>
+            <p><strong>Perfect IV Odds depend on how it was acquired:</strong></p>
+            <ul>
+                <li>1 in 64 (Lucky Trade)</li>
+                <li>1 in 216 (Raid/Egg/Research)</li>
+                <li>1 in 1,331 (Best Friend Trade)</li>
+                <li>1 in 1,728 (Weather Boost)</li>
+                <li>1 in 4,096 (Wild Catch)</li>
+            </ul>
+        `;
+        modalBackdrop.classList.remove('hidden');
+        document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
+    }
+
     try {
         const response = await fetch('/api/rankings');
         if (!response.ok) throw new Error('Failed to load rankings from the server.');
@@ -360,20 +373,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingOverlay.classList.add('hidden');
         rankingsGrid.classList.remove('hidden');
 
-        // --- Rarity Info Tooltip Logic ---
+        // --- Rarity Info Panel Logic ---
         const infoBtn = document.querySelector('.info-btn');
         if (infoBtn) {
-            const infoTooltip = infoBtn.nextElementSibling;
-
             infoBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
-                infoTooltip.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (event) => {
-                if (!infoTooltip.classList.contains('hidden') && !infoBtn.contains(event.target)) {
-                    infoTooltip.classList.add('hidden');
-                }
+                openRarityInfoModal();
             });
         }
 

@@ -96,7 +96,7 @@ body.dashboard-public {
 #rankings-container { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 #rankings-grid { display: grid; grid-template-columns: 1fr; gap: 20px; flex-grow: 1; min-height: 0; }
 @media (min-width: 1024px) { #rankings-grid { grid-template-columns: repeat(3, 1fr); } }
-.ranking-column { display: flex; flex-direction: column; overflow: hidden; }
+.ranking-column { display: flex; flex-direction: column; min-height: 0; }
 .table-container, .list-container { overflow-y: auto; flex-grow: 1; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
@@ -246,14 +246,11 @@ td img {
     font-weight: bold;
 }
 
-/* --- Info Tooltip for Rarity Ranking --- */
+/* --- Info Panel for Rarity Ranking --- */
 h2.ranking-title-with-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-.info-tooltip-container {
-    position: relative;
 }
 .info-btn {
     background: #e0e0e0;
@@ -272,53 +269,6 @@ h2.ranking-title-with-info {
 }
 .info-btn:hover {
     background: #ccc;
-}
-.info-tooltip {
-    position: absolute;
-    bottom: 140%; /* Position above the button */
-    left: 50%;
-    transform: translateX(-95%); /* Adjust to be more to the right */
-    width: 240px;
-    background-color: #333;
-    color: #fff;
-    text-align: left;
-    padding: 15px;
-    border-radius: 8px;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    font-size: 1rem; /* Reset font size from h2 */
-    font-weight: normal; /* Reset font weight from h2 */
-}
-/* Arrow for the tooltip */
-.info-tooltip::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    right: 15px; /* Align arrow to the right */
-    border-width: 6px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
-}
-.info-tooltip h4 {
-    margin: 0 0 10px 0;
-    font-size: 1em;
-    border-bottom: 1px solid #555;
-    padding-bottom: 8px;
-    font-weight: bold;
-}
-.info-tooltip ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-.info-tooltip ul li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9em;
-    padding: 5px 0;
-}
-.info-tooltip ul li span:last-child {
-    font-weight: bold;
 }
 
 /* Styles moved from login.html */
