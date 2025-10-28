@@ -112,24 +112,6 @@ const pokedexService = {
               Object.values(pokemon.eliteCinematicMoves || {}).forEach(move => stringMoveMap[move.id] = move.names.English);
             });
 
-            // Load the numeric-to-string ID map from file
-            try {
-                const numericMoveIdMapContent = await fs.readFile(MOVE_ID_MAP_FILE, 'utf-8');
-                const numericMoveIdMap = JSON.parse(numericMoveIdMapContent);
-                
-                // Create the final map using the loaded numeric-to-string ID map
-                const finalMoveMap = {};
-                for (const numericId in numericMoveIdMap) {
-                    const stringId = numericMoveIdMap[numericId];
-                    if (stringMoveMap[stringId]) {
-                        finalMoveMap[numericId] = stringMoveMap[stringId];
-                    }
-                }
-                this.moveMap = finalMoveMap; // Assign the correct map
-            } catch (error) {
-                console.error('❌ CRITICAL: Could not load or process moveIdMap.json.', error);
-            }
-
             console.log(`👍 Pokédex is now loaded with ${Object.keys(this.pokedex).length} entries.`);
 
             // Load moves from the new JSON files, fetching if they don't exist

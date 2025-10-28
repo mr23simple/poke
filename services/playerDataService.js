@@ -26,7 +26,7 @@ const playerDataService = {
             this.playerIdToPublicIdMap = new Map(parsedMap.playerIdToPublicIdMap);
         } catch (error) {
             if (error.code === 'ENOENT') {
-                console.log('publicIdMap.json not found. Initializing from users.json.');
+                console.log('🔄 publicIdMap.json not found. Initializing from users.json.');
             } else {
                 console.error('Error reading or parsing publicIdMap.json. Re-initializing from users.json.', error);
             }
@@ -48,7 +48,7 @@ const playerDataService = {
                 }
                 if (mapUpdated) {
                     await this.savePublicIdMap();
-                    console.log('publicIdMap regenerated from users.json.');
+                    console.log('👍 publicIdMap regenerated from users.json.');
 
                     // Force rankings regeneration by deleting the file
                     try {
@@ -119,7 +119,7 @@ const playerDataService = {
             return;
         } catch (error) {
             if (error.code === 'ENOENT') {
-                console.log('rankings.json not found. Initializing from player data files...');
+                console.log('🔄 rankings.json not found. Initializing from player data files...');
                 await this.generateAndSaveRankings();
             } else {
                 console.error('Error accessing rankings.json:', error);
@@ -347,7 +347,7 @@ const playerDataService = {
             rankings = JSON.parse(rankingsContent);
         } catch (error) {
             if (error.code === 'ENOENT') {
-                console.log('rankings.json not found during update, generating new one.');
+                console.log('🔄 rankings.json not found during update, generating new one.');
                 rankings = await this.generateAndSaveRankings();
             } else {
                 console.error('Error reading rankings.json for update:', error);
