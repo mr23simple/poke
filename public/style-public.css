@@ -67,8 +67,10 @@
 
 /* --- Page-Specific Body Styles --- */
 body.dashboard-public {
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* --- Login & Register Forms --- */
@@ -143,6 +145,11 @@ td img {
     display: none; /* Hidden by default */
 }
 @media (max-width: 1023px) {
+    body.dashboard-public {
+        height: auto;
+        overflow: auto;
+    }
+
     #rankings-grid {
         overflow-y: auto;
         flex-grow: 1;
@@ -150,6 +157,11 @@ td img {
 
 
     .ranking-column {
+    }
+
+    .table-container {
+        flex-grow: 0;
+        overflow: visible;
     }
 
     .table-container:not(.expanded) tbody tr:nth-child(n+11) {
