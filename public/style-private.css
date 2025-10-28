@@ -139,13 +139,20 @@ body.dashboard-private, body:not([class]) {
 
 /* --- Private Dashboard Layout --- */
 .dashboard-private .container { max-width: 1200px; }
-.dashboard-private main { display: grid; grid-template-columns: 1fr; gap: 20px; }
-@media (min-width: 992px) {
-    .dashboard-private main { grid-template-columns: 1fr 1fr; align-items: flex-start; }
-    .dashboard-private .left-column { grid-column: 1 / 2; }
-    .dashboard-private .right-column { grid-column: 2 / 3; grid-row: 1 / 3; }
-    .dashboard-private #pokemon-summary { height: 100%; }
+
+#character-section .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
 }
+
+@media (min-width: 992px) {
+    #character-section .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: flex-start;
+    }
+}
+
 .left-column, .right-column { display: flex; flex-direction: column; gap: 20px; }
 
 
@@ -193,4 +200,17 @@ body.dashboard-private, body:not([class]) {
     overflow-y: auto;
     margin: 0 -10px; /* Counteract card padding for full bleed scroll */
     padding: 0 10px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive columns for the main Pokemon list in the Pokemon tab */
+@media (min-width: 768px) {
+    #pokemon-section #all-pokemon-list {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+@media (min-width: 1200px) {
+    #pokemon-section #all-pokemon-list {
+        grid-template-columns: repeat(7, 1fr);
+    }
 }
