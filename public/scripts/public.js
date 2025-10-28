@@ -100,6 +100,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('modal-close-btn').onclick = () => modalBackdrop.classList.add('hidden');
     }
 
+    function generateBadges(p) {
+        const badges = [];
+        let hasIvCombo = false;
+        let hasShinyCombo = false;
+        let hasLuckyCombo = false;
+        let hasMaxLevelCombo = false;
+
+        // Highest priority combos
+        if (p.isShiny && p.isLucky && p.isPerfect) {
+            badges.push('<span class="badge shlundo-badge">Shlundo</span>');
+            hasIvCombo = hasShinyCombo = hasLuckyCombo = true;
+        } else if (p.isLucky && p.isPerfect) {
+            badges.push('<span class="badge lundo-badge">Lundo</span>');
+            hasIvCombo = hasLuckyCombo = true;
+        } else if (p.isPerfect && p.isMaxLevel) {
+            badges.push('<span class="badge max-badge">MAX</span>');
+            hasIvCombo = hasMaxLevelCombo = true;
+        } else if (p.isShiny && p.isPerfect) {
+            badges.push('<span class="badge shundo-badge">Shundo</span>');
+            hasIvCombo = hasShinyCombo = true;
+        } else if (p.isShiny && p.isZeroIv) {
+            badges.push('<span class="badge shnundo-badge">Shnundo</span>');
+            hasIvCombo = hasShinyCombo = true;
+        }
+
+        // Individual badges (if not part of a combo)
+        if (!hasShinyCombo && p.isShiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
+        if (!hasLuckyCombo && p.isLucky) {
+            badges.push('<span class="badge lucky-badge">Lucky</span>');
+        } else if (p.isTraded && !p.isLucky) {
+            badges.push('<span class="badge traded-badge">Traded</span>');
+        }
+        
+        if (!hasIvCombo) {
+            if (p.isPerfect) badges.push('<span class="badge perfect-badge">Hundo</span>');
+            else if (p.isZeroIv) badges.push('<span class="badge zero-iv-badge">Nundo</span>');
+        }
+
+        if (!hasMaxLevelCombo && p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+
+        // Other non-conflicting badges
+        if (p.isShadow) badges.push('<span class="badge shadow-badge">Shadow</span>');
+        if (p.isPurified) badges.push('<span class="badge purified-badge">Purified</span>');
+        if (p.isLegendary) badges.push('<span class="badge legendary-badge">Legendary</span>');
+        if (p.isMythical) badges.push('<span class="badge mythical-badge">Mythical</span>');
+
+        return badges.join(' ');
+    }
+
     function openPokemonModal(pokemon) {
         const ivAttack = pokemon.iv.attack;
         const ivDefense = pokemon.iv.defense;
@@ -116,15 +165,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h2>
                         ${pokemon.name}
                         <span class="badges-container">
-                            ${pokemon.isShiny ? '<span class="badge shiny-badge">Shiny</span>' : ''}
-                            ${pokemon.isLucky ? '<span class="badge lucky-badge">Lucky</span>' : (pokemon.isTraded ? '<span class="badge traded-badge">Traded</span>' : '')}
-                            ${pokemon.isZeroIv ? '<span class="badge zero-iv-badge">0 IV</span>' : ''}
-                            ${pokemon.isPerfect ? '<span class="badge perfect-badge">Perfect</span>' : ''}
-                            ${pokemon.isShadow ? '<span class="badge shadow-badge">Shadow</span>' : ''}
-                            ${pokemon.isPurified ? '<span class="badge purified-badge">Purified</span>' : ''}
-                            ${pokemon.isLegendary ? '<span class="badge legendary-badge">Legendary</span>' : ''}
-                            ${pokemon.isMythical ? '<span class="badge mythical-badge">Mythical</span>' : ''}
-                            ${pokemon.isMaxLevel ? '<span class="badge max-level-badge">Max</span>' : ''}
+                            ${generateBadges(pokemon)}
                         </span>
                     </h2>
                     <div class="pokemon-stats-grid">
@@ -278,54 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span>${p.name}</span>
                 </td>
                 <td class="badges-cell">
-                    ${(() => {
-                        const badges = [];
-                        let hasIvCombo = false;
-                        let hasShinyCombo = false;
-                        let hasLuckyCombo = false;
-                        let hasMaxLevelCombo = false;
-
-                        // Highest priority combos
-                        if (p.isShiny && p.isLucky && p.isPerfect) {
-                            badges.push('<span class="badge shlundo-badge">Shlundo</span>');
-                            hasIvCombo = hasShinyCombo = hasLuckyCombo = true;
-                        } else if (p.isLucky && p.isPerfect) {
-                            badges.push('<span class="badge lundo-badge">Lundo</span>');
-                            hasIvCombo = hasLuckyCombo = true;
-                        } else if (p.isPerfect && p.isMaxLevel) {
-                            badges.push('<span class="badge max-badge">MAX</span>');
-                            hasIvCombo = hasMaxLevelCombo = true;
-                        } else if (p.isShiny && p.isPerfect) {
-                            badges.push('<span class="badge shundo-badge">Shundo</span>');
-                            hasIvCombo = hasShinyCombo = true;
-                        } else if (p.isShiny && p.isZeroIv) {
-                            badges.push('<span class="badge shnundo-badge">Shnundo</span>');
-                            hasIvCombo = hasShinyCombo = true;
-                        }
-
-                        // Individual badges (if not part of a combo)
-                        if (!hasShinyCombo && p.isShiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
-                        if (!hasLuckyCombo && p.isLucky) {
-                            badges.push('<span class="badge lucky-badge">Lucky</span>');
-                        } else if (p.isTraded && !p.isLucky) {
-                            badges.push('<span class="badge traded-badge">Traded</span>');
-                        }
-                        
-                        if (!hasIvCombo) {
-                            if (p.isPerfect) badges.push('<span class="badge perfect-badge">Hundo</span>');
-                            else if (p.isZeroIv) badges.push('<span class="badge zero-iv-badge">Nundo</span>');
-                        }
-
-                        if (!hasMaxLevelCombo && p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
-
-                        // Other non-conflicting badges
-                        if (p.isShadow) badges.push('<span class="badge shadow-badge">Shadow</span>');
-                        if (p.isPurified) badges.push('<span class="badge purified-badge">Purified</span>');
-                        if (p.isLegendary) badges.push('<span class="badge legendary-badge">Legendary</span>');
-                        if (p.isMythical) badges.push('<span class="badge mythical-badge">Mythical</span>');
-
-                        return badges.join(' ');
-                    })()}
+                    ${generateBadges(p)}
                 </td>
                 <td>${maskUsername(p.owner)}</td>
             </tr>
