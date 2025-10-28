@@ -67,10 +67,8 @@
 
 /* --- Page-Specific Body Styles --- */
 body.dashboard-public {
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 /* --- Login & Register Forms --- */
@@ -150,24 +148,16 @@ td img {
         flex-grow: 1;
     }
 
+
     .ranking-column {
-        overflow: visible;
     }
 
-    .table-container {
-        /* Each row is about 40px tall, so 10 rows is ~400px + header */
-        max-height: 450px; 
-        overflow-y: hidden;
-        flex-grow: 0;
-        transition: max-height 0.5s ease-in-out;
+    .table-container:not(.expanded) tbody tr:nth-child(n+11) {
+        display: none;
     }
 
     .ranking-footer {
         display: block; /* Show button on small screens */
-    }
-
-    .table-container.expanded {
-        max-height: 5000px; /* A very large value to ensure all content is visible */
     }
 
     .ranking-column.expanded .show-more-btn {
@@ -185,6 +175,12 @@ td img {
     }
     .pokemon-cell {
         justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .hide-on-mobile {
+        display: none;
     }
 }
 

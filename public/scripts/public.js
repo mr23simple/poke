@@ -301,8 +301,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>
                     ${player.buddy ? `<img src="${player.buddy.sprite}" alt="${player.buddy.name}" title="${player.buddy.name}">` : 'N/A'}
                 </td>
-                <td>${player.kmWalked} km</td>
-                <td>${player.pokemonCaught.toLocaleString()}</td>
+                <td class="hide-on-mobile">${player.kmWalked} km</td>
+                <td class="hide-on-mobile">${player.pokemonCaught.toLocaleString()}</td>
             </tr>
         `).join('');
 
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span>${p.name}</span>
                 </td>
                 <td><strong>${p.cp.toLocaleString()}</strong></td>
-                <td>${maskUsername(p.owner)}</td>
+                <td class="hide-on-mobile">${maskUsername(p.owner)}</td>
             </tr>
         `).join('');
 
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="badges-cell">
                     ${generateBadges(p)}
                 </td>
-                <td>${maskUsername(p.owner)}</td>
+                <td class="hide-on-mobile">${maskUsername(p.owner)}</td>
             </tr>
         `).join('');
 
