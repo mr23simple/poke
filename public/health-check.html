@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon GO | Service Health</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="style-base.css">
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-subheader.css">
+    <style>
+        /* Basic styles for the health check page */
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .health-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .health-card h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .hash-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .hash-table th, .hash-table td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            font-family: 'monospace';
+            word-break: break-all;
+        }
+        .hash-table th {
+            background-color: #f9f9f9;
+        }
+        .status-ok {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .status-mismatch {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .status-missing {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        #cron-summary-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .cron-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: #fff;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .cron-status.success {
+            background-color: #2ecc71;
+        }
+        .cron-status.failed {
+            background-color: #e74c3c;
+        }
+        .cron-status.not-run {
+            background-color: #95a5a6;
+        }
+        .cron-details p {
+            margin: 0.5rem 0;
+            color: #6c757d;
+        }
+        .cron-details strong {
+            color: #343a40;
+        }
+        #countdown-timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    <div id="subheader-placeholder"></div>
+
+    <main>
+        <h1>Service Health Check</h1>
+        
+        <div id="cron-summary-card">
+            <!-- Content will be injected by JavaScript -->
+        </div>
+
+        <div id="health-check-container">
+            <p>Loading health status...</p>
+        </div>
+    </main>
+
+    <script src="/scripts/health-check.js"></script>
+    <script src="/scripts/loadHeader.js"></script>
+</body>
+</html>

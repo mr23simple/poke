@@ -96,7 +96,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (mainHeader) mainHeader.classList.add('default-bg');
             }
 
-            if (path === '/' || path.includes('index.html')) {
+            if (path.includes('health-check.html')) {
+                mainTitle.textContent = 'Service Health';
+                setLinkVisibility(true, false, false, false, false); // Home only
+                if (subheaderPlaceholder) {
+                    subheaderPlaceholder.remove();
+                }
+            } else if (path === '/' || path.includes('index.html')) {
                 mainTitle.textContent = 'Pokémon GO Player Dashboard';
                 if (authStatus.loggedIn) {
                     setLinkVisibility(false, false, false, true, true); // Dashboard, Logout

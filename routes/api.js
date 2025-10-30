@@ -5,6 +5,16 @@ const { isAuthenticated } = require('./auth');
 
 const router = express.Router();
 
+router.get('/health-check', async (req, res) => {
+    try {
+        const healthData = await pokedexService.getHealthCheckData();
+        res.json(healthData);
+    } catch (error) {
+        console.error("Error in /api/health-check:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.get('/rankings', async (req, res) => {
     try {
         const rankings = await playerDataService.getRankings();

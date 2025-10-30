@@ -30,8 +30,13 @@ app.use('/api', apiRoutes);
 
 // --- Start Server ---
 (async () => {
-    await pokedexService.initialize();
-    await playerDataService.init();
-    await playerDataService.initializeRankings();
-    app.listen(config.PORT, () => console.log(`🚀 Server running at http://localhost:${config.PORT}`));
+    try {
+        await pokedexService.initialize();
+        await playerDataService.init();
+        await playerDataService.initializeRankings();
+        app.listen(config.PORT, () => console.log(`🚀 Server running at http://localhost:${config.PORT}`));
+    } catch (error) {
+        console.error('❌ CRITICAL: Failed to initialize services. Server will not start.', error);
+        process.exit(1);
+    }
 })();

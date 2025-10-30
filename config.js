@@ -2,8 +2,8 @@ const path = require('path');
 
 const DATA_DIR = path.join(__dirname, 'data');
 const RANKINGS_FILE = path.join(DATA_DIR, 'rankings.json');
-const POKEDEX_FILE = path.join(DATA_DIR, 'pokedex.json');
-const POKEDEX_RAW_FILE = path.join(DATA_DIR, 'pokedex_raw.json');
+const POKEDEX_FILE = path.join(DATA_DIR, 'pokedex_modified.json');
+const POKEDEX_RAW_FILE = path.join(DATA_DIR, 'pokedex.json');
 const COSTUME_ID_MAP_FILE = path.join(DATA_DIR, 'costumeIdMap.json');
 const PUBLIC_ID_MAP_FILE = path.join(DATA_DIR, 'publicIdMap.json');
 const SHINY_RATES_FILE = path.join(DATA_DIR, 'shinyRates.json');
