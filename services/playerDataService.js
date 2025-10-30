@@ -736,13 +736,25 @@ const playerDataService = {
                     return p;
                 }
                 const pokedexEntry = getPokedexEntry(p);
+
+                let specialForm = null;
+                switch (p.pokemonDisplay.breadModeEnum) {
+                    case 1:
+                        specialForm = 'Dynamax';
+                        break;
+                    case 2:
+                        specialForm = 'Gigantamax';
+                        break;
+                }
+
                 return {
                     ...p,
                     name: pokedexService.getPokemonName(p.pokemonId, p.pokemonDisplay.formName),
                     sprite: pokedexService.getPokemonSprite(p),
                     typeColors: pokedexService.getPokemonTypeColors(pokedexEntry),
                     pokemonClass: pokedexEntry?.pokemonClass,
-                    isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83
+                    isMaxLevel: (p.cpMultiplier + (p.additionalCpMultiplier || 0)) > 0.83,
+                    specialForm: specialForm
                 };
             });
             

@@ -86,6 +86,8 @@ const GridComponent = {
             if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
             if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
             if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+            if (p.specialForm === 'Dynamax') badges.push('<span class="badge dynamax-badge">Dynamax</span>');
+            if (p.specialForm === 'Gigantamax') badges.push('<span class="badge gigantamax-badge">G-Max</span>');
             
             if (badges.length > 0) {
                 return `${name}<br>${badges.join(' ')}`;
@@ -451,6 +453,8 @@ createApp({
             if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
             if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
             if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+            if (p.specialForm === 'Dynamax') badges.push('<span class="badge dynamax-badge">Dynamax</span>');
+            if (p.specialForm === 'Gigantamax') badges.push('<span class="badge gigantamax-badge">G-Max</span>');
             
             if (badges.length > 0) {
                 return `${name}<br>${badges.join(' ')}`;

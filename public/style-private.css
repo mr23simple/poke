@@ -478,3 +478,14 @@ body.dashboard-private, body:not([class]) {
     flex-basis: 30%;
     text-align: center;
 }
+
+/* Dynamax and Gigantamax Badges */
+.dynamax-badge {
+    background-color: #FF0033;
+    color: white;
+}
+
+.gigantamax-badge {
+    background-image: linear-gradient(to right, #FF0033, #87CEEB);
+    color: white;
+}
