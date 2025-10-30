@@ -70,25 +70,33 @@ const GridComponent = {
         displayName(p) { return p.nickname || p.name; },
         getBadges(p, name) {
             const badges = [];
-            if (p.pokemonDisplay?.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
+            if (!p || !p.pokemonDisplay) return name;
+
+            if (p.pokemonDisplay.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
             if (p.isLucky) {
                 badges.push('<span class="badge lucky-badge">Lucky</span>');
             } else if (p.tradedTimeMs > 0) {
                 badges.push('<span class="badge traded-badge">Traded</span>');
             }
-            if (p.isZeroIv) {
+            
+            const ivPercent = this.getIvPercent(p);
+            if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
                 badges.push('<span class="badge zero-iv-badge">0 IV</span>');
-            } else if (this.getIvPercent(p) >= 100) {
+            } else if (ivPercent >= 100) {
                 badges.push('<span class="badge perfect-badge">Perfect</span>');
             }
-            if (p.pokemonDisplay?.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
-            if (p.pokemonDisplay?.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+
+            if (p.pokemonDisplay.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
+            if (p.pokemonDisplay.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+
             if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
             if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
-            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+
             if (p.specialForm === 'Dynamax') badges.push('<span class="badge dynamax-badge">Dynamax</span>');
             if (p.specialForm === 'Gigantamax') badges.push('<span class="badge gigantamax-badge">G-Max</span>');
-            
+
+            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+
             if (badges.length > 0) {
                 return `${name}<br>${badges.join(' ')}`;
             }
@@ -350,7 +358,7 @@ createApp({
                 if (p.isLucky) {
                     score += 2;
                 }
-                if (p.pokemonDisplay?.shadow) {
+                if (p.pokemonDisplay?.alignment === 1) {
                     score += 1;
                 }
                 const pokedexEntry = getPokedexEntry(p);
@@ -407,8 +415,8 @@ createApp({
                         else if (searchTerm === 'shiny' && p.pokemonDisplay.shiny) match = true;
                         else if (searchTerm === 'lucky' && p.isLucky) match = true;
                         else if (searchTerm === 'perfect' && getIvPercent(p) >= 100) match = true;
-                        else if (searchTerm === 'shadow' && p.pokemonDisplay.shadow) match = true;
-                        else if (searchTerm === 'purified' && p.pokemonDisplay.purified) match = true;
+                        else if (searchTerm === 'shadow' && p.pokemonDisplay.alignment === 1) match = true;
+                        else if (searchTerm === 'purified' && p.pokemonDisplay.alignment === 2) match = true;
                         const pokedexEntry = getPokedexEntry(p);
                         if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY' && searchTerm === 'legendary') match = true;
                         if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC' && searchTerm === 'mythical') match = true;
@@ -436,26 +444,35 @@ createApp({
         const getCardClass = (p) => p.typeColors && p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
         const getBadges = (p, name) => {
             const badges = [];
-            if (p.pokemonDisplay?.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
+            if (!p || !p.pokemonDisplay) return name;
+
+            if (p.pokemonDisplay.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
             if (p.isLucky) {
                 badges.push('<span class="badge lucky-badge">Lucky</span>');
-            } else if (p.tradedTimeMs > 0) {
+            }
+            else if (p.tradedTimeMs > 0) {
                 badges.push('<span class="badge traded-badge">Traded</span>');
             }
-            if (p.isZeroIv) {
+            
+            const ivPercent = getIvPercent(p);
+            if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
                 badges.push('<span class="badge zero-iv-badge">0 IV</span>');
-            } else if (getIvPercent(p) >= 100) {
+            }
+            else if (ivPercent >= 100) {
                 badges.push('<span class="badge perfect-badge">Perfect</span>');
             }
-            if (p.pokemonDisplay?.shadow) badges.push('<span class="badge shadow-badge">Shadow</span>');
-            if (p.pokemonDisplay?.purified) badges.push('<span class="badge purified-badge">Purified</span>');
-            const pokedexEntry = getPokedexEntry(p);
-            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
-            if (pokedexEntry?.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
-            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+
+            if (p.pokemonDisplay.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
+            if (p.pokemonDisplay.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+
+            if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
+            if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
+
             if (p.specialForm === 'Dynamax') badges.push('<span class="badge dynamax-badge">Dynamax</span>');
             if (p.specialForm === 'Gigantamax') badges.push('<span class="badge gigantamax-badge">G-Max</span>');
-            
+
+            if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Max</span>');
+
             if (badges.length > 0) {
                 return `${name}<br>${badges.join(' ')}`;
             }

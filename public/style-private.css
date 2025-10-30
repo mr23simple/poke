@@ -489,3 +489,109 @@ body.dashboard-private, body:not([class]) {
     background-image: linear-gradient(to right, #FF0033, #87CEEB);
     color: white;
 }
+
+/* Styles for the colored modal */
+#modal-content.styled {
+    color: white;
+}
+
+#modal-content.styled h2,
+#modal-content.styled h4,
+#modal-content.styled .stat-label,
+#modal-content.styled .stat-value,
+#modal-content.styled .grid-stats div,
+#modal-content.styled .pokemon-stats-grid div,
+#modal-content.styled strong,
+#modal-content.styled span {
+    color: white !important;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+#modal-content.styled #modal-close-btn {
+    color: white !important;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+}
+
+#modal-content.styled .stat-bar {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Modal VFX --- */
+.sprite-container {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden; /* To contain the effects */
+}
+
+.pokemon-modal-header .sprite-container {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.pokemon-modal-header img {
+    position: relative;
+    z-index: 10; /* Image is on top */
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    margin-right: 0;
+    border-radius: 0;
+}
+
+.vfx-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+/* 1. Shadow Aura */
+@keyframes aura-pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+.vfx-layer.shadow-aura {
+    background: radial-gradient(circle, rgba(80, 80, 80, 0.7) 30%, rgba(0, 0, 0, 0) 70%);
+    animation: aura-pulse 1.5s ease-in-out infinite;
+    z-index: 3;
+}
+
+/* 2. Lucky Glow */
+.vfx-layer.lucky-glow {
+    background: radial-gradient(circle, rgba(255, 223, 0, 0.7) 30%, rgba(255, 215, 0, 0) 65%);
+    animation: aura-pulse 3s ease-in-out infinite reverse;
+    z-index: 3; /* Lucky glow on top of shadow */
+}
+
+/* 3. Shiny Glint */
+@keyframes shiny-glint {
+    0% { transform: translateX(-150%) skewX(-30deg); }
+    100% { transform: translateX(150%) skewX(-30deg); }
+}
+.vfx-layer.shiny-glint::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+    animation: shiny-glint 2.5s ease-in-out infinite;
+    z-index: 4; /* Shiny glint on top of all auras */
+}
+
+/* 4. Purified Glow */
+.vfx-layer.purified-glow {
+    background: radial-gradient(circle, rgba(220, 220, 220, 0.7) 30%, rgba(173, 216, 230, 0) 70%);
+    animation: aura-pulse 5s ease-in-out infinite;
+    z-index: 2; /* Same layer as shadow, since they are mutually exclusive */
+}

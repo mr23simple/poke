@@ -24,11 +24,17 @@
         
         <!-- Pokémon Detail Modal -->
         <div id="modal-backdrop" v-if="selectedPokemon" @click.self="selectedPokemon = null">
-            <div id="modal-content" class="card">
+            <div id="modal-content" class="card" :style="createBackgroundStyle(selectedPokemon.typeColors)">
                 <button id="modal-close-btn" @click="selectedPokemon = null">&times;</button>
                 
                 <div class="pokemon-modal-header">
-                    <img :src="selectedPokemon.sprite" :alt="selectedPokemon.nickname || selectedPokemon.name">
+                    <div class="sprite-container">
+                        <div v-if="selectedPokemon.pokemonDisplay.alignment === 1" class="vfx-layer shadow-aura"></div>
+                        <div v-if="selectedPokemon.pokemonDisplay.alignment === 2" class="vfx-layer purified-glow"></div>
+                        <div v-if="selectedPokemon.isLucky" class="vfx-layer lucky-glow"></div>
+                        <div v-if="selectedPokemon.pokemonDisplay.shiny" class="vfx-layer shiny-glint"></div>
+                        <img :src="selectedPokemon.sprite" :alt="selectedPokemon.nickname || selectedPokemon.name">
+                    </div>
                     <div class="pokemon-info">
                         <h2>
                             {{ selectedPokemon.nickname || selectedPokemon.name }}
