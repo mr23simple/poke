@@ -491,28 +491,28 @@ body.dashboard-private, body:not([class]) {
 }
 
 /* Styles for the colored modal */
-#modal-content.styled {
+#modal-content {
     color: white;
 }
 
-#modal-content.styled h2,
-#modal-content.styled h4,
-#modal-content.styled .stat-label,
-#modal-content.styled .stat-value,
-#modal-content.styled .grid-stats div,
-#modal-content.styled .pokemon-stats-grid div,
-#modal-content.styled strong,
-#modal-content.styled span {
+#modal-content h2,
+#modal-content h4,
+#modal-content .stat-label,
+#modal-content .stat-value,
+#modal-content .grid-stats div,
+#modal-content .pokemon-stats-grid div,
+#modal-content strong,
+#modal-content span {
     color: white !important;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
 }
 
-#modal-content.styled #modal-close-btn {
+#modal-content #modal-close-btn {
     color: white !important;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
 }
 
-#modal-content.styled .stat-bar {
+#modal-content .stat-bar {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
