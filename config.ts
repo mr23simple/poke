@@ -6,20 +6,8 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function findProjectRoot(startDir: string): string {
-    let currentDir = startDir;
-    while (currentDir !== '/') {
-        if (fs.existsSync(path.join(currentDir, 'package.json'))) {
-            return currentDir;
-        }
-        currentDir = path.dirname(currentDir);
-    }
-    // Fallback if package.json is not found (e.g., in a weird test environment)
-    return __dirname.includes('dist') ? path.resolve(__dirname, '..') : __dirname;
-}
-
-// If we are running from the 'dist' folder, the root is one level up
-export const rootDir = findProjectRoot(__dirname);
+// If running from dist, the root is one level up. This is simpler and less prone to fs issues.
+export const rootDir = __dirname.includes('dist') ? path.resolve(__dirname, '..') : __dirname;
 
 export const DATA_DIR = path.join(rootDir, 'data');
 export const RANKINGS_FILE = path.join(DATA_DIR, 'private/rankings.json');

@@ -182,17 +182,21 @@ writeStream.on('finish', () => {
     console.log(`Done! Saved to ${OUTPUT_PATH}`);
 
     console.log("Compiling binary ranks...");
-    const isProd = !__dirname.endsWith('scripts'); // Better prod check
+    const isProd = __dirname.includes('dist'); // Reverted to the more reliable check
     const compileScriptPath = isProd 
         ? path.join(config.rootDir, 'dist/scripts/compile_pvp_binary.js')
         : path.join(config.rootDir, 'scripts/compile_pvp_binary.ts');
-    const compileCommand = isProd ? `node ${compileScriptPath}` : `pnpm tsx ${compileScriptPath}`;
+    const compileCommand = isProd ? `node "${compileScriptPath}"` : `pnpm tsx "${compileScriptPath}"`;
 
     exec(compileCommand, { cwd: config.rootDir }, (err, stdout) => {
-        if (err) console.error(err);
-        else console.log(stdout);
+        if (err) {
+            console.error(`Error during binary compilation: ${err.message}`);
+            console.error(stderr);
+        }
+        else {
+            console.log(stdout);
+        }
     });
-});
-    }
+});    }
     main().catch(console.error);
 }
