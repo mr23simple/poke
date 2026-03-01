@@ -6,8 +6,33 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// If running from dist, the root is one level up. This is simpler and less prone to fs issues.
-export const rootDir = __dirname.includes('dist') ? path.resolve(__dirname, '..') : __dirname;
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function findProjectRoot(startDir: string): string {
+    let currentDir = startDir;
+    // Prevent infinite loop at filesystem root
+    while (currentDir && currentDir !== path.parse(currentDir).root) {
+        if (fs.existsSync(path.join(currentDir, 'package.json'))) {
+            return currentDir;
+        }
+        currentDir = path.dirname(currentDir);
+    }
+    // If package.json is not found, fallback to a more explicit check
+    // In prod, __dirname will be like /var/www/poke/dist/services. We want /var/www/poke.
+    if (startDir.includes('/dist')) {
+        return startDir.split('/dist')[0];
+    }
+    // In dev, the startDir is likely the root already.
+    return startDir;
+}
+
+export const rootDir = findProjectRoot(__dirname);
 
 export const DATA_DIR = path.join(rootDir, 'data');
 export const RANKINGS_FILE = path.join(DATA_DIR, 'private/rankings.json');
