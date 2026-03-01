@@ -105,72 +105,72 @@ pipeline {
                                 "${env.TARGET_PATH}" \\
                                 "${env.SERVICE_NAME}" \\
                                 "\${REMOTE_DEPLOY_TMP_DIR}" << 'EOF'
-                                #!/bin/bash
-                                set -euxo pipefail
+#!/bin/bash
+set -euxo pipefail
 
-                                # --- BEGIN REMOTE SERVER SCRIPT ---
-                                
-                                # Assign passed arguments to local variables in the remote script
-                                TARGET_PATH="\$1"
-                                SERVICE_NAME="\$2"
-                                DEPLOY_TMP_DIR="\$3"
+# --- BEGIN REMOTE SERVER SCRIPT ---
 
-                                echo "Remote script started. Target path: \${TARGET_PATH}, Service: \${SERVICE_NAME}, Temp Dir: \${DEPLOY_TMP_DIR}"
+# Assign passed arguments to local variables in the remote script
+TARGET_PATH="\$1"
+SERVICE_NAME="\$2"
+DEPLOY_TMP_DIR="\$3"
 
-                                # Ensure the target application directory exists and has correct permissions
-                                sudo mkdir -p "\${TARGET_PATH}"
-                                sudo chown rafael:rafael "\${TARGET_PATH}"
+echo "Remote script started. Target path: \${TARGET_PATH}, Service: \${SERVICE_NAME}, Temp Dir: \${DEPLOY_TMP_DIR}"
 
-                                # Navigate to the application's root directory on the server
-                                cd "\${TARGET_PATH}"
+# Ensure the target application directory exists and has correct permissions
+sudo mkdir -p "\${TARGET_PATH}"
+sudo chown rafael:rafael "\${TARGET_PATH}"
 
-                                # --- Safely clean and prepare TARGET_PATH ---
-                                TEMP_PERSIST_DIR="/tmp/poke_persist_\$(date +%Y%m%d%H%M%S)"
-                                mkdir -p "\${TEMP_PERSIST_DIR}"
-                                echo "Moving persistent data to \${TEMP_PERSIST_DIR}"
+# Navigate to the application's root directory on the server
+cd "\${TARGET_PATH}"
 
-                                [ -d "data" ] && sudo mv data "\${TEMP_PERSIST_DIR}/" || echo "No 'data' directory to move."
-                                [ -d "node_modules" ] && sudo mv node_modules "\${TEMP_PERSIST_DIR}/" || echo "No 'node_modules' directory to move."
-                                [ -f ".env" ] && sudo mv .env "\${TEMP_PERSIST_DIR}/" || echo "No '.env' file to move."
+# --- Safely clean and prepare TARGET_PATH ---
+TEMP_PERSIST_DIR="/tmp/poke_persist_\$(date +%Y%m%d%H%M%S)"
+mkdir -p "\${TEMP_PERSIST_DIR}"
+echo "Moving persistent data to \${TEMP_PERSIST_DIR}"
 
-                                # Now, delete everything else that should be replaced by the new deployment
-                                echo "Cleaning target directory: \${TARGET_PATH}"
-                                sudo rm -rf \${TARGET_PATH}/*
+[ -d "data" ] && sudo mv data "\${TEMP_PERSIST_DIR}/" || echo "No 'data' directory to move."
+[ -d "node_modules" ] && sudo mv node_modules "\${TEMP_PERSIST_DIR}/" || echo "No 'node_modules' directory to move."
+[ -f ".env" ] && sudo mv .env "\${TEMP_PERSIST_DIR}/" || echo "No '.env' file to move."
 
-                                # Extract the new deployment archive into the target application directory
-                                echo "Extracting deployment from \${DEPLOY_TMP_DIR}"
-                                cd "\${DEPLOY_TMP_DIR}"
-                                sudo tar -xzf deployment.tar.gz -C "\${TARGET_PATH}" --overwrite
+# Now, delete everything else that should be replaced by the new deployment
+echo "Cleaning target directory: \${TARGET_PATH}"
+sudo rm -rf \${TARGET_PATH}/*
 
-                                # Clean up the temporary deployment archive on the server
-                                echo "Cleaning up remote temporary deploy directory"
-                                rm -rf "\${DEPLOY_TMP_DIR}"
+# Extract the new deployment archive into the target application directory
+echo "Extracting deployment from \${DEPLOY_TMP_DIR}"
+cd "\${DEPLOY_TMP_DIR}"
+sudo tar -xzf deployment.tar.gz -C "\${TARGET_PATH}" --overwrite
 
-                                # Navigate back to TARGET_PATH and move persistent directories back
-                                cd "\${TARGET_PATH}"
-                                echo "Restoring persistent data from \${TEMP_PERSIST_DIR}"
-                                [ -d "\${TEMP_PERSIST_DIR}/data" ] && sudo mv "\${TEMP_PERSIST_DIR}/data" . || echo "No 'data' to restore."
-                                [ -d "\${TEMP_PERSIST_DIR}/node_modules" ] && sudo mv "\${TEMP_PERSIST_DIR}/node_modules" . || echo "No 'node_modules' to restore."
-                                [ -f "\${TEMP_PERSIST_DIR}/.env" ] && sudo mv "\${TEMP_PERSIST_DIR}/.env" . || echo "No '.env' to restore."
-                                rm -rf "\${TEMP_PERSIST_DIR}"
+# Clean up the temporary deployment archive on the server
+echo "Cleaning up remote temporary deploy directory"
+rm -rf "\${DEPLOY_TMP_DIR}"
 
-                                # --- Setup and restart application ---
-                                echo "Setting up node environment and installing dependencies"
-                                # Source NVM to ensure 'pnpm' is in the PATH. Note the double backslash for Groovy.
-                                export NVM_DIR="/root/.nvm"
-                                [ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
+# Navigate back to TARGET_PATH and move persistent directories back
+cd "\${TARGET_PATH}"
+echo "Restoring persistent data from \${TEMP_PERSIST_DIR}"
+[ -d "\${TEMP_PERSIST_DIR}/data" ] && sudo mv "\${TEMP_PERSIST_DIR}/data" . || echo "No 'data' to restore."
+[ -d "\${TEMP_PERSIST_DIR}/node_modules" ] && sudo mv "\${TEMP_PERSIST_DIR}/node_modules" . || echo "No 'node_modules' to restore."
+[ -f "\${TEMP_PERSIST_DIR}/.env" ] && sudo mv "\${TEMP_PERSIST_DIR}/.env" . || echo "No '.env' to restore."
+rm -rf "\${TEMP_PERSIST_DIR}"
 
-                                # Install production-only dependencies
-                                PNPM_FULL_PATH="/root/.nvm/versions/node/v24.4.0/bin/pnpm"
-                                sudo "\${PNPM_FULL_PATH}" install --prod --frozen-lockfile
+# --- Setup and restart application ---
+echo "Setting up node environment and installing dependencies"
+# Source NVM to ensure 'pnpm' is in the PATH. Note the double backslash for Groovy.
+export NVM_DIR="/root/.nvm"
+[ -s "\$NVM_DIR/nvm.sh" ] && \\. "\$NVM_DIR/nvm.sh"
 
-                                # Restart the application using PM2
-                                echo "Restarting PM2 service: \${SERVICE_NAME}"
-                                sudo pm2 restart "\${SERVICE_NAME}" || sudo pm2 start ecosystem.config.cjs --name "\${SERVICE_NAME}"
-                                sudo pm2 save
-                                
-                                echo "Remote script finished successfully."
-                            EOF
+# Install production-only dependencies
+PNPM_FULL_PATH="/root/.nvm/versions/node/v24.4.0/bin/pnpm"
+sudo "\${PNPM_FULL_PATH}" install --prod --frozen-lockfile
+
+# Restart the application using PM2
+echo "Restarting PM2 service: \${SERVICE_NAME}"
+sudo pm2 restart "\${SERVICE_NAME}" || sudo pm2 start ecosystem.config.cjs --name "\${SERVICE_NAME}"
+sudo pm2 save
+
+echo "Remote script finished successfully."
+EOF
                         """
                     }
                 }
