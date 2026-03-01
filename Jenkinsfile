@@ -54,6 +54,33 @@ pipeline {
             }
         }
         
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // This assumes a SonarQube scanner tool is configured in Jenkins
+                    // with the name 'sonar-scanner-4.0'.
+                    def scannerHome = tool 'sonar-scanner-4.0'
+                    withSonarQubeEnv('sonarqube') {
+                        // Inject the SonarQube token from Jenkins credentials
+                        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                            sh "${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=poke-dashboard \
+                                -Dsonar.projectName='Poke Dashboard' \
+                                -Dsonar.sources=src,services,routes,middlewares,scripts,server.ts,config.ts \
+                                -Dsonar.tests=tests \
+                                -Dsonar.test.inclusions=tests/**/*.ts \
+                                -Dsonar.exclusions=node_modules/**,dist/**,public/**,assets/**,pgsharp_player_data/**,data/private/** \
+                                -Dsonar.token=${SONAR_TOKEN}"
+                        }
+                    }
+                    // Optional: Wait for the quality gate result
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
+            }
+        }
+        
         stage('Build') {
             steps {
                 echo 'Building application for production...'
