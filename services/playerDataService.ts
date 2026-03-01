@@ -636,7 +636,9 @@ const playerDataService = {
             return {
                 playerData: data,
                 pvpDataVersion: pvpService.getDataVersion(),
-                pokedexService: { typeColorMap: pokedexService.typeColorMap }
+                pokedexService: { 
+                    typeColorMap: pokedexService.typeColorMap
+                }
             };
         } catch (error) { throw new Error('A server error occurred while processing your player data.'); }
     }
