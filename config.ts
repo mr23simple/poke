@@ -6,14 +6,6 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import path from 'path';
-import { fileURLToPath } from 'url';
-import 'dotenv/config';
-import fs from 'fs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 function findProjectRoot(startDir: string): string {
     let currentDir = startDir;
     // Prevent infinite loop at filesystem root
