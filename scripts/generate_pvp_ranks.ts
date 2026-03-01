@@ -188,7 +188,7 @@ writeStream.on('finish', () => {
         : path.join(config.rootDir, 'scripts/compile_pvp_binary.ts');
     const compileCommand = isProd ? `node "${compileScriptPath}"` : `pnpm tsx "${compileScriptPath}"`;
 
-    exec(compileCommand, { cwd: config.rootDir }, (err, stdout) => {
+    exec(compileCommand, { cwd: config.rootDir }, (err, stdout, stderr) => {
         if (err) {
             console.error(`Error during binary compilation: ${err.message}`);
             console.error(stderr);
