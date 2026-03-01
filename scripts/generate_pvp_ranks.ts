@@ -4,13 +4,13 @@ import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
 import { exec } from 'child_process';
 import os from 'os';
 import { fileURLToPath } from 'url';
-import config from '../config.js'; // Import config
+import config, { PVP_RANKS_JSON_FILE } from '../config.js'; // Import config
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const POKEDEX_PATH = config.POKEDEX_FILE; // Use the path from config.ts
-const OUTPUT_PATH = path.join(__dirname, '../data/user/generated/pvp_ranks.json');
+const OUTPUT_PATH = PVP_RANKS_JSON_FILE;
 const TEMP_OUTPUT_PATH = OUTPUT_PATH + '.tmp';
 
 // --- Constants ---
@@ -176,23 +176,23 @@ else {
             });
             distribute(worker);
         });
+writeStream.on('finish', () => {
+    process.stdout.write(`\rProgress: ${finished}/${pokedex.length}\n`);
+    fs.renameSync(TEMP_OUTPUT_PATH, OUTPUT_PATH);
+    console.log(`Done! Saved to ${OUTPUT_PATH}`);
 
-        writeStream.on('finish', () => {
-            process.stdout.write(`\rProgress: ${finished}/${pokedex.length}\n`);
-            fs.renameSync(TEMP_OUTPUT_PATH, OUTPUT_PATH);
-            console.log(`Done! Saved to ${OUTPUT_PATH}`);
-            
-            console.log("Compiling binary ranks...");
-            const compileScriptPath = isProd 
-                ? path.join(__dirname, 'compile_pvp_binary.js')
-                : path.join(__dirname, 'compile_pvp_binary.ts');
-            const compileCommand = isProd ? `node ${compileScriptPath}` : `pnpm tsx ${compileScriptPath}`;
+    console.log("Compiling binary ranks...");
+    const isProd = !__dirname.endsWith('scripts'); // Better prod check
+    const compileScriptPath = isProd 
+        ? path.join(config.rootDir, 'dist/scripts/compile_pvp_binary.js')
+        : path.join(config.rootDir, 'scripts/compile_pvp_binary.ts');
+    const compileCommand = isProd ? `node ${compileScriptPath}` : `pnpm tsx ${compileScriptPath}`;
 
-            exec(compileCommand, { cwd: path.join(__dirname, '..') }, (err, stdout) => {
-                if (err) console.error(err);
-                else console.log(stdout);
-            });
-        });
+    exec(compileCommand, { cwd: config.rootDir }, (err, stdout) => {
+        if (err) console.error(err);
+        else console.log(stdout);
+    });
+});
     }
     main().catch(console.error);
 }

@@ -1,12 +1,25 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function findProjectRoot(startDir: string): string {
+    let currentDir = startDir;
+    while (currentDir !== '/') {
+        if (fs.existsSync(path.join(currentDir, 'package.json'))) {
+            return currentDir;
+        }
+        currentDir = path.dirname(currentDir);
+    }
+    // Fallback if package.json is not found (e.g., in a weird test environment)
+    return __dirname.includes('dist') ? path.resolve(__dirname, '..') : __dirname;
+}
+
 // If we are running from the 'dist' folder, the root is one level up
-export const rootDir = __dirname.includes('dist') ? path.join(__dirname, '..') : __dirname;
+export const rootDir = findProjectRoot(__dirname);
 
 export const DATA_DIR = path.join(rootDir, 'data');
 export const RANKINGS_FILE = path.join(DATA_DIR, 'private/rankings.json');
@@ -24,6 +37,8 @@ export const TYPE_EFFECTIVENESS_FILE = path.join(DATA_DIR, 'public/type_effectiv
 export const TYPE_EFFECTIVENESS_API_URL = 'https://pogoapi.net/api/v1/type_effectiveness.json';
 export const RAID_BOSS_FILE = path.join(DATA_DIR, 'public/raidboss.json');
 export const STATUS_FILE = path.join(DATA_DIR, 'user/generated/raidboss-update-status.json');
+export const PVP_RANKS_JSON_FILE = path.join(DATA_DIR, 'user/generated/pvp_ranks.json');
+export const PVP_RANKS_BINARY_FILE = path.join(DATA_DIR, 'user/generated/pvp_ranks.bin');
 
 /**
  * For a production environment, it's highly recommended to use environment variables
@@ -62,5 +77,7 @@ export default {
     TYPE_EFFECTIVENESS_API_URL,
     RAID_BOSS_FILE,
     STATUS_FILE,
+    PVP_RANKS_JSON_FILE,
+    PVP_RANKS_BINARY_FILE,
     rootDir
 };
