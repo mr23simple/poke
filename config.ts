@@ -44,6 +44,7 @@ export const RAID_BOSS_FILE = path.join(DATA_DIR, 'public/raidboss.json');
 export const STATUS_FILE = path.join(DATA_DIR, 'user/generated/raidboss-update-status.json');
 export const PVP_RANKS_JSON_FILE = path.join(DATA_DIR, 'user/generated/pvp_ranks.json');
 export const PVP_RANKS_BINARY_FILE = path.join(DATA_DIR, 'user/generated/pvp_ranks.bin');
+export const MAX_BATTLES_FILE = path.join(DATA_DIR, 'public/max_battles.json');
 
 /**
  * For a production environment, it's highly recommended to use environment variables
@@ -84,5 +85,6 @@ export default {
     STATUS_FILE,
     PVP_RANKS_JSON_FILE,
     PVP_RANKS_BINARY_FILE,
+    MAX_BATTLES_FILE,
     rootDir
 };
