@@ -448,8 +448,9 @@ body.lite-mode .pokedex-card {
     background: none !important;
     border: 1px solid #ccc !important;
     box-shadow: none !important;
-    aspect-ratio: 3 / 4 !important; /* Lite: 4 Height : 3 Width */
+    aspect-ratio: auto !important;
     min-height: auto !important;
+    height: auto !important;
 }
 
 body.lite-mode[data-theme="dark"] .pokemon-card,
