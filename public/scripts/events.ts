@@ -2,6 +2,8 @@
 /**
  * This script fetches and displays Pokemon GO events in the public dashboard.
  */
+let cachedEvents = [];
+
 async function loadEvents() {
     const eventsContainer = document.getElementById('events-container');
     const API_URL = 'https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json';
@@ -56,13 +58,13 @@ async function loadEvents() {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Failed to fetch events');
         
-        const events = await response.json();
+        cachedEvents = await response.json();
         const now = new Date();
 
         const activeEvents = [];
         const upcomingEvents = [];
 
-        events.forEach(event => {
+        cachedEvents.forEach(event => {
             const start = new Date(event.start);
             const end = new Date(event.end);
             if (now >= start && now <= end) {
@@ -90,7 +92,7 @@ async function loadEvents() {
             const color = EVENT_COLORS[event.eventType] || EVENT_COLORS['default'];
 
             return `
-                <div class="event-item">
+                <div class="event-item" data-event-id="${event.eventID}">
                     <div class="event-dot" style="background-color: ${color}"></div>
                     <div class="event-info">
                         <span class="event-name" title="${event.name}">${event.name}</span>
@@ -112,10 +114,238 @@ async function loadEvents() {
 
         eventsContainer.innerHTML = html;
 
+        // Attach click listeners for event modal detailed views
+        eventsContainer.querySelectorAll('.event-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const eventId = item.getAttribute('data-event-id');
+                const event = cachedEvents.find(e => e.eventID === eventId);
+                if (event) {
+                    showEventDetailModal(event, EVENT_COLORS[event.eventType] || EVENT_COLORS['default']);
+                }
+            });
+        });
+
     } catch (error) {
         console.error('Error loading events:', error);
         eventsContainer.innerHTML = '<p class="error-message">Error loading events.</p>';
     }
+}
+
+function showEventDetailModal(event, color) {
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const modalContent = document.getElementById('modal-content');
+    if (!modalBackdrop || !modalContent) return;
+
+    // Apply color theme dynamically
+    modalContent.style.setProperty('--event-theme', color);
+
+    const now = new Date();
+    const start = new Date(event.start);
+    const end = new Date(event.end);
+    
+    let timerText = '';
+    if (now < start) {
+        const total = Date.parse(event.start) - Date.parse(now);
+        const days = Math.floor(total / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+        timerText = `Starts in: ${days > 0 ? `${days}d ${hours}h` : `${hours}h`}`;
+    } else {
+        const total = Date.parse(event.end) - Date.parse(now);
+        const days = Math.floor(total / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+        timerText = `Ends in: ${days > 0 ? `${days}d ${hours}h` : `${hours}h`}`;
+    }
+
+    let extraDataHtml = '';
+    const extra = event.extraData || {};
+
+    // 1. Spotlight Hour Layout
+    if (event.eventType === 'pokemon-spotlight-hour' && extra.spotlight) {
+        const sp = extra.spotlight;
+        extraDataHtml = `
+            <div class="event-details-grid">
+                <div class="event-section-card">
+                    <h4>Featured Pokémon</h4>
+                    <div style="text-align:center; padding: 15px 0;">
+                        <img src="${sp.image}" alt="${sp.name}" style="width:96px; height:96px; object-fit:contain;">
+                        <div style="font-weight:700; font-size:1.2rem; margin-top:5px;">${sp.name}</div>
+                        ${sp.canBeShiny ? '<span style="color:#d4af37; font-weight:bold; font-size:0.85rem;">✨ Shiny Available</span>' : ''}
+                    </div>
+                </div>
+                <div class="event-section-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                    <div style="font-size:0.9rem; font-weight:700; text-transform:uppercase; color:#718096; margin-bottom:5px;">Active Bonus</div>
+                    <div style="font-size:1.5rem; font-weight:800; color:var(--event-theme); line-height:1.2; max-width:220px;">
+                        ${sp.bonus || 'No Extra Bonus'}
+                    </div>
+                </div>
+            </div>
+        `;
+    } 
+    // 2. Raid Hour / Raid Battles / Raid Day Layout
+    else if ((event.eventType === 'raid-battles' || event.eventType === 'raid-hour' || event.eventType === 'raid-day') && extra.raidbattles) {
+        const rb = extra.raidbattles;
+        const bosses = rb.bosses || [];
+        const shinies = rb.shinies || [];
+        
+        extraDataHtml = `
+            <div class="event-details-grid">
+                ${bosses.length > 0 ? `
+                <div class="event-section-card">
+                    <h4>Raid Bosses</h4>
+                    <div class="event-grid-list">
+                        ${bosses.map(b => `
+                            <div class="event-tile">
+                                <img src="${b.image}" alt="${b.name}">
+                                <div class="event-tile-name">${b.name}</div>
+                                ${b.canBeShiny ? '<span class="shiny-indicator" title="Shiny Available">✨</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
+
+                ${shinies.length > 0 ? `
+                <div class="event-section-card">
+                    <h4>Featured Shinies</h4>
+                    <div class="event-grid-list">
+                        ${shinies.map(s => `
+                            <div class="event-tile">
+                                <img src="${s.image}" alt="${s.name}">
+                                <div class="event-tile-name">${s.name}</div>
+                                <span class="shiny-indicator">✨</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
+            </div>
+        `;
+    }
+    // 3. Community Day Layout
+    else if (event.eventType === 'community-day' && extra.communityday) {
+        const cd = extra.communityday;
+        const spawns = cd.spawns || [];
+        const bonuses = cd.bonuses || [];
+        const specialResearch = cd.specialresearch || [];
+        
+        extraDataHtml = `
+            <div class="event-details-grid" style="grid-template-columns: 1fr;">
+                <div style="display:grid; grid-template-columns: 1fr; gap:20px; @media (min-width:768px) { grid-template-columns: 1fr 1fr; }">
+                    ${spawns.length > 0 ? `
+                    <div class="event-section-card">
+                        <h4>Featured Spawns</h4>
+                        <div class="event-grid-list">
+                            ${spawns.map(s => `
+                                <div class="event-tile">
+                                    <img src="${s.image}" alt="${s.name}">
+                                    <div class="event-tile-name">${s.name}</div>
+                                    ${s.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+
+                    ${bonuses.length > 0 ? `
+                    <div class="event-section-card">
+                        <h4>Event Bonuses</h4>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            ${bonuses.map(b => `
+                                <div class="event-bonus-row">
+                                    ${b.image ? `<img src="${b.image}" alt="bonus icon" class="event-bonus-icon">` : ''}
+                                    <div class="event-bonus-text">${b.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+                </div>
+
+                ${specialResearch.length > 0 ? `
+                <div class="event-section-card">
+                    <h4>Special Research Steps</h4>
+                    <div class="research-timeline">
+                        ${specialResearch.map(step => `
+                            <div class="research-step">
+                                <div class="research-step-marker"></div>
+                                <div class="research-step-title">${step.name}</div>
+                                <div class="research-task-list">
+                                    <div style="font-weight:700; margin-bottom:5px; color:#4a5568;">Tasks:</div>
+                                    ${step.tasks.map(t => `
+                                        <div class="research-task-item">
+                                            <span>${t.text}</span>
+                                            <span class="research-reward-pill">
+                                                <img src="${t.reward.image}" alt="reward">
+                                                <span>${t.reward.text}</span>
+                                            </span>
+                                        </div>
+                                    `).join('')}
+                                    <div style="font-weight:700; margin: 8px 0 5px 0; color:#4a5568;">Step Rewards:</div>
+                                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                        ${step.rewards.map(r => `
+                                            <span class="research-reward-pill">
+                                                <img src="${r.image}" alt="reward">
+                                                <span>${r.text}</span>
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
+            </div>
+        `;
+    }
+    // 4. Default / Generic Layout
+    else {
+        const isSpawns = extra.generic?.hasSpawns;
+        const isResearch = extra.generic?.hasFieldResearchTasks;
+        extraDataHtml = `
+            <div class="event-details-grid" style="grid-template-columns: 1fr;">
+                <div class="event-section-card" style="text-align:center; padding: 25px;">
+                    <div style="font-size:1.1rem; font-weight:600; color:#4a5568; margin-bottom:15px;">
+                        Standard Event details and timers are active. 
+                    </div>
+                    <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+                        <span style="display:flex; align-items:center; gap:6px; background:#f7fafc; padding:8px 16px; border-radius:30px; border:1px solid #edf2f7; font-weight:600;">
+                            ${isSpawns ? '✅ Wild Spawns Active' : '❌ No Special Spawns'}
+                        </span>
+                        <span style="display:flex; align-items:center; gap:6px; background:#f7fafc; padding:8px 16px; border-radius:30px; border:1px solid #edf2f7; font-weight:600;">
+                            ${isResearch ? '✅ Field Research Available' : '❌ No Special Research Tasks'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    modalContent.innerHTML = `
+        <button id="modal-close-btn">&times;</button>
+        <div class="event-modal-hero" style="background-image: url('${event.image || 'https://cdn.leekduck.com/assets/img/events/default.jpg'}')">
+            <div class="event-modal-hero-overlay"></div>
+            <div class="event-modal-hero-content">
+                <span class="event-modal-badge">${event.heading}</span>
+                <h2 class="event-modal-hero-title">${event.name}</h2>
+                <div class="event-timer-large">📅 ${timerText}</div>
+            </div>
+        </div>
+        <div style="padding: 0 5px 15px 5px;">
+            ${extraDataHtml}
+            <div style="margin-top: 20px; text-align: right;">
+                <a href="${event.link}" target="_blank" style="display:inline-block; background:var(--event-theme); color:#fff; text-decoration:none; padding:10px 20px; border-radius:8px; font-weight:700; font-size:0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    View on Leek Duck ↗
+                </a>
+            </div>
+        </div>
+    `;
+
+    // Attach close listener
+    const closeBtn = document.getElementById('modal-close-btn');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            modalBackdrop.classList.add('hidden');
+        };
+    }
+
+    // Show the modal
+    modalBackdrop.classList.remove('hidden');
 }
 
 // Initial load
