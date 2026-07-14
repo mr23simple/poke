@@ -390,38 +390,36 @@ function showEventDetailModal(event, color) {
         const specialResearch = cd.specialresearch || [];
         
         extraDataHtml = `
-            <div class="event-details-grid" style="grid-template-columns: 1fr;">
-                <div style="display:grid; grid-template-columns: 1fr; gap:20px; @media (min-width:768px) { grid-template-columns: 1fr 1fr; }">
-                    ${spawns.length > 0 ? `
-                    <div class="event-section-card">
-                        <h4>Featured Spawns</h4>
-                        <div class="event-grid-list">
-                            ${spawns.map(s => `
-                                <div class="event-tile">
-                                    <img src="${s.image}" alt="${s.name}">
-                                    <div class="event-tile-name">${s.name}</div>
-                                    ${s.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>` : ''}
+            <div class="event-details-grid">
+                ${spawns.length > 0 ? `
+                <div class="event-section-card">
+                    <h4>Featured Spawns</h4>
+                    <div class="event-grid-list">
+                        ${spawns.map(s => `
+                            <div class="event-tile">
+                                <img src="${s.image}" alt="${s.name}">
+                                <div class="event-tile-name">${s.name}</div>
+                                ${s.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
 
-                    ${bonuses.length > 0 ? `
-                    <div class="event-section-card">
-                        <h4>Event Bonuses</h4>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            ${bonuses.map(b => `
-                                <div class="event-bonus-row">
-                                    ${b.image ? `<img src="${b.image}" alt="bonus icon" class="event-bonus-icon">` : ''}
-                                    <div class="event-bonus-text">${b.text}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>` : ''}
-                </div>
+                ${bonuses.length > 0 ? `
+                <div class="event-section-card">
+                    <h4>Event Bonuses</h4>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${bonuses.map(b => `
+                            <div class="event-bonus-row">
+                                ${b.image ? `<img src="${b.image}" alt="bonus icon" class="event-bonus-icon">` : ''}
+                                <div class="event-bonus-text">${b.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
 
                 ${specialResearch.length > 0 ? `
-                <div class="event-section-card">
+                <div class="event-section-card" style="grid-column: 1 / -1;">
                     <h4>Special Research Steps</h4>
                     <div class="research-timeline">
                         ${specialResearch.map(step => `

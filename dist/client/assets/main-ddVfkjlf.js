@@ -215,38 +215,36 @@ import"./loadHeader-CY8Lp3rz.js";/* empty css                     */document.add
                 </div>`:""}
             </div>
         `}else if(p.eventType==="community-day"&&y.communityday){const d=y.communityday,a=d.spawns||[],c=d.bonuses||[],o=d.specialresearch||[];u=`
-            <div class="event-details-grid" style="grid-template-columns: 1fr;">
-                <div style="display:grid; grid-template-columns: 1fr; gap:20px; @media (min-width:768px) { grid-template-columns: 1fr 1fr; }">
-                    ${a.length>0?`
-                    <div class="event-section-card">
-                        <h4>Featured Spawns</h4>
-                        <div class="event-grid-list">
-                            ${a.map(e=>`
-                                <div class="event-tile">
-                                    <img src="${e.image}" alt="${e.name}">
-                                    <div class="event-tile-name">${e.name}</div>
-                                    ${e.canBeShiny?'<span class="shiny-indicator">✨</span>':""}
-                                </div>
-                            `).join("")}
-                        </div>
-                    </div>`:""}
+            <div class="event-details-grid">
+                ${a.length>0?`
+                <div class="event-section-card">
+                    <h4>Featured Spawns</h4>
+                    <div class="event-grid-list">
+                        ${a.map(e=>`
+                            <div class="event-tile">
+                                <img src="${e.image}" alt="${e.name}">
+                                <div class="event-tile-name">${e.name}</div>
+                                ${e.canBeShiny?'<span class="shiny-indicator">✨</span>':""}
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>`:""}
 
-                    ${c.length>0?`
-                    <div class="event-section-card">
-                        <h4>Event Bonuses</h4>
-                        <div style="display:flex; flex-direction:column; gap:10px;">
-                            ${c.map(e=>`
-                                <div class="event-bonus-row">
-                                    ${e.image?`<img src="${e.image}" alt="bonus icon" class="event-bonus-icon">`:""}
-                                    <div class="event-bonus-text">${e.text}</div>
-                                </div>
-                            `).join("")}
-                        </div>
-                    </div>`:""}
-                </div>
+                ${c.length>0?`
+                <div class="event-section-card">
+                    <h4>Event Bonuses</h4>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${c.map(e=>`
+                            <div class="event-bonus-row">
+                                ${e.image?`<img src="${e.image}" alt="bonus icon" class="event-bonus-icon">`:""}
+                                <div class="event-bonus-text">${e.text}</div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>`:""}
 
                 ${o.length>0?`
-                <div class="event-section-card">
+                <div class="event-section-card" style="grid-column: 1 / -1;">
                     <h4>Special Research Steps</h4>
                     <div class="research-timeline">
                         ${o.map(e=>`
