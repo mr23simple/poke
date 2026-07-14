@@ -358,16 +358,21 @@ function showEventDetailModal(event, color) {
             <div class="event-details-grid">
                 <div class="event-section-card">
                     <h4>Featured Pokémon</h4>
-                    <div style="text-align:center; padding: 15px 0;">
-                        <img src="${sp.image}" alt="${sp.name}" style="width:96px; height:96px; object-fit:contain;">
-                        <div style="font-weight:700; font-size:1.2rem; margin-top:5px;">${sp.name}</div>
-                        ${sp.canBeShiny ? '<span style="color:#d4af37; font-weight:bold; font-size:0.85rem;">✨ Shiny Available</span>' : ''}
+                    <div class="event-grid-list" style="justify-content: center; padding: 10px 0;">
+                        <div class="event-tile" style="width: 130px; height: 130px; flex-direction: column; justify-content: center; align-items: center; gap: 8px;">
+                            <img src="${sp.image}" alt="${sp.name}" style="width: 80px; height: 80px;">
+                            <div class="event-tile-name" style="font-weight: 700; font-size: 0.95rem;">${sp.name}</div>
+                            ${sp.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
+                        </div>
                     </div>
                 </div>
-                <div class="event-section-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-                    <div style="font-size:0.9rem; font-weight:700; text-transform:uppercase; color:#718096; margin-bottom:5px;">Active Bonus</div>
-                    <div style="font-size:1.5rem; font-weight:800; color:var(--event-theme); line-height:1.2; max-width:220px;">
-                        ${sp.bonus || 'No Extra Bonus'}
+                <div class="event-section-card">
+                    <h4>Event Bonuses</h4>
+                    <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; padding: 10px 0;">
+                        <div class="event-bonus-row">
+                            <span style="font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: 2px;">🎁</span>
+                            <div class="event-bonus-text">${sp.bonus || 'No Extra Bonus'}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -509,14 +514,14 @@ function showEventDetailModal(event, color) {
         extraDataHtml = `
             <div class="event-details-grid" style="grid-template-columns: 1fr;">
                 <div class="event-section-card" style="text-align:center; padding: 25px;">
-                    <div style="font-size:1.1rem; font-weight:600; color:#4a5568; margin-bottom:15px;">
+                    <div style="font-size:1.1rem; font-weight:600; color:#4a5568; margin-bottom:15px;" class="generic-event-desc">
                         Standard Event details and timers are active. 
                     </div>
                     <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-                        <span style="display:flex; align-items:center; gap:6px; background:#f7fafc; padding:8px 16px; border-radius:30px; border:1px solid #edf2f7; font-weight:600;">
+                        <span class="event-status-pill">
                             ${isSpawns ? '✅ Wild Spawns Active' : '❌ No Special Spawns'}
                         </span>
-                        <span style="display:flex; align-items:center; gap:6px; background:#f7fafc; padding:8px 16px; border-radius:30px; border:1px solid #edf2f7; font-weight:600;">
+                        <span class="event-status-pill">
                             ${isResearch ? '✅ Field Research Available' : '❌ No Special Research Tasks'}
                         </span>
                     </div>
