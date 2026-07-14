@@ -152,26 +152,47 @@ function showTimelineModal(eventColors) {
         if (e.target === backdrop) backdrop.classList.add('hidden');
     };
 
-    // Calculate 14 days starting from today (midnight local time)
+    // Calculate start date (today, midnight local time)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Exclude past events (events that ended before today)
+    const validEvents = cachedEvents.filter(event => {
+        const end = new Date(event.end);
+        return end >= today;
+    });
+
+    // Find the latest end date among the valid active or future events
+    let maxEnd = new Date(today);
+    validEvents.forEach(event => {
+        const end = new Date(event.end);
+        if (end > maxEnd) {
+            maxEnd = end;
+        }
+    });
+
+    // Calculate timeline duration in days (minimum 14 days, maximum 90 days)
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.ceil((maxEnd - today) / msPerDay);
+    const totalDays = Math.min(Math.max(14, diffDays), 90);
+
+    // Populate timelineDays array
     const timelineDays = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < totalDays; i++) {
         const day = new Date(today);
         day.setDate(today.getDate() + i);
         timelineDays.push(day);
     }
-    const timelineEndDate = new Date(timelineDays[13]);
+    const timelineEndDate = new Date(timelineDays[totalDays - 1]);
     timelineEndDate.setHours(23, 59, 59, 999);
 
-    // Group cached events by their eventType
+    // Group valid events by their eventType
     const eventsByGroup = {};
-    cachedEvents.forEach(event => {
+    validEvents.forEach(event => {
         const start = new Date(event.start);
         const end = new Date(event.end);
         
-        // Check if event overlaps with the 14-day timeline
+        // Double check overlap with our dynamic timeline range
         if (end < today || start > timelineEndDate) return;
 
         if (!eventsByGroup[event.eventType]) {
@@ -180,10 +201,10 @@ function showTimelineModal(eventColors) {
         eventsByGroup[event.eventType].push(event);
     });
 
-    // Generate HTML for the grid
-    let gridHtml = `<div class="timeline-grid">`;
+    // Generate HTML for the grid with dynamic grid template styling
+    let gridHtml = `<div class="timeline-grid" style="grid-template-columns: 160px repeat(${totalDays}, 100px);">`;
 
-    // 1. Header row (Event Type label + 14 day headers)
+    // 1. Header row (Event Type label + day headers)
     gridHtml += `<div class="timeline-header-row">`;
     gridHtml += `<div class="timeline-label-header">Event Category</div>`;
     
@@ -208,33 +229,33 @@ function showTimelineModal(eventColors) {
         gridHtml += `<div class="timeline-row">`;
         gridHtml += `<div class="timeline-row-label">${groupLabel}</div>`;
 
-        // Render empty cell tracks for visual reference (14 columns)
-        for (let i = 0; i < 14; i++) {
+        // Render empty cell tracks for visual reference (totalDays columns)
+        for (let i = 0; i < totalDays; i++) {
             const classNames = `timeline-grid-cell${i === 0 ? ' today-col' : ''}`;
             gridHtml += `<div class="${classNames}"></div>`;
         }
 
-        // Render event bar container
-        gridHtml += `<div class="timeline-bar-wrapper">`;
+        // Render event bar container (dynamic span of columns)
+        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px);">`;
         events.forEach(event => {
             const start = new Date(event.start);
             const end = new Date(event.end);
 
-            // Calculate start column index (0 to 13)
+            // Calculate start column index relative to today
             let startCol = 0;
             if (start > today) {
                 startCol = Math.floor((start - today) / (24 * 60 * 60 * 1000));
             }
             
-            // Calculate end column index (1 to 14)
-            let endCol = 14;
+            // Calculate end column index relative to today
+            let endCol = totalDays;
             if (end < timelineEndDate) {
                 endCol = Math.ceil((end - today) / (24 * 60 * 60 * 1000));
             }
 
             // Boundary checks
             if (startCol < 0) startCol = 0;
-            if (endCol > 14) endCol = 14;
+            if (endCol > totalDays) endCol = totalDays;
             if (endCol <= startCol) endCol = startCol + 1; // ensure at least 1 column width
 
             const color = eventColors[event.eventType] || eventColors['default'];
