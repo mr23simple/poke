@@ -1793,11 +1793,21 @@ body.dashboard-private, body:not([class]) {
         min-height: 190px !important;
         padding: 6px !important;
     }
+    #pokemon-highlights-container .pokemon-image-container,
+    #pokemon-section #all-pokemon-list .pokemon-image-container,
+    #all-pokemon-list .pokemon-image-container {
+        width: 64px !important;
+        height: 64px !important;
+        margin: 0 auto 6px !important;
+    }
     #pokemon-highlights-container .pokemon-card img,
     #pokemon-section #all-pokemon-list .pokemon-card img,
     #all-pokemon-list .pokemon-card img {
         width: 48px !important;
         height: 48px !important;
+        position: absolute !important;
+        top: 8px !important;
+        left: 8px !important;
     }
     #pokemon-highlights-container .pokemon-card .pokemon-name,
     #pokemon-section #all-pokemon-list .pokemon-card .pokemon-name,
