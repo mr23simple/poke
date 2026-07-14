@@ -20,7 +20,7 @@ app.set('trust proxy', 1);
 // --- Middleware ---
 app.use(compression());
 app.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' data: raw.githubusercontent.com unpkg.com https://leekduck.com; font-src 'self' fonts.gstatic.com https://www.slant.co data:; connect-src 'self' https://pokemon-go-api.github.io https://pogoapi.net https://raw.githubusercontent.com; worker-src 'self';");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; img-src 'self' data: raw.githubusercontent.com unpkg.com https://leekduck.com https://*.leekduck.com https://*.raids.nl; font-src 'self' fonts.gstatic.com https://www.slant.co data:; connect-src 'self' https://pokemon-go-api.github.io https://pogoapi.net https://raw.githubusercontent.com; worker-src 'self';");
     next();
 });
 app.use(express.json({ limit: '10mb' }));
