@@ -387,14 +387,17 @@ function showEventDetailModal(event, color) {
         const cd = extra.communityday;
         const spawns = cd.spawns || [];
         const bonuses = cd.bonuses || [];
+        const shinies = cd.shinies || [];
+        const bonusDisclaimers = cd.bonusDisclaimers || [];
         const specialResearch = cd.specialresearch || [];
         
         extraDataHtml = `
             <div class="event-details-grid">
-                ${spawns.length > 0 ? `
+                ${(spawns.length > 0 || shinies.length > 0) ? `
                 <div class="event-section-card">
+                    ${spawns.length > 0 ? `
                     <h4>Featured Spawns</h4>
-                    <div class="event-grid-list">
+                    <div class="event-grid-list" style="margin-bottom: 20px;">
                         ${spawns.map(s => `
                             <div class="event-tile">
                                 <img src="${s.image}" alt="${s.name}">
@@ -402,7 +405,19 @@ function showEventDetailModal(event, color) {
                                 ${s.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
                             </div>
                         `).join('')}
-                    </div>
+                    </div>` : ''}
+
+                    ${shinies.length > 0 ? `
+                    <h4 style="margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 15px;">New / Featured Shinies</h4>
+                    <div class="event-grid-list">
+                        ${shinies.map(s => `
+                            <div class="event-tile">
+                                <img src="${s.image}" alt="${s.name}">
+                                <div class="event-tile-name">${s.name}</div>
+                                <span class="shiny-indicator">✨</span>
+                            </div>
+                        `).join('')}
+                    </div>` : ''}
                 </div>` : ''}
 
                 ${bonuses.length > 0 ? `
@@ -416,6 +431,10 @@ function showEventDetailModal(event, color) {
                             </div>
                         `).join('')}
                     </div>
+                    ${bonusDisclaimers.length > 0 ? `
+                    <div class="bonus-disclaimer" style="font-size:0.75rem; color:#718096; margin-top:12px; border-top:1px solid #edf2f7; padding-top:8px; line-height:1.4;">
+                        ${bonusDisclaimers.map(d => `<div style="margin-bottom: 4px;">${d}</div>`).join('')}
+                    </div>` : ''}
                 </div>` : ''}
 
                 ${specialResearch.length > 0 ? `
