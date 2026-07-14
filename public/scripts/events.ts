@@ -125,10 +125,152 @@ async function loadEvents() {
             });
         });
 
+        // Set up expand events button click listener
+        const expandBtn = document.getElementById('expand-events-btn');
+        if (expandBtn) {
+            expandBtn.onclick = () => {
+                showTimelineModal(EVENT_COLORS);
+            };
+        }
+
     } catch (error) {
         console.error('Error loading events:', error);
         eventsContainer.innerHTML = '<p class="error-message">Error loading events.</p>';
     }
+}
+
+function showTimelineModal(eventColors) {
+    const backdrop = document.getElementById('timeline-modal-backdrop');
+    const scrollContainer = document.getElementById('timeline-scroll-container');
+    const closeBtn = document.getElementById('timeline-modal-close-btn');
+
+    if (!backdrop || !scrollContainer || !closeBtn) return;
+
+    // Set up close actions
+    closeBtn.onclick = () => backdrop.classList.add('hidden');
+    backdrop.onclick = (e) => {
+        if (e.target === backdrop) backdrop.classList.add('hidden');
+    };
+
+    // Calculate 14 days starting from today (midnight local time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const timelineDays = [];
+    for (let i = 0; i < 14; i++) {
+        const day = new Date(today);
+        day.setDate(today.getDate() + i);
+        timelineDays.push(day);
+    }
+    const timelineEndDate = new Date(timelineDays[13]);
+    timelineEndDate.setHours(23, 59, 59, 999);
+
+    // Group cached events by their eventType
+    const eventsByGroup = {};
+    cachedEvents.forEach(event => {
+        const start = new Date(event.start);
+        const end = new Date(event.end);
+        
+        // Check if event overlaps with the 14-day timeline
+        if (end < today || start > timelineEndDate) return;
+
+        if (!eventsByGroup[event.eventType]) {
+            eventsByGroup[event.eventType] = [];
+        }
+        eventsByGroup[event.eventType].push(event);
+    });
+
+    // Generate HTML for the grid
+    let gridHtml = `<div class="timeline-grid">`;
+
+    // 1. Header row (Event Type label + 14 day headers)
+    gridHtml += `<div class="timeline-header-row">`;
+    gridHtml += `<div class="timeline-label-header">Event Category</div>`;
+    
+    const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    timelineDays.forEach((day, index) => {
+        const isToday = index === 0;
+        const classNames = `timeline-date-cell${isToday ? ' today' : ''}`;
+        gridHtml += `
+            <div class="${classNames}">
+                <div>${weekDays[day.getDay()]}</div>
+                <div>${day.getDate()}</div>
+            </div>
+        `;
+    });
+    gridHtml += `</div>`; // end timeline-header-row
+
+    // 2. Data rows for each group
+    Object.keys(eventsByGroup).forEach(groupName => {
+        const events = eventsByGroup[groupName];
+        const groupLabel = groupName.replace(/-/g, ' ');
+
+        gridHtml += `<div class="timeline-row">`;
+        gridHtml += `<div class="timeline-row-label">${groupLabel}</div>`;
+
+        // Render empty cell tracks for visual reference (14 columns)
+        for (let i = 0; i < 14; i++) {
+            const classNames = `timeline-grid-cell${i === 0 ? ' today-col' : ''}`;
+            gridHtml += `<div class="${classNames}"></div>`;
+        }
+
+        // Render event bar container
+        gridHtml += `<div class="timeline-bar-wrapper">`;
+        events.forEach(event => {
+            const start = new Date(event.start);
+            const end = new Date(event.end);
+
+            // Calculate start column index (0 to 13)
+            let startCol = 0;
+            if (start > today) {
+                startCol = Math.floor((start - today) / (24 * 60 * 60 * 1000));
+            }
+            
+            // Calculate end column index (1 to 14)
+            let endCol = 14;
+            if (end < timelineEndDate) {
+                endCol = Math.ceil((end - today) / (24 * 60 * 60 * 1000));
+            }
+
+            // Boundary checks
+            if (startCol < 0) startCol = 0;
+            if (endCol > 14) endCol = 14;
+            if (endCol <= startCol) endCol = startCol + 1; // ensure at least 1 column width
+
+            const color = eventColors[event.eventType] || eventColors['default'];
+            const leftOffset = startCol * 100;
+            const barWidth = (endCol - startCol) * 100 - 6; // slightly smaller to create gap
+
+            gridHtml += `
+                <div class="timeline-bar" 
+                     style="left: ${leftOffset + 3}px; width: ${barWidth}px; background-color: ${color};"
+                     title="${event.name}"
+                     data-event-id="${event.eventID}">
+                    ${event.name}
+                </div>
+            `;
+        });
+        gridHtml += `</div>`; // end timeline-bar-wrapper
+        gridHtml += `</div>`; // end timeline-row
+    });
+
+    gridHtml += `</div>`; // end timeline-grid
+    scrollContainer.innerHTML = gridHtml;
+
+    // Attach click listeners to the bars to open the detailed modal
+    scrollContainer.querySelectorAll('.timeline-bar').forEach(bar => {
+        bar.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent backdrop clicks
+            const eventId = bar.getAttribute('data-event-id');
+            const event = cachedEvents.find(ev => ev.eventID === eventId);
+            if (event) {
+                showEventDetailModal(event, eventColors[event.eventType] || eventColors['default']);
+            }
+        });
+    });
+
+    // Show timeline modal
+    backdrop.classList.remove('hidden');
 }
 
 function showEventDetailModal(event, color) {
