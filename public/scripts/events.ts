@@ -262,15 +262,44 @@ function showTimelineModal(eventColors) {
             const start = parseLocalDate(event.start);
             const end = parseLocalDate(event.end);
 
+            // Check if event starts and ends on the same calendar day
+            const isSingleDay = start.getFullYear() === end.getFullYear() &&
+                                start.getMonth() === end.getMonth() &&
+                                start.getDate() === end.getDate();
+
+            let hasCooccurring = false;
+            if (isSingleDay) {
+                const targetDayStart = new Date(start);
+                targetDayStart.setHours(0, 0, 0, 0);
+                const targetDayEnd = new Date(start);
+                targetDayEnd.setHours(23, 59, 59, 999);
+
+                hasCooccurring = events.some(other => {
+                    if (other.eventID === event.eventID) return false;
+                    const otherStart = parseLocalDate(other.start);
+                    const otherEnd = parseLocalDate(other.end);
+                    return (otherEnd >= targetDayStart && otherStart <= targetDayEnd);
+                });
+            }
+
+            let finalStart = start;
+            let finalEnd = end;
+            if (isSingleDay && !hasCooccurring) {
+                finalStart = new Date(start);
+                finalStart.setHours(0, 0, 0, 0);
+                finalEnd = new Date(end);
+                finalEnd.setHours(23, 59, 59, 999);
+            }
+
             // Calculate fractional days relative to today
             let startCol = 0;
-            if (start > today) {
-                startCol = (start - today) / (24 * 60 * 60 * 1000);
+            if (finalStart > today) {
+                startCol = (finalStart - today) / (24 * 60 * 60 * 1000);
             }
             
             let endCol = totalDays;
-            if (end < timelineEndDate) {
-                endCol = (end - today) / (24 * 60 * 60 * 1000);
+            if (finalEnd < timelineEndDate) {
+                endCol = (finalEnd - today) / (24 * 60 * 60 * 1000);
             }
 
             if (startCol < 0) startCol = 0;
