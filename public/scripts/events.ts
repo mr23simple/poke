@@ -163,6 +163,10 @@ function showTimelineModal(eventColors) {
 
     if (!backdrop || !scrollContainer || !closeBtn) return;
 
+    const isMobile = window.innerWidth <= 768;
+    const labelWidth = isMobile ? 110 : 160;
+    const colWidth = isMobile ? 70 : 100;
+
     // Helper to close modal
     const closeModal = () => {
         backdrop.classList.add('hidden');
@@ -227,7 +231,7 @@ function showTimelineModal(eventColors) {
     });
 
     // Generate HTML for the grid with dynamic grid template styling
-    let gridHtml = `<div class="timeline-grid" style="grid-template-columns: 160px repeat(${totalDays}, 100px);">`;
+    let gridHtml = `<div class="timeline-grid" style="grid-template-columns: ${labelWidth}px repeat(${totalDays}, ${colWidth}px);">`;
 
     // 1. Header row (Event Type label + day headers)
     gridHtml += `<div class="timeline-header-row">`;
@@ -339,11 +343,11 @@ function showTimelineModal(eventColors) {
         }
 
         // Render event bar container with dynamic height
-        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px); height: ${rowHeight}px; grid-row: ${rowIndex};">`;
+        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, ${colWidth}px); height: ${rowHeight}px; grid-row: ${rowIndex};">`;
         eventsWithTrack.forEach(({ event, startCol, endCol, track }) => {
             const color = eventColors[event.eventType] || eventColors['default'];
-            const leftOffset = startCol * 100;
-            const barWidth = (endCol - startCol) * 100 - 6;
+            const leftOffset = startCol * colWidth;
+            const barWidth = (endCol - startCol) * colWidth - 6;
             const topOffset = 10 + track * 34;
 
             gridHtml += `
