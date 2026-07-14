@@ -226,45 +226,74 @@ function showTimelineModal(eventColors) {
         const events = eventsByGroup[groupName];
         const groupLabel = groupName.replace(/-/g, ' ');
 
+        // Sort events in this group by start date
+        events.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // Track system to stack overlapping events vertically
+        const tracks = []; // stores the float endCol of the last event on each track
+
+        // First pass: calculate tracks and offsets
+        const eventsWithTrack = events.map(event => {
+            const start = new Date(event.start);
+            const end = new Date(event.end);
+
+            // Calculate fractional days relative to today
+            let startCol = 0;
+            if (start > today) {
+                startCol = (start - today) / (24 * 60 * 60 * 1000);
+            }
+            
+            let endCol = totalDays;
+            if (end < timelineEndDate) {
+                endCol = (end - today) / (24 * 60 * 60 * 1000);
+            }
+
+            if (startCol < 0) startCol = 0;
+            if (endCol > totalDays) endCol = totalDays;
+            if (endCol <= startCol) endCol = startCol + (1 / 24); // minimum 1 hour width
+
+            // Find first track without overlap
+            let assignedTrackIndex = -1;
+            for (let t = 0; t < tracks.length; t++) {
+                if (startCol >= tracks[t] - 0.01) { // 0.01 margin for floating point
+                    assignedTrackIndex = t;
+                    break;
+                }
+            }
+
+            if (assignedTrackIndex === -1) {
+                tracks.push(endCol);
+                assignedTrackIndex = tracks.length - 1;
+            } else {
+                tracks[assignedTrackIndex] = endCol;
+            }
+
+            return { event, startCol, endCol, track: assignedTrackIndex };
+        });
+
+        const numTracks = Math.max(1, tracks.length);
+        const rowHeight = 16 + numTracks * 34;
+
         gridHtml += `<div class="timeline-row">`;
-        gridHtml += `<div class="timeline-row-label">${groupLabel}</div>`;
+        gridHtml += `<div class="timeline-row-label" style="height: ${rowHeight}px;">${groupLabel}</div>`;
 
         // Render empty cell tracks for visual reference (totalDays columns)
         for (let i = 0; i < totalDays; i++) {
             const classNames = `timeline-grid-cell${i === 0 ? ' today-col' : ''}`;
-            gridHtml += `<div class="${classNames}"></div>`;
+            gridHtml += `<div class="${classNames}" style="height: ${rowHeight}px;"></div>`;
         }
 
-        // Render event bar container (dynamic span of columns)
-        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px);">`;
-        events.forEach(event => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
-
-            // Calculate start column index relative to today
-            let startCol = 0;
-            if (start > today) {
-                startCol = Math.floor((start - today) / (24 * 60 * 60 * 1000));
-            }
-            
-            // Calculate end column index relative to today
-            let endCol = totalDays;
-            if (end < timelineEndDate) {
-                endCol = Math.ceil((end - today) / (24 * 60 * 60 * 1000));
-            }
-
-            // Boundary checks
-            if (startCol < 0) startCol = 0;
-            if (endCol > totalDays) endCol = totalDays;
-            if (endCol <= startCol) endCol = startCol + 1; // ensure at least 1 column width
-
+        // Render event bar container with dynamic height
+        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px); height: ${rowHeight}px;">`;
+        eventsWithTrack.forEach(({ event, startCol, endCol, track }) => {
             const color = eventColors[event.eventType] || eventColors['default'];
             const leftOffset = startCol * 100;
-            const barWidth = (endCol - startCol) * 100 - 6; // slightly smaller to create gap
+            const barWidth = (endCol - startCol) * 100 - 6;
+            const topOffset = 10 + track * 34;
 
             gridHtml += `
                 <div class="timeline-bar" 
-                     style="left: ${leftOffset + 3}px; width: ${barWidth}px; background-color: ${color};"
+                     style="left: ${leftOffset + 3}px; width: ${barWidth}px; top: ${topOffset}px; background-color: ${color};"
                      title="${event.name}"
                      data-event-id="${event.eventID}">
                     ${event.name}
