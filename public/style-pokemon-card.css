@@ -106,3 +106,37 @@
 .perfect-badge {
     background-color: #e74c3c;
 }
+
+@media (max-width: 768px) {
+    #pokemon-highlights-container, #all-pokemon-list {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
+        gap: 8px !important;
+    }
+    .pokemon-card {
+        min-height: 190px !important;
+        padding: 6px !important;
+    }
+    .pokemon-card img {
+        width: 48px !important;
+        height: 48px !important;
+    }
+    .pokemon-name {
+        font-size: 0.75em !important;
+        margin: 3px 0 !important;
+    }
+    .pokemon-cp {
+        font-size: 0.75em !important;
+    }
+    .iv-bar-container {
+        height: 5px !important;
+        margin: 5px 0 !important;
+    }
+    .pokemon-card small {
+        font-size: 0.65em !important;
+    }
+    .badge {
+        font-size: 0.6em !important;
+        padding: 1px 4px !important;
+        margin-left: 2px !important;
+    }
+}

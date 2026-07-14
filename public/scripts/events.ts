@@ -3,6 +3,7 @@
  * This script fetches and displays Pokemon GO events in the public dashboard.
  */
 let cachedEvents = [];
+let showAllEvents = false;
 
 function parseLocalDate(dateStr) {
     if (!dateStr) return new Date();
@@ -100,6 +101,22 @@ async function loadEvents() {
             return;
         }
 
+        let displayedActive = activeEvents;
+        let displayedUpcoming = upcomingEvents;
+        const defaultLimit = 5;
+        const totalCount = activeEvents.length + upcomingEvents.length;
+        const hasMore = totalCount > defaultLimit;
+
+        if (!showAllEvents && hasMore) {
+            if (activeEvents.length >= defaultLimit) {
+                displayedActive = activeEvents.slice(0, defaultLimit);
+                displayedUpcoming = [];
+            } else {
+                displayedActive = activeEvents;
+                displayedUpcoming = upcomingEvents.slice(0, defaultLimit - activeEvents.length);
+            }
+        }
+
         const renderEvent = (event, isUpcoming) => {
             const start = parseLocalDate(event.start);
             const end = parseLocalDate(event.end);
@@ -119,13 +136,21 @@ async function loadEvents() {
         };
 
         let html = '';
-        if (activeEvents.length > 0) {
+        if (displayedActive.length > 0) {
             html += '<h3 class="events-section-header">Ongoing</h3>';
-            html += activeEvents.map(e => renderEvent(e, false)).join('');
+            html += displayedActive.map(e => renderEvent(e, false)).join('');
         }
-        if (upcomingEvents.length > 0) {
+        if (displayedUpcoming.length > 0) {
             html += '<h3 class="events-section-header">Upcoming</h3>';
-            html += upcomingEvents.map(e => renderEvent(e, true)).join('');
+            html += displayedUpcoming.map(e => renderEvent(e, true)).join('');
+        }
+
+        if (hasMore) {
+            html += `
+                <button id="toggle-events-btn" class="toggle-events-btn">
+                    ${showAllEvents ? 'Show Less' : `Show All (${totalCount})`}
+                </button>
+            `;
         }
 
         eventsContainer.innerHTML = html;
@@ -140,6 +165,15 @@ async function loadEvents() {
                 }
             });
         });
+
+        // Set up toggle events button click listener
+        const toggleBtn = document.getElementById('toggle-events-btn');
+        if (toggleBtn) {
+            toggleBtn.onclick = () => {
+                showAllEvents = !showAllEvents;
+                loadEvents();
+            };
+        }
 
         // Set up expand events button click listener
         const expandBtn = document.getElementById('expand-events-btn');
