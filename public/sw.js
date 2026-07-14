@@ -1,4 +1,4 @@
-const CACHE_NAME = 'external-images-v1';
+const CACHE_NAME = 'external-images-v2';
 const ALLOWED_HOSTS = ['raw.githubusercontent.com'];
 
 self.addEventListener('install', (event) => {
@@ -27,8 +27,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Check if the request is for one of our allowed external hosts
-    if (ALLOWED_HOSTS.includes(url.hostname)) {
+    // Check if the request is for one of our allowed external hosts and is an image
+    const isImage = /\.(png|jpe?g|gif|webp|ico|svg)(\?.*)?$/i.test(url.pathname);
+    if (ALLOWED_HOSTS.includes(url.hostname) && isImage) {
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
                 // Return cached response if found
