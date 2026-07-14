@@ -54,15 +54,15 @@ export default async function scrapeMaxBattles() {
         const response = await fetch(url);
         const html = await response.text();
 
-        const startMarker = 'id="pokemon"';
+        const startMarker = 'id="to-cards"';
         const startIndex = html.indexOf(startMarker);
         if (startIndex === -1) {
-            console.error('Error: Could not find #pokemon container');
+            console.error('Error: Could not find #to-cards container');
             return;
         }
 
         const relevantHtml = html.substring(startIndex);
-        const parts = relevantHtml.split(/<h2[^>]*>Tier\s+(\d+)<\/h2>/);
+        const parts = relevantHtml.split(/class="to-card"\s+data-tier="t(\d+)"/);
 
         const groupedBattles = [];
 
