@@ -1778,3 +1778,48 @@ body.dashboard-private, body:not([class]) {
     }
 }
 
+@media (max-width: 768px) {
+    #pokemon-highlights-container, 
+    #pokemon-section #all-pokemon-list,
+    #all-pokemon-list {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)) !important;
+        gap: 8px !important;
+    }
+    #pokemon-highlights-container .pokemon-card,
+    #pokemon-section #all-pokemon-list .pokemon-card,
+    #all-pokemon-list .pokemon-card {
+        width: auto !important;
+        max-width: 100% !important;
+        min-height: 190px !important;
+        padding: 6px !important;
+    }
+    #pokemon-highlights-container .pokemon-card img,
+    #pokemon-section #all-pokemon-list .pokemon-card img,
+    #all-pokemon-list .pokemon-card img {
+        width: 48px !important;
+        height: 48px !important;
+    }
+    #pokemon-highlights-container .pokemon-card .pokemon-name,
+    #pokemon-section #all-pokemon-list .pokemon-card .pokemon-name,
+    #all-pokemon-list .pokemon-card .pokemon-name {
+        font-size: 0.75em !important;
+        margin: 3px 0 !important;
+    }
+    #pokemon-highlights-container .pokemon-card .pokemon-cp,
+    #pokemon-section #all-pokemon-list .pokemon-card .pokemon-cp,
+    #all-pokemon-list .pokemon-card .pokemon-cp {
+        font-size: 0.75em !important;
+    }
+    #pokemon-highlights-container .pokemon-card .iv-bar-container,
+    #pokemon-section #all-pokemon-list .pokemon-card .iv-bar-container,
+    #all-pokemon-list .pokemon-card .iv-bar-container {
+        height: 5px !important;
+        margin: 5px 0 !important;
+    }
+    #pokemon-highlights-container .pokemon-card small,
+    #pokemon-section #all-pokemon-list .pokemon-card small,
+    #all-pokemon-list .pokemon-card small {
+        font-size: 0.65em !important;
+    }
+}
+
