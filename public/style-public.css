@@ -574,7 +574,6 @@ h2.ranking-title-with-info {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 12px;
     background: #f8fafc;
     padding: 10px 14px;
     border-radius: 10px;

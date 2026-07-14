@@ -246,7 +246,7 @@ import"./loadHeader-CY8Lp3rz.js";/* empty css                     */document.add
                 ${c.length>0?`
                 <div class="event-section-card">
                     <h4>Event Bonuses</h4>
-                    <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:10px;">
                         ${c.map(s=>`
                             <div class="event-bonus-row">
                                 ${s.image?`<img src="${s.image}" alt="bonus icon" class="event-bonus-icon">`:""}

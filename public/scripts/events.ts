@@ -423,7 +423,7 @@ function showEventDetailModal(event, color) {
                 ${bonuses.length > 0 ? `
                 <div class="event-section-card">
                     <h4>Event Bonuses</h4>
-                    <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:10px;">
                         ${bonuses.map(b => `
                             <div class="event-bonus-row">
                                 ${b.image ? `<img src="${b.image}" alt="bonus icon" class="event-bonus-icon">` : ''}
