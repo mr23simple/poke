@@ -1004,4 +1004,21 @@ h2.ranking-title-with-info {
         height: 24px !important;
         line-height: 1.2 !important;
     }
+    .event-grid-list {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)) !important;
+        gap: 8px !important;
+    }
+    .event-tile {
+        padding: 6px 4px !important;
+    }
+    .event-tile img {
+        width: 44px !important;
+        height: 44px !important;
+    }
+    .event-tile-name {
+        font-size: 0.65rem !important;
+    }
+    .event-section-card {
+        padding: 10px !important;
+    }
 }
