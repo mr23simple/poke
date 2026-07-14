@@ -6,8 +6,8 @@
     "dev": "vite",
     "start": "node --max-old-space-size=768 dist/server.js",
     "build": "tsc && vite build",
-    "deploy-push": "pnpm build && node scripts/git-push.js",
-    "deploy-pull": "git pull && ([ -f package.json ] && pnpm install --prod) && pm2 restart ecosystem.config.cjs",
+    "deploy-push": "pnpm test && pnpm build && node scripts/git-push.js",
+    "deploy-pull": "git reset --hard HEAD && git pull && pnpm install --prod && pm2 restart ecosystem.config.cjs",
     "test": "vitest run",
     "pvp-gen": "pnpm tsx scripts/generate_pvp_ranks.ts"
   },
