@@ -945,3 +945,33 @@ h2.ranking-title-with-info {
 [data-theme="dark"] .generic-event-desc {
     color: #a0aec0 !important;
 }
+
+/* Spotlight Hour Styling */
+.spotlight-pokemon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+.spotlight-pokemon-tile {
+    width: 130px;
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.spotlight-bonus-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
+}
+.spotlight-bonus-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}

@@ -4,6 +4,22 @@
  */
 let cachedEvents = [];
 
+function parseLocalDate(dateStr) {
+    if (!dateStr) return new Date();
+    const matches = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if (matches) {
+        return new Date(
+            parseInt(matches[1], 10),
+            parseInt(matches[2], 10) - 1,
+            parseInt(matches[3], 10),
+            parseInt(matches[4], 10),
+            parseInt(matches[5], 10),
+            parseInt(matches[6], 10)
+        );
+    }
+    return new Date(dateStr);
+}
+
 async function loadEvents() {
     const eventsContainer = document.getElementById('events-container');
     const API_URL = 'https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json';
@@ -42,7 +58,7 @@ async function loadEvents() {
     };
 
     function getTimeRemaining(endTime) {
-        const total = Date.parse(endTime) - Date.parse(new Date());
+        const total = parseLocalDate(endTime).getTime() - new Date().getTime();
         if (total <= 0) return null;
         
         const days = Math.floor(total / (1000 * 60 * 60 * 24));
@@ -65,8 +81,8 @@ async function loadEvents() {
         const upcomingEvents = [];
 
         cachedEvents.forEach(event => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
+            const start = parseLocalDate(event.start);
+            const end = parseLocalDate(event.end);
             if (now >= start && now <= end) {
                 activeEvents.push(event);
             } else if (now < start) {
@@ -75,9 +91,9 @@ async function loadEvents() {
         });
 
         // Sort upcoming by start date
-        upcomingEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+        upcomingEvents.sort((a, b) => parseLocalDate(a.start) - parseLocalDate(b.start));
         // Sort active by end date
-        activeEvents.sort((a, b) => new Date(a.end) - new Date(b.end));
+        activeEvents.sort((a, b) => parseLocalDate(a.end) - parseLocalDate(b.end));
 
         if (activeEvents.length === 0 && upcomingEvents.length === 0) {
             eventsContainer.innerHTML = '<p class="no-events">No active or upcoming events found.</p>';
@@ -85,8 +101,8 @@ async function loadEvents() {
         }
 
         const renderEvent = (event, isUpcoming) => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
+            const start = parseLocalDate(event.start);
+            const end = parseLocalDate(event.end);
             const statusText = isUpcoming ? 'Starts in' : 'Ends in';
             const timer = getTimeRemaining(isUpcoming ? event.start : event.end);
             const color = EVENT_COLORS[event.eventType] || EVENT_COLORS['default'];
@@ -143,13 +159,22 @@ function showTimelineModal(eventColors) {
     const backdrop = document.getElementById('timeline-modal-backdrop');
     const scrollContainer = document.getElementById('timeline-scroll-container');
     const closeBtn = document.getElementById('timeline-modal-close-btn');
+    const expandBtn = document.getElementById('expand-events-btn');
 
     if (!backdrop || !scrollContainer || !closeBtn) return;
 
+    // Helper to close modal
+    const closeModal = () => {
+        backdrop.classList.add('hidden');
+        if (expandBtn) {
+            expandBtn.setAttribute('aria-expanded', 'false');
+        }
+    };
+
     // Set up close actions
-    closeBtn.onclick = () => backdrop.classList.add('hidden');
+    closeBtn.onclick = closeModal;
     backdrop.onclick = (e) => {
-        if (e.target === backdrop) backdrop.classList.add('hidden');
+        if (e.target === backdrop) closeModal();
     };
 
     // Calculate start date (today, midnight local time)
@@ -158,14 +183,14 @@ function showTimelineModal(eventColors) {
 
     // Exclude past events (events that ended before today)
     const validEvents = cachedEvents.filter(event => {
-        const end = new Date(event.end);
+        const end = parseLocalDate(event.end);
         return end >= today;
     });
 
     // Find the latest end date among the valid active or future events
     let maxEnd = new Date(today);
     validEvents.forEach(event => {
-        const end = new Date(event.end);
+        const end = parseLocalDate(event.end);
         if (end > maxEnd) {
             maxEnd = end;
         }
@@ -189,8 +214,8 @@ function showTimelineModal(eventColors) {
     // Group valid events by their eventType
     const eventsByGroup = {};
     validEvents.forEach(event => {
-        const start = new Date(event.start);
-        const end = new Date(event.end);
+        const start = parseLocalDate(event.start);
+        const end = parseLocalDate(event.end);
         
         // Double check overlap with our dynamic timeline range
         if (end < today || start > timelineEndDate) return;
@@ -227,15 +252,15 @@ function showTimelineModal(eventColors) {
         const groupLabel = groupName.replace(/-/g, ' ');
 
         // Sort events in this group by start date
-        events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        events.sort((a, b) => parseLocalDate(a.start) - parseLocalDate(b.start));
 
         // Track system to stack overlapping events vertically
         const tracks = []; // stores the float endCol of the last event on each track
 
         // First pass: calculate tracks and offsets
         const eventsWithTrack = events.map(event => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
+            const start = parseLocalDate(event.start);
+            const end = parseLocalDate(event.end);
 
             // Calculate fractional days relative to today
             let startCol = 0;
@@ -319,8 +344,11 @@ function showTimelineModal(eventColors) {
         });
     });
 
-    // Show timeline modal
+    // Show timeline modal and set accessibility state
     backdrop.classList.remove('hidden');
+    if (expandBtn) {
+        expandBtn.setAttribute('aria-expanded', 'true');
+    }
 }
 
 function showEventDetailModal(event, color) {
@@ -332,17 +360,17 @@ function showEventDetailModal(event, color) {
     modalContent.style.setProperty('--event-theme', color);
 
     const now = new Date();
-    const start = new Date(event.start);
-    const end = new Date(event.end);
+    const start = parseLocalDate(event.start);
+    const end = parseLocalDate(event.end);
     
     let timerText = '';
     if (now < start) {
-        const total = Date.parse(event.start) - Date.parse(now);
+        const total = start.getTime() - now.getTime();
         const days = Math.floor(total / (1000 * 60 * 60 * 24));
         const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
         timerText = `Starts in: ${days > 0 ? `${days}d ${hours}h` : `${hours}h`}`;
     } else {
-        const total = Date.parse(event.end) - Date.parse(now);
+        const total = end.getTime() - now.getTime();
         const days = Math.floor(total / (1000 * 60 * 60 * 24));
         const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
         timerText = `Ends in: ${days > 0 ? `${days}d ${hours}h` : `${hours}h`}`;
@@ -358,8 +386,8 @@ function showEventDetailModal(event, color) {
             <div class="event-details-grid">
                 <div class="event-section-card">
                     <h4>Featured Pokémon</h4>
-                    <div class="event-grid-list" style="justify-content: center; padding: 10px 0;">
-                        <div class="event-tile" style="width: 130px; height: 130px; flex-direction: column; justify-content: center; align-items: center; gap: 8px;">
+                    <div class="spotlight-pokemon-container">
+                        <div class="event-tile spotlight-pokemon-tile">
                             <img src="${sp.image}" alt="${sp.name}" style="width: 80px; height: 80px;">
                             <div class="event-tile-name" style="font-weight: 700; font-size: 0.95rem;">${sp.name}</div>
                             ${sp.canBeShiny ? '<span class="shiny-indicator">✨</span>' : ''}
@@ -368,9 +396,9 @@ function showEventDetailModal(event, color) {
                 </div>
                 <div class="event-section-card">
                     <h4>Event Bonuses</h4>
-                    <div style="display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; padding: 10px 0;">
+                    <div class="spotlight-bonus-container">
                         <div class="event-bonus-row">
-                            <span style="font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: 2px;">🎁</span>
+                            <span class="spotlight-bonus-icon">🎁</span>
                             <div class="event-bonus-text">${sp.bonus || 'No Extra Bonus'}</div>
                         </div>
                     </div>
