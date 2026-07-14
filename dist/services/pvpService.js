@@ -1,9 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PVP_RANKS_BINARY_FILE } from '../config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const BINARY_PATH = path.join(__dirname, '../data/user/generated/pvp_ranks.bin');
+const BINARY_PATH = PVP_RANKS_BINARY_FILE;
 // Format Constants (must match scripts/compile_pvp_binary.js)
 const NAME_SIZE = 32;
 // const RANK_TABLE_SIZE = 4096 * 2; // Commented out as in original JS if it was unused or for reference

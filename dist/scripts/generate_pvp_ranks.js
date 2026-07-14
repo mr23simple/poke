@@ -4,11 +4,11 @@ import { Worker, isMainThread, parentPort } from 'worker_threads';
 import { exec } from 'child_process';
 import os from 'os';
 import { fileURLToPath } from 'url';
-import config from '../config.js'; // Import config
+import config, { PVP_RANKS_JSON_FILE } from '../config.js'; // Import config
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const POKEDEX_PATH = config.POKEDEX_FILE; // Use the path from config.ts
-const OUTPUT_PATH = path.join(__dirname, '../data/user/generated/pvp_ranks.json');
+const OUTPUT_PATH = PVP_RANKS_JSON_FILE;
 const TEMP_OUTPUT_PATH = OUTPUT_PATH + '.tmp';
 // --- Constants ---
 const CPM_TABLE = {
@@ -163,15 +163,19 @@ else {
             fs.renameSync(TEMP_OUTPUT_PATH, OUTPUT_PATH);
             console.log(`Done! Saved to ${OUTPUT_PATH}`);
             console.log("Compiling binary ranks...");
+            const isProd = __dirname.includes('dist'); // Reverted to the more reliable check
             const compileScriptPath = isProd
-                ? path.join(__dirname, 'compile_pvp_binary.js')
-                : path.join(__dirname, 'compile_pvp_binary.ts');
-            const compileCommand = isProd ? `node ${compileScriptPath}` : `pnpm tsx ${compileScriptPath}`;
-            exec(compileCommand, { cwd: path.join(__dirname, '..') }, (err, stdout) => {
-                if (err)
-                    console.error(err);
-                else
+                ? path.join(config.rootDir, 'dist/scripts/compile_pvp_binary.js')
+                : path.join(config.rootDir, 'scripts/compile_pvp_binary.ts');
+            const compileCommand = isProd ? `node "${compileScriptPath}"` : `pnpm tsx "${compileScriptPath}"`;
+            exec(compileCommand, { cwd: config.rootDir }, (err, stdout, stderr) => {
+                if (err) {
+                    console.error(`Error during binary compilation: ${err.message}`);
+                    console.error(stderr);
+                }
+                else {
                     console.log(stdout);
+                }
             });
         });
     }

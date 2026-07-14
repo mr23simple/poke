@@ -324,7 +324,7 @@ const GridComponent = {
     emits: ['pokemon-clicked'],
     template: `
         <div id="all-pokemon-list">
-            <div v-for="p in pokemons" :key="p.id" :class="getCardClass(p)" @click="$emit('pokemon-clicked', p)">
+            <div v-for="p in pokemons" :key="p.id" :class="[getCardClass(p), { 'no-image': isLiteMode || !p.sprite }]" @click="$emit('pokemon-clicked', p)">
                 <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
                     <img :src="p.sprite" :alt="displayName(p)" loading="lazy">
                 </div>

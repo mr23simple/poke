@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import config from '../config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const JSON_PATH = path.join(__dirname, '../data/user/generated/pvp_ranks.json');
-const BINARY_PATH = path.join(__dirname, '../data/user/generated/pvp_ranks.bin');
+const JSON_PATH = config.PVP_RANKS_JSON_FILE;
+const BINARY_PATH = config.PVP_RANKS_BINARY_FILE;
 // Format Constants
 const NAME_SIZE = 32; // Fixed size for species/form names
 const RANK_TABLE_SIZE = 4096 * 2; // 4096 Uint16s

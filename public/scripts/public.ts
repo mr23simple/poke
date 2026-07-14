@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <h3>Highlights</h3>
                 <div id="modal-pokemon-container">
                     ${details.highlights.map(p => {
-                        const cardClass = p.typeColors.length > 0 ? 'pokemon-card colored' : 'pokemon-card';
+                        const cardClass = `pokemon-card${p.typeColors.length > 0 ? ' colored' : ''}${isLiteMode || !p.sprite ? ' no-image' : ''}`;
                         return `<div class="${cardClass}" style="${createBackgroundStyle(p.typeColors)}">
                                     <img src="${p.sprite}" alt="${p.name}" loading="lazy">
                                     <p class="pokemon-name">

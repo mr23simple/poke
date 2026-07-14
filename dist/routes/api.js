@@ -7,13 +7,14 @@ import pokedexService from '../services/pokedexService.js';
 import pvpService from '../services/pvpService.js';
 import { saveDataLimiter } from '../middlewares/rateLimiter.js';
 import { isAuthenticated } from './auth.js';
+import config from '../config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const router = express.Router();
 router.get('/combat-moves', async (req, res) => {
     try {
-        const fastMoves = JSON.parse(await fs.readFile(path.join(__dirname, '../data/public/fast_moves.json'), 'utf-8'));
-        const chargedMoves = JSON.parse(await fs.readFile(path.join(__dirname, '../data/public/charged_moves.json'), 'utf-8'));
+        const fastMoves = JSON.parse(await fs.readFile(config.FAST_MOVES_FILE, 'utf-8'));
+        const chargedMoves = JSON.parse(await fs.readFile(config.CHARGED_MOVES_FILE, 'utf-8'));
         res.json({ fastMoves, chargedMoves });
     }
     catch (error) {

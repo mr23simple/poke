@@ -1,11 +1,8 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const POKEDEX_PATH = path.join(__dirname, '../data/user/generated/pokedex_modified.json');
-const OUTPUT_PATH = path.join(__dirname, '../data/public/max_battles.json');
+import config from '../config.js';
+const POKEDEX_PATH = config.POKEDEX_FILE;
+const OUTPUT_PATH = config.MAX_BATTLES_FILE;
 export default async function scrapeMaxBattles() {
     const url = 'https://www.snacknap.com/max-battles';
     // Load Pokedex
@@ -91,3 +88,8 @@ export default async function scrapeMaxBattles() {
         throw e; // Propagate error
     }
 }
+// Execute the function when the script is run directly
+scrapeMaxBattles().catch(e => {
+    console.error("Scraping script failed to run:", e);
+    process.exit(1);
+});

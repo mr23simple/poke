@@ -28,9 +28,9 @@
 /* This single rule now applies the grid to BOTH the highlights and the modal list */
 #pokemon-highlights-container, #all-pokemon-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 140px);
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 /* Unified Pokémon Card Style */
@@ -40,13 +40,26 @@
     padding: 10px;
     text-align: center;
     background: linear-gradient(145deg, #f9f9f9, #e6e6e6);
-    width: 140px;
+    width: 100%;
+    max-width: 160px;
     min-height: 280px;
     overflow: hidden;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
 }
+
+/* No-image variant (e.g. in lite mode or missing sprite) */
+.pokemon-card.no-image {
+    min-height: auto;
+}
+
+.pokemon-card.no-image .pokemon-image-container {
+    display: none !important;
+}
+
 .pokemon-card img {
     width: 72px;
     height: 72px;

@@ -11,10 +11,10 @@
     <link rel="shortcut icon" href="/assets/favicon-BR64d0U5.ico">
     <!-- 1. Include Vue.js library -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <script type="module" crossorigin src="/assets/private-2TGl2yGr.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/loadHeader-DqtcMgNc.js">
-  <link rel="stylesheet" crossorigin href="/assets/loadHeader-SkaMhKPx.css">
-  <link rel="stylesheet" crossorigin href="/assets/private-UdpkF5kE.css">
+  <script type="module" crossorigin src="/assets/private-5krGDur0.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/loadHeader-BHQRgu4R.js">
+  <link rel="stylesheet" crossorigin href="/assets/loadHeader-kAen8Ph4.css">
+  <link rel="stylesheet" crossorigin href="/assets/private-Bhz9yQJo.css">
 </head>
 <body class="dashboard-private">
     <div id="header-placeholder"></div>
@@ -155,7 +155,7 @@
                                 <div v-if="formGroup.pokemons.length > 1" class="form-group-wrapper">
                                     <h5 class="form-group-header">{{ formGroup.displayName }}</h5>
                                     <div class="form-group-box">
-                                        <div v-for="p in formGroup.pokemons" :key="p.id" class="pokemon-card" @click="openPokemonModal(p)">
+                                        <div v-for="p in formGroup.pokemons" :key="p.id" :class="['pokemon-card', { 'no-image': isLiteMode || !p.sprite }]" @click="openPokemonModal(p)">
                                             <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
                                                 <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
                                             </div>
@@ -184,7 +184,7 @@
                             <h4>{{ group[0].name }} ({{ group.length }})</h4>
                         </div>
                         <div class="pokemon-row-scroll">
-                            <div v-for="p in group" :key="p.id" class="pokemon-card" @click="openPokemonModal(p)">
+                            <div v-for="p in group" :key="p.id" :class="['pokemon-card', { 'no-image': isLiteMode || !p.sprite }]" @click="openPokemonModal(p)">
                                 <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
                                     <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
                                 </div>

@@ -550,7 +550,9 @@ const playerDataService = {
             return {
                 playerData: data,
                 pvpDataVersion: pvpService.getDataVersion(),
-                pokedexService: { typeColorMap: pokedexService.typeColorMap }
+                pokedexService: {
+                    typeColorMap: pokedexService.typeColorMap
+                }
             };
         }
         catch (error) {
