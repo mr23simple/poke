@@ -147,7 +147,7 @@ async function loadEvents() {
 
         if (hasMore) {
             html += `
-                <button id="toggle-events-btn" class="toggle-events-btn">
+                <button id="toggle-events-btn" class="btn btn-block btn-neutral mt-3">
                     ${showAllEvents ? 'Show Less' : `Show All (${totalCount})`}
                 </button>
             `;
@@ -190,7 +190,7 @@ async function loadEvents() {
 }
 
 function showTimelineModal(eventColors) {
-    const backdrop = document.getElementById('timeline-modal-backdrop');
+    const backdrop = document.getElementById('timeline-modal-backdrop') as HTMLDialogElement | null;
     const scrollContainer = document.getElementById('timeline-scroll-container');
     const closeBtn = document.getElementById('timeline-modal-close-btn');
     const expandBtn = document.getElementById('expand-events-btn');
@@ -203,7 +203,7 @@ function showTimelineModal(eventColors) {
 
     // Helper to close modal
     const closeModal = () => {
-        backdrop.classList.add('hidden');
+        backdrop.close();
         if (expandBtn) {
             expandBtn.setAttribute('aria-expanded', 'false');
         }
@@ -414,7 +414,7 @@ function showTimelineModal(eventColors) {
     });
 
     // Show timeline modal and set accessibility state
-    backdrop.classList.remove('hidden');
+    backdrop.showModal();
     if (expandBtn) {
         expandBtn.setAttribute('aria-expanded', 'true');
     }
@@ -628,7 +628,9 @@ function showEventDetailModal(event, color) {
     }
 
     modalContent.innerHTML = `
-        <button id="modal-close-btn">&times;</button>
+        <form method="dialog">
+            <button id="modal-close-btn" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-30">✕</button>
+        </form>
         <div class="event-modal-hero" style="background-image: url('${event.image || 'https://cdn.leekduck.com/assets/img/events/default.jpg'}')">
             <div class="event-modal-hero-overlay"></div>
             <div class="event-modal-hero-content">
@@ -637,26 +639,35 @@ function showEventDetailModal(event, color) {
                 <div class="event-timer-large">📅 ${timerText}</div>
             </div>
         </div>
-        <div style="padding: 0 5px 15px 5px;">
+        <div style="padding: 15px;">
             ${extraDataHtml}
             <div style="margin-top: 20px; text-align: right;">
-                <a href="${event.link}" target="_blank" style="display:inline-block; background:var(--event-theme); color:#fff; text-decoration:none; padding:10px 20px; border-radius:8px; font-weight:700; font-size:0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <a href="${event.link}" target="_blank" class="btn btn-primary">
                     View on Leek Duck ↗
                 </a>
             </div>
         </div>
     `;
 
+    const dialogEl = modalBackdrop as HTMLDialogElement;
+
     // Attach close listener
     const closeBtn = document.getElementById('modal-close-btn');
     if (closeBtn) {
-        closeBtn.onclick = () => {
-            modalBackdrop.classList.add('hidden');
+        closeBtn.onclick = (e) => {
+            e.preventDefault();
+            dialogEl.close();
         };
     }
 
+    dialogEl.onclick = (e) => {
+        if (e.target === dialogEl) {
+            dialogEl.close();
+        }
+    };
+
     // Show the modal
-    modalBackdrop.classList.remove('hidden');
+    dialogEl.showModal();
 }
 
 // Initial load

@@ -1046,3 +1046,24 @@ h2.ranking-title-with-info {
 [data-theme="dark"] .toggle-events-btn:hover {
     background: #4a5568;
 }
+
+/* Ensure dialog modals strictly use daisyUI framework styling defaults and do not inherit index-level offsets */
+dialog#modal-backdrop,
+dialog#timeline-modal-backdrop {
+    top: 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    border: none !important;
+    background-color: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+dialog#modal-backdrop #modal-content,
+dialog#timeline-modal-backdrop #timeline-modal-content {
+    box-sizing: border-box !important;
+    border-radius: 1rem !important;
+}
