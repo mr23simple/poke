@@ -247,6 +247,7 @@ function showTimelineModal(eventColors) {
     gridHtml += `</div>`; // end timeline-header-row
 
     // 2. Data rows for each group
+    let rowIndex = 2;
     Object.keys(eventsByGroup).forEach(groupName => {
         const events = eventsByGroup[groupName];
         const groupLabel = groupName.replace(/-/g, ' ');
@@ -329,16 +330,16 @@ function showTimelineModal(eventColors) {
         const rowHeight = 16 + numTracks * 34;
 
         gridHtml += `<div class="timeline-row">`;
-        gridHtml += `<div class="timeline-row-label" style="height: ${rowHeight}px;">${groupLabel}</div>`;
+        gridHtml += `<div class="timeline-row-label" style="height: ${rowHeight}px; grid-row: ${rowIndex};">${groupLabel}</div>`;
 
         // Render empty cell tracks for visual reference (totalDays columns)
         for (let i = 0; i < totalDays; i++) {
             const classNames = `timeline-grid-cell${i === 0 ? ' today-col' : ''}`;
-            gridHtml += `<div class="${classNames}" style="height: ${rowHeight}px;"></div>`;
+            gridHtml += `<div class="${classNames}" style="height: ${rowHeight}px; grid-row: ${rowIndex};"></div>`;
         }
 
         // Render event bar container with dynamic height
-        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px); height: ${rowHeight}px;">`;
+        gridHtml += `<div class="timeline-bar-wrapper" style="grid-column: 2 / span ${totalDays}; grid-template-columns: repeat(${totalDays}, 100px); height: ${rowHeight}px; grid-row: ${rowIndex};">`;
         eventsWithTrack.forEach(({ event, startCol, endCol, track }) => {
             const color = eventColors[event.eventType] || eventColors['default'];
             const leftOffset = startCol * 100;
@@ -356,6 +357,7 @@ function showTimelineModal(eventColors) {
         });
         gridHtml += `</div>`; // end timeline-bar-wrapper
         gridHtml += `</div>`; // end timeline-row
+        rowIndex++;
     });
 
     gridHtml += `</div>`; // end timeline-grid
