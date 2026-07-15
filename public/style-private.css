@@ -1758,4 +1758,104 @@ body.dashboard-private, body:not([class]) {
     }
 }
 
+@media (max-width: 768px) {
+    /* Modal container padding & headers */
+    #modal-content, 
+    #cleanup-modal-content, 
+    #team-builder-modal-content, 
+    #trash-modal-content,
+    .trash-modal-redesign, 
+    #avatar-modal-content {
+        padding: 12px !important;
+        font-size: 0.9em !important;
+    }
+    
+    #modal-content h2, 
+    #team-builder-modal-content h2, 
+    #cleanup-modal-content h2,
+    .modal-header h2,
+    .modal-title {
+        font-size: 1.25rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Tabs & segmented controls */
+    .modal-tabs, .segmented-control {
+        padding: 3px !important;
+        gap: 3px !important;
+        margin-bottom: 10px !important;
+    }
+    .modal-tabs button, .segmented-control button {
+        padding: 6px 8px !important;
+        font-size: 0.8rem !important;
+        border-radius: 4px !important;
+    }
+
+    /* Raid Boss/Enemy items */
+    .raid-boss-selector {
+        padding: 6px !important;
+        gap: 6px !important;
+    }
+    .raid-boss-group {
+        padding: 6px !important;
+        margin-right: 6px !important;
+    }
+    .raid-boss-level-title {
+        font-size: 0.75rem !important;
+        margin-bottom: 6px !important;
+    }
+    .raid-boss-selector .pokemon-image-container {
+        width: 50px !important;
+        height: 50px !important;
+        border-width: 2px !important;
+        margin-right: 6px !important;
+    }
+    .raid-boss-selector .pokemon-image-container img {
+        width: 36px !important;
+        height: 36px !important;
+        position: absolute !important;
+        top: 5px !important;
+        left: 5px !important;
+    }
+
+    /* Input wrappers */
+    .custom-enemy-input-wrapper {
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+    }
+    .custom-enemy-input-wrapper input {
+        padding: 6px 10px !important;
+        font-size: 0.85rem !important;
+    }
+    .custom-enemy-input-wrapper button,
+    .btn-add-enemy {
+        padding: 6px 12px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Close buttons */
+    #modal-close-btn,
+    #team-builder-modal-close-btn,
+    #cleanup-modal-close-btn,
+    #trash-modal-close-btn,
+    .modal-close-btn {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 1.25rem !important;
+        top: 8px !important;
+        right: 8px !important;
+    }
+    
+    /* Stats & lists inside modals */
+    .stat-row {
+        margin-bottom: 6px !important;
+    }
+    .stat-label {
+        font-size: 0.8rem !important;
+    }
+    .stat-value {
+        font-size: 0.8rem !important;
+    }
+}
+
 
