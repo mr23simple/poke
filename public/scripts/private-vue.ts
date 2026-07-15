@@ -111,35 +111,35 @@ function getBadges(p, name, limitRank = true) {
         pvp: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v5c0 5.25 4.2 10.15 10 11.5 5.8-1.35 10-6.25 10-11.5V7l-10-5zm0 18.4c-4.42-1.07-7.6-5.18-7.6-9.4v-4l7.6-3.8 7.6 3.8v4c0 4.22-3.18 8.33-7.6 9.4z"/></svg>`
     };
 
-    if (p.pokemonDisplay.isStrongPokemon) badges.push(`<span class="badge mighty-badge">${icons.mighty}Mighty</span>`);
-    if (p.pokemonDisplay.shiny) badges.push(`<span class="badge shiny-badge">${icons.shiny}Shiny</span>`);
+    if (p.pokemonDisplay.isStrongPokemon) badges.push(`<span class="badge mighty-badge" title="Mighty">${icons.mighty}</span>`);
+    if (p.pokemonDisplay.shiny) badges.push(`<span class="badge shiny-badge" title="Shiny">${icons.shiny}</span>`);
     if (p.isLucky) {
-        badges.push(`<span class="badge lucky-badge">${icons.lucky}Lucky</span>`);
+        badges.push(`<span class="badge lucky-badge" title="Lucky">${icons.lucky}</span>`);
     }
     else if (p.tradedTimeMs > 0) {
-        badges.push(`<span class="badge traded-badge">${icons.traded}Traded</span>`);
+        badges.push(`<span class="badge traded-badge" title="Traded">${icons.traded}</span>`);
     }
     
     const ivPercent = getIvPercent(p);
     if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
-        badges.push(`<span class="badge zero-iv-badge">${icons.zeroIv}0 IV</span>`);
+        badges.push(`<span class="badge zero-iv-badge" title="0 IV">${icons.zeroIv}</span>`);
     } else if (parseFloat(ivPercent) >= 100) {
-        badges.push(`<span class="badge perfect-badge">${icons.perfect}Perfect</span>`);
+        badges.push(`<span class="badge perfect-badge" title="Perfect">${icons.perfect}</span>`);
     }
 
-    if (p.pokemonDisplay.alignment === 1) badges.push(`<span class="badge shadow-badge">${icons.shadow}Shadow</span>`);
-    if (p.pokemonDisplay.alignment === 2) badges.push(`<span class="badge purified-badge">${icons.purified}Purified</span>`);
+    if (p.pokemonDisplay.alignment === 1) badges.push(`<span class="badge shadow-badge" title="Shadow">${icons.shadow}</span>`);
+    if (p.pokemonDisplay.alignment === 2) badges.push(`<span class="badge purified-badge" title="Purified">${icons.purified}</span>`);
 
-    if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push(`<span class="badge legendary-badge">${icons.legendary}Legendary</span>`);
-    if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push(`<span class="badge mythical-badge">${icons.mythical}Mythical</span>`);
+    if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push(`<span class="badge legendary-badge" title="Legendary">${icons.legendary}</span>`);
+    if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push(`<span class="badge mythical-badge" title="Mythical">${icons.mythical}</span>`);
 
-    if (p.pokemonDisplay.breadModeEnum === 1) badges.push(`<span class="badge dynamax-badge">${icons.dynamax}Dynamax</span>`);
-    if (p.pokemonDisplay.breadModeEnum === 2) badges.push(`<span class="badge gigantamax-badge">${icons.gigantamax}G-Max</span>`);
+    if (p.pokemonDisplay.breadModeEnum === 1) badges.push(`<span class="badge dynamax-badge" title="Dynamax">${icons.dynamax}</span>`);
+    if (p.pokemonDisplay.breadModeEnum === 2) badges.push(`<span class="badge gigantamax-badge" title="G-Max">${icons.gigantamax}</span>`);
 
-    if (p.isMaxLevel) badges.push(`<span class="badge max-level-badge">${icons.lvl50}Lvl50</span>`);
+    if (p.isMaxLevel) badges.push(`<span class="badge max-level-badge" title="Lvl50">${icons.lvl50}</span>`);
 
     if (p.pokemonDisplay.locationCard) {
-        badges.push(`<span class="badge background-badge">${icons.background}Background</span>`);
+        badges.push(`<span class="badge background-badge" title="Background">${icons.background}</span>`);
     }
 
     // PvP Ranks as Markers
