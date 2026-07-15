@@ -93,35 +93,53 @@ function getBadges(p, name, limitRank = true) {
     const badges = [];
     if (!p || !p.pokemonDisplay) return name;
 
-    if (p.pokemonDisplay.isStrongPokemon) badges.push('<span class="badge mighty-badge">Mighty</span>');
-    if (p.pokemonDisplay.shiny) badges.push('<span class="badge shiny-badge">Shiny</span>');
+    const icons = {
+        mighty: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M19.36 10.04L20.78 8.62C21.56 7.84 21.56 6.57 20.78 5.79L18.21 3.22C17.43 2.44 16.16 2.44 15.38 3.22L13.96 4.64L19.36 10.04M12.54 6.06L3.06 15.54C2.9 15.7 2.81 15.91 2.81 16.14V20.43C2.81 20.87 3.17 21.23 3.61 21.23H7.9C8.13 21.23 8.34 21.14 8.5 20.98L17.94 11.54L12.54 6.06M17.5 16.5H19.5V18.5H17.5V16.5M14.5 19.5H16.5V21.5H14.5V19.5Z"/></svg>`,
+        shiny: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2h7.6l-6.2 4.5 2.4 7.3-6.2-4.5-6.2 4.5 2.4-7.3-6.2-4.5h7.6z"/></svg>`,
+        lucky: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+        traded: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>`,
+        zeroIv: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+        perfect: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M5 16L3 5L8.5 10L12 3L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/></svg>`,
+        shadow: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2S8 7 8 10.5C8 12.43 9.57 14 11.5 14s3.5-1.57 3.5-3.5c0-1.34-1.25-3.41-3-3.95V10c0 .55-.45 1-1 1s-1-.45-1-1V5.5c0-.55-.45-1-1-1s-1 .45-1 1v4.3c-1.25-.45-2-1.75-2-3.15C5 4.5 7.5 2 12 2z"/></svg>`,
+        purified: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4 12h4m12 0h-4m-1.48-6.52l-2.83 2.83M8.31 15.69l-2.83 2.83m14.14 0l-2.83-2.83M8.31 8.31L5.48 5.48M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>`,
+        legendary: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+        mythical: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`,
+        dynamax: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M19.36 10.04a6 6 0 0 0-11.3 0 4.5 4.5 0 0 0-3.56 4.46A4.5 4.5 0 0 0 9 19h9a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-3.14-4.46z"/></svg>`,
+        gigantamax: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M19.36 10.04a6 6 0 0 0-11.3 0 4.5 4.5 0 0 0-3.56 4.46A4.5 4.5 0 0 0 9 19h9a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-3.14-4.46zM13 18l-2 3h3l-1 2 3-3.5h-3l2-2.5z"/></svg>`,
+        lvl50: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6zM7.41 21.41L12 16.83l4.59 4.58L18 20l-6-6-6 6z"/></svg>`,
+        background: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.5 6c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM5 17l3.5-4.5 2.5 3.01L14.5 11l4.5 6H5z"/></svg>`,
+        pvp: `<svg class="w-3 h-3 inline-block mr-1 align-middle fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v5c0 5.25 4.2 10.15 10 11.5 5.8-1.35 10-6.25 10-11.5V7l-10-5zm0 18.4c-4.42-1.07-7.6-5.18-7.6-9.4v-4l7.6-3.8 7.6 3.8v4c0 4.22-3.18 8.33-7.6 9.4z"/></svg>`
+    };
+
+    if (p.pokemonDisplay.isStrongPokemon) badges.push(`<span class="badge mighty-badge">${icons.mighty}Mighty</span>`);
+    if (p.pokemonDisplay.shiny) badges.push(`<span class="badge shiny-badge">${icons.shiny}Shiny</span>`);
     if (p.isLucky) {
-        badges.push('<span class="badge lucky-badge">Lucky</span>');
+        badges.push(`<span class="badge lucky-badge">${icons.lucky}Lucky</span>`);
     }
     else if (p.tradedTimeMs > 0) {
-        badges.push('<span class="badge traded-badge">Traded</span>');
+        badges.push(`<span class="badge traded-badge">${icons.traded}Traded</span>`);
     }
     
     const ivPercent = getIvPercent(p);
     if (p.individualAttack === 0 && p.individualDefense === 0 && p.individualStamina === 0) {
-        badges.push('<span class="badge zero-iv-badge">0 IV</span>');
+        badges.push(`<span class="badge zero-iv-badge">${icons.zeroIv}0 IV</span>`);
     } else if (parseFloat(ivPercent) >= 100) {
-        badges.push('<span class="badge perfect-badge">Perfect</span>');
+        badges.push(`<span class="badge perfect-badge">${icons.perfect}Perfect</span>`);
     }
 
-    if (p.pokemonDisplay.alignment === 1) badges.push('<span class="badge shadow-badge">Shadow</span>');
-    if (p.pokemonDisplay.alignment === 2) badges.push('<span class="badge purified-badge">Purified</span>');
+    if (p.pokemonDisplay.alignment === 1) badges.push(`<span class="badge shadow-badge">${icons.shadow}Shadow</span>`);
+    if (p.pokemonDisplay.alignment === 2) badges.push(`<span class="badge purified-badge">${icons.purified}Purified</span>`);
 
-    if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push('<span class="badge legendary-badge">Legendary</span>');
-    if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push('<span class="badge mythical-badge">Mythical</span>');
+    if (p.pokemonClass === 'POKEMON_CLASS_LEGENDARY') badges.push(`<span class="badge legendary-badge">${icons.legendary}Legendary</span>`);
+    if (p.pokemonClass === 'POKEMON_CLASS_MYTHIC') badges.push(`<span class="badge mythical-badge">${icons.mythical}Mythical</span>`);
 
-    if (p.pokemonDisplay.breadModeEnum === 1) badges.push('<span class="badge dynamax-badge">Dynamax</span>');
-    if (p.pokemonDisplay.breadModeEnum === 2) badges.push('<span class="badge gigantamax-badge">G-Max</span>');
+    if (p.pokemonDisplay.breadModeEnum === 1) badges.push(`<span class="badge dynamax-badge">${icons.dynamax}Dynamax</span>`);
+    if (p.pokemonDisplay.breadModeEnum === 2) badges.push(`<span class="badge gigantamax-badge">${icons.gigantamax}G-Max</span>`);
 
-    if (p.isMaxLevel) badges.push('<span class="badge max-level-badge">Lvl50</span>');
+    if (p.isMaxLevel) badges.push(`<span class="badge max-level-badge">${icons.lvl50}Lvl50</span>`);
 
     if (p.pokemonDisplay.locationCard) {
-        badges.push('<span class="badge background-badge">Background</span>');
+        badges.push(`<span class="badge background-badge">${icons.background}Background</span>`);
     }
 
     // PvP Ranks as Markers
@@ -129,19 +147,19 @@ function getBadges(p, name, limitRank = true) {
         let extraClass = '';
         if (p.rankGreat <= 10) extraClass = ' rank-1';
         else if (p.rankGreat <= 25) extraClass = ' rank-good';
-        badges.push(`<span class="badge pvp-badge great${extraClass}" title="Great League Rank #${p.rankGreat}">#${p.rankGreat}</span>`);
+        badges.push(`<span class="badge pvp-badge great${extraClass}" title="Great League Rank #${p.rankGreat}">${icons.pvp}#${p.rankGreat}</span>`);
     }
     if (p.rankUltra && p.cp <= 2500 && (!limitRank || p.rankUltra <= 100)) {
         let extraClass = '';
         if (p.rankUltra <= 10) extraClass = ' rank-1';
         else if (p.rankUltra <= 25) extraClass = ' rank-good';
-        badges.push(`<span class="badge pvp-badge ultra${extraClass}" title="Ultra League Rank #${p.rankUltra}">#${p.rankUltra}</span>`);
+        badges.push(`<span class="badge pvp-badge ultra${extraClass}" title="Ultra League Rank #${p.rankUltra}">${icons.pvp}#${p.rankUltra}</span>`);
     }
     if (p.rankMaster && (!limitRank || p.rankMaster <= 100)) {
         let extraClass = '';
         if (p.rankMaster <= 10) extraClass = ' rank-1';
         else if (p.rankMaster <= 25) extraClass = ' rank-good';
-        badges.push(`<span class="badge pvp-badge master${extraClass}" title="Master League Rank #${p.rankMaster}">#${p.rankMaster}</span>`);
+        badges.push(`<span class="badge pvp-badge master${extraClass}" title="Master League Rank #${p.rankMaster}">${icons.pvp}#${p.rankMaster}</span>`);
     }
 
     if (badges.length > 0) {
