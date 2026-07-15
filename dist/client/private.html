@@ -11,10 +11,10 @@
     <link rel="shortcut icon" href="/assets/favicon-BR64d0U5.ico">
     <!-- 1. Include Vue.js library -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <script type="module" crossorigin src="/assets/private-tanhfuWE.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/loadHeader-B2YrxrUU.js">
-  <link rel="stylesheet" crossorigin href="/assets/loadHeader-BICQvSZs.css">
-  <link rel="stylesheet" crossorigin href="/assets/private-B99Nb1O2.css">
+  <script type="module" crossorigin src="/assets/private-fLDu_swK.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/loadHeader-BKoniw6b.js">
+  <link rel="stylesheet" crossorigin href="/assets/loadHeader-Dgd-YLex.css">
+  <link rel="stylesheet" crossorigin href="/assets/private-Dt2fV6ii.css">
 </head>
 <body class="dashboard-private">
     <div id="header-placeholder"></div>
@@ -405,19 +405,7 @@
                             <div class="summary-header">
                                 <h2>Pokémon Highlights</h2>
                             </div>
-                            <div id="pokemon-highlights-container">
-                                <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" @click="openPokemonModal(p)">
-                                    <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
-                                        <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
-                                    </div>
-                                    <p class="pokemon-name">
-                                        <span :class="{'lite-name-span': isLiteMode}" :style="isLiteMode ? createBackgroundStyle(p.typeColors) : ''">{{ p.nickname || p.name }}</span>
-                                        <br v-if="getBadges(p, '', true)">
-                                        <span v-html="getBadges(p, '', true)"></span>
-                                    </p>
-                                    <p class="pokemon-cp">CP {{ p.cp }}</p>
-                                </div>
-                            </div>
+                            <grid-component :pokemons="highlights" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
                         </section>
                     </div>
                 </div>

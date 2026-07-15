@@ -323,26 +323,50 @@ const GridComponent = {
     props: ['pokemons', 'isLiteMode'],
     emits: ['pokemon-clicked'],
     template: `
-        <div id="all-pokemon-list">
-            <div v-for="p in pokemons" :key="p.id" :class="[getCardClass(p), { 'no-image': isLiteMode || !p.sprite }]" @click="$emit('pokemon-clicked', p)">
-                <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
-                    <img :src="p.sprite" :alt="displayName(p)" loading="lazy">
-                </div>
-                <p class="pokemon-name">
-                    <span :class="{'lite-name-span': isLiteMode}" 
-                          :style="isLiteMode ? createBackgroundStyle(p.typeColors) : ''">
-                        {{ displayName(p) }}
-                    </span>
-                    <br v-if="getBadges(p, '', true)">
-                    <span v-html="getBadges(p, '', true)"></span>
-                </p>
-                <p class="pokemon-cp">CP {{ p.cp }}</p>
-                <p v-if="p.score" class="pokemon-score">{{ p.scoreLabel || 'Score' }}: {{ p.score.toFixed(2) }}</p>
-                <div class="iv-bar-container">
-                    <div class="iv-bar" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
-                </div>
-                <small>{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
-            </div>
+        <div class="overflow-x-auto w-full">
+            <table class="table table-sm md:table-md w-full">
+                <thead>
+                    <tr>
+                        <th class="w-12 text-center">Sprite</th>
+                        <th>Pokémon</th>
+                        <th>CP</th>
+                        <th class="w-32">IV Stats</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="p in pokemons" :key="p.id" class="hover cursor-pointer" @click="$emit('pokemon-clicked', p)">
+                        <td class="text-center align-middle">
+                            <div class="avatar placeholder">
+                                <div class="w-10 h-10 rounded-full relative flex items-center justify-center" :style="createBackgroundStyle(p.typeColors)">
+                                    <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="displayName(p)" class="w-8 h-8 object-contain" loading="lazy" />
+                                </div>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-sm md:text-base">{{ displayName(p) }}</span>
+                                <div class="flex flex-wrap gap-1 mt-0.5" v-html="getBadges(p, '', true)"></div>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <span class="font-bold text-sm md:text-base">CP {{ p.cp }}</span>
+                            <div v-if="p.score" class="text-xs text-neutral-500 font-medium mt-0.5">
+                                {{ p.scoreLabel || 'Score' }}: {{ p.score.toFixed(2) }}
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <div class="flex flex-col w-full min-w-[100px] max-w-[140px]">
+                                <div class="w-full bg-neutral-200 dark:bg-neutral-700 h-2.5 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                </div>
+                                <span class="text-xs text-neutral-500 font-semibold mt-1">
+                                    {{ getIvPercent(p) }}% <span class="opacity-75">({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</span>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     `,
     methods: {

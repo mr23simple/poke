@@ -407,19 +407,7 @@
                             <div class="summary-header">
                                 <h2>Pokémon Highlights</h2>
                             </div>
-                            <div id="pokemon-highlights-container">
-                                <div v-for="p in highlights" :key="p.id" :class="getCardClass(p)" @click="openPokemonModal(p)">
-                                    <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
-                                        <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
-                                    </div>
-                                    <p class="pokemon-name">
-                                        <span :class="{'lite-name-span': isLiteMode}" :style="isLiteMode ? createBackgroundStyle(p.typeColors) : ''">{{ p.nickname || p.name }}</span>
-                                        <br v-if="getBadges(p, '', true)">
-                                        <span v-html="getBadges(p, '', true)"></span>
-                                    </p>
-                                    <p class="pokemon-cp">CP {{ p.cp }}</p>
-                                </div>
-                            </div>
+                            <grid-component :pokemons="highlights" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
                         </section>
                     </div>
                 </div>
