@@ -87,44 +87,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             perfect: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5L8.5 10L12 3L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z"/></svg>`,
             shadow: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C11.5 3 10 6.5 10.5 8c.5 1.5 2 1.5 2.5 3s.5 2-.5 3c-1 1-2 .5-3-.5S9 11 9 9.5c0-2-2-4.5-3-5.5 1 2.5.5 6-.5 7.5S3.5 14 4 16c.5 2 2.5 4 4.5 4.5 3.5 1 7.5-.5 9-3.5 1.5-3 1-7-.5-9-1.5-2-3.5-3.5-5-6z"/></svg>`,
             purified: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4 12h4m12 0h-4m-1.48-6.52l-2.83 2.83M8.31 15.69l-2.83 2.83m14.14 0l-2.83-2.83M8.31 8.31L5.48 5.48M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>`,
-            legendary: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2c-1.5 0-3 1.2-3 2.7 0 .8.4 1.5.9 2L7 9.5c-2.5.5-4.5 2-6 3.5l.5 1.5c1.8-.8 3.5-1.2 5.5-1l1-1.5 1.5 1c-1.2 2.2-1.7 3.8-1.7 5.5 0 2.2 2 3.5 3.2 3.5s3.2-1.3 3.2-3.5c0-1.7-.5-3.3-1.7-5.5l1.5-1 1 1.5c2-.2 3.7.2 5.5 1l.5-1.5c-1.5-1.5-3.5-3-6-3.5L14.1 6.7c.5-.5.9-1.2.9-2C15 3.2 13.5 2 12 2zm-1 3.5c.3 0 .5.2.5.5s-.2.5-.5.5-.5-.2-.5-.5.2-.5.5-.5zm2 0c.3 0 .5.2.5.5s-.2.5-.5.5-.5-.2-.5-.5.2-.5.5-.5z"/></svg>`,
+            legendary: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M2 13c3-1.5 5.5-1.5 7.5.5l3-3.5c1-1.2 2.5-1.8 4-1.5l4.5-3.5 1.5 1.5-3.5 4.5c1.2 1.5.8 3.5-.5 4.5l-5.5 3.5c-1.5 1-3.2 7-4.5-.5l-3.5.5C3.5 14.8 2.5 14 2 13zm12-3c.6 0 1-.4 1-1s-.4-1-1-1-1 .4-1 1 .4 1 1 1z"/></svg>`,
             mythical: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 1 1 0 0 0-2 0 7 7 0 1 1-7-7 1 1 0 0 0 0-2zm0 4a5 5 0 1 0 5 5 1 1 0 0 0-2 0 3 3 0 1 1-3-3 1 1 0 0 0 0-2z"/></svg>`
         };
 
-        // Highest priority combos
-        if (p.isShiny && p.isLucky && p.isPerfect) {
-            badges.push(`<span class="badge shlundo-badge" title="Shlundo">${icons.shiny}${icons.lucky}${icons.perfect}</span>`);
-            hasIvCombo = hasShinyCombo = hasLuckyCombo = true;
-        } else if (p.isLucky && p.isPerfect) {
-            badges.push(`<span class="badge lundo-badge" title="Lundo">${icons.lucky}${icons.perfect}</span>`);
-            hasIvCombo = hasLuckyCombo = true;
-        } else if (p.isShiny && p.isPerfect) {
-            badges.push(`<span class="badge shundo-badge" title="Shundo">${icons.shiny}${icons.perfect}</span>`);
-            hasIvCombo = hasShinyCombo = true;
-        } else if (p.isShiny && p.isZeroIv) {
-            badges.push(`<span class="badge shnundo-badge" title="Shnundo">${icons.shiny}${icons.zeroIv}</span>`);
-            hasIvCombo = hasShinyCombo = true;
+        // Individual badges (each displayed separately)
+        if (p.isShiny) {
+            badges.push(`<span class="badge shiny-badge" title="Shiny">${icons.shiny}</span>`);
         }
-
-        // Individual badges (if not part of a combo)
-        if (!hasShinyCombo && p.isShiny) badges.push(`<span class="badge shiny-badge" title="Shiny">${icons.shiny}</span>`);
-        if (!hasLuckyCombo && p.isLucky) {
+        if (p.isLucky) {
             badges.push(`<span class="badge lucky-badge" title="Lucky">${icons.lucky}</span>`);
-        } else if (p.isTraded && !p.isLucky) {
+        } else if (p.isTraded) {
             badges.push(`<span class="badge traded-badge" title="Traded">${icons.traded}</span>`);
         }
         
-        if (!hasIvCombo) {
-            if (p.isPerfect) badges.push(`<span class="badge perfect-badge" title="Hundo">${icons.perfect}</span>`);
-            else if (p.isZeroIv) badges.push(`<span class="badge zero-iv-badge" title="Nundo">${icons.zeroIv}</span>`);
+        if (p.isPerfect) {
+            badges.push(`<span class="badge perfect-badge" title="Hundo">${icons.perfect}</span>`);
+        } else if (p.isZeroIv) {
+            badges.push(`<span class="badge zero-iv-badge" title="Nundo">${icons.zeroIv}</span>`);
         }
 
-        // Other non-conflicting badges
+        // Other badges
         if (p.pokemonDisplay?.alignment === 1) badges.push(`<span class="badge shadow-badge" title="Shadow">${icons.shadow}</span>`);
         if (p.pokemonDisplay?.alignment === 2) badges.push(`<span class="badge purified-badge" title="Purified">${icons.purified}</span>`);
         if (p.isLegendary) badges.push(`<span class="badge legendary-badge" title="Legendary">${icons.legendary}</span>`);
         if (p.isMythical) badges.push(`<span class="badge mythical-badge" title="Mythical">${icons.mythical}</span>`);
-
         return badges.join(' ');
     }
 
