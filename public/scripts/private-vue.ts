@@ -333,32 +333,34 @@ const GridComponent = {
                 </thead>
                 <tbody>
                     <tr v-for="p in pokemons" :key="p.id" class="hover cursor-pointer" @click="$emit('pokemon-clicked', p)">
-                        <!-- Col 1: Pokémon (Sprite on top, Name/badges below) -->
-                        <td class="align-top py-2">
-                            <div class="flex flex-col items-start gap-1">
-                                <div v-if="!isLiteMode && p.sprite" class="avatar placeholder">
+                        <!-- Col 1: Pokémon (Sprite, Name, and Tags flow horizontally on wide screens) -->
+                        <td class="align-middle py-2">
+                            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                <div v-if="!isLiteMode && p.sprite" class="avatar placeholder flex-shrink-0">
                                     <div class="w-10 h-10 rounded-full relative flex items-center justify-center" :style="createBackgroundStyle(p.typeColors)">
                                         <img :src="p.sprite" :alt="displayName(p)" class="w-8 h-8 object-contain" loading="lazy" />
                                     </div>
                                 </div>
-                                <span class="font-bold text-sm md:text-base leading-tight">{{ displayName(p) }}</span>
-                                <div class="flex flex-wrap gap-1" v-html="getBadges(p, '', true)"></div>
+                                <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                    <span class="font-bold text-sm md:text-base leading-tight">{{ displayName(p) }}</span>
+                                    <div class="flex flex-wrap gap-1" v-html="getBadges(p, '', true)"></div>
+                                </div>
                             </div>
                         </td>
-                        <!-- Col 2: CP & Stats (CP/Score on top, IV stats below) -->
-                        <td class="align-top py-2 text-right">
-                            <div class="flex flex-col items-end gap-1">
-                                <div class="flex flex-col items-end">
-                                    <span class="font-bold text-sm md:text-base">CP {{ p.cp }}</span>
-                                    <div v-if="p.score" class="text-xs text-neutral-500 font-medium mt-0.5">
+                        <!-- Col 2: CP & Stats (CP and IV Stats flow horizontally on wide screens) -->
+                        <td class="align-middle py-2 text-right">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-1 md:gap-4">
+                                <div class="flex flex-col items-end md:items-start text-right md:text-left">
+                                    <span class="font-bold text-sm md:text-base whitespace-nowrap">CP {{ p.cp }}</span>
+                                    <div v-if="p.score" class="text-xs text-neutral-500 font-medium whitespace-nowrap">
                                         {{ p.scoreLabel || 'Score' }}: {{ p.score.toFixed(2) }}
                                     </div>
                                 </div>
-                                <div class="flex flex-col items-end w-full max-w-[120px] mt-1">
+                                <div class="flex flex-col items-end w-full max-w-[120px] md:max-w-[160px]">
                                     <div class="w-full bg-neutral-200 dark:bg-neutral-700 h-2 rounded-full overflow-hidden">
                                         <div class="h-full rounded-full" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
                                     </div>
-                                    <span class="text-[10px] md:text-xs text-neutral-500 font-semibold mt-0.5">
+                                    <span class="text-[10px] md:text-xs text-neutral-500 font-semibold mt-0.5 whitespace-nowrap">
                                         {{ getIvPercent(p) }}% <span class="opacity-75">({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</span>
                                     </span>
                                 </div>
