@@ -94,7 +94,7 @@ function getBadges(p, name, limitRank = true) {
     if (!p || !p.pokemonDisplay) return name;
 
     const icons = {
-        mighty: `<svg width="14" height="14" fill="black" viewBox="0 0 24 24"><path d="M19.36 10.04L20.78 8.62C21.56 7.84 21.56 6.57 20.78 5.79L18.21 3.22C17.43 2.44 16.16 2.44 15.38 3.22L13.96 4.64L19.36 10.04M12.54 6.06L3.06 15.54C2.9 15.7 2.81 15.91 2.81 16.14V20.43C2.81 20.87 3.17 21.23 3.61 21.23H7.9C8.13 21.23 8.34 21.14 8.5 20.98L17.94 11.54L12.54 6.06M17.5 16.5H19.5V18.5H17.5V16.5M14.5 19.5H16.5V21.5H14.5V19.5Z"/></svg>`,
+        mighty: `<svg width="14" height="14" fill="black" viewBox="0 0 24 24"><path d="M21.9 2.1a1 1 0 0 0-1.4 0l-4.9 4.9c-.6-.2-1.3-.1-1.7.3L12 9.2l-1.9-1.9a1 1 0 0 0-1.4 0L2.1 13.9a1 1 0 0 0 0 1.4l3.5 3.5-3.5 3.5a1 1 0 1 0 1.4 1.4l3.5-3.5 3.5 3.5a1 1 0 0 0 1.4 0l6.6-6.6c.4-.4.5-1.1.3-1.7l4.9-4.9a1 1 0 0 0 0-1.4l-2.1-2.1zM6.3 17.7L3.5 14.9l4.9-4.9 2.8 2.8-4.9 4.9zm9.9-9.9l-2.8-2.8 4.9-4.9 2.8 2.8-4.9 4.9z"/></svg>`,
         shiny: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2h7.6l-6.2 4.5 2.4 7.3-6.2-4.5-6.2 4.5 2.4-7.3-6.2-4.5h7.6z"/></svg>`,
         lucky: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 10a2.5 2.5 0 1 0-2.5-2.5A2.5 2.5 0 0 0 12 10zm-2 2a2.5 2.5 0 1 0-2.5 2.5A2.5 2.5 0 0 0 10 12zm2 2a2.5 2.5 0 1 0 2.5 2.5A2.5 2.5 0 0 0 12 14zm2-2a2.5 2.5 0 1 0 2.5-2.5A2.5 2.5 0 0 0 14 12zm-3 2c0 2-2 4-4 4"/></svg>`,
         traded: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>`,
@@ -107,7 +107,7 @@ function getBadges(p, name, limitRank = true) {
         dynamax: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19.36 10.04a6 6 0 0 0-11.3 0 4.5 4.5 0 0 0-3.56 4.46A4.5 4.5 0 0 0 9 19h9a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-3.14-4.46z"/></svg>`,
         gigantamax: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19.36 10.04a6 6 0 0 0-11.3 0 4.5 4.5 0 0 0-3.56 4.46A4.5 4.5 0 0 0 9 19h9a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-3.14-4.46zM13 18l-2 3h3l-1 2 3-3.5h-3l2-2.5z"/></svg>`,
         lvl50: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6zM7.41 21.41L12 16.83l4.59 4.58L18 20l-6-6-6 6z"/></svg>`,
-        background: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.5 6c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM5 17l3.5-4.5 2.5 3.01L14.5 11l4.5 6H5z"/></svg>`
+        background: `<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`
     };
 
     if (p.pokemonDisplay.isStrongPokemon) badges.push(`<span class="badge mighty-badge" title="Mighty">${icons.mighty}</span>`);
