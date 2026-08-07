@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="/assets/favicon-BR64d0U5.ico">
     <!-- 1. Include Vue.js library (Production Build) -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script type="module" crossorigin src="/assets/private-DIQk5LGn.js"></script>
+  <script type="module" crossorigin src="/assets/private-_ktUKO4h.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/loadHeader-CM3yMTv0.js">
   <link rel="stylesheet" crossorigin href="/assets/loadHeader-D48O7bF7.css">
   <link rel="stylesheet" crossorigin href="/assets/private-BHJolPMa.css">
@@ -354,7 +354,7 @@
                                         <span>✏️</span>
                                     </div>
                                 </div>
-                                <div><strong>Lv. {{ player.level }}</strong></div>
+                                <div><strong>Lv. {{ player?.level || 1 }}</strong></div>
                             </div>
                             <div class="xp-bar-container">
                                 <div class="xp-bar" :style="{ width: xpPercentage + '%' }"></div>
@@ -363,10 +363,10 @@
                             <div class="grid-stats">
                                 <div><span>Stardust</span><strong>{{ stardust.toLocaleString() }}</strong></div>
                                 <div><span>PokéCoins</span><strong>{{ pokecoins.toLocaleString() }}</strong></div>
-                                <div><span>Pokémon Caught</span><strong>{{ player.numPokemonCaptured?.toLocaleString() }}</strong></div>
-                                <div><span>Pokédex Entries</span><strong>{{ player.numUniquePokedexEntries?.toLocaleString() }}</strong></div>
-                                <div><span>Distance Walked</span><strong>{{ parseFloat(player.kmWalked || 0).toFixed(2) }} km</strong></div>
-                                <div><span>PokéStops Visited</span><strong>{{ player.pokeStopVisits?.toLocaleString() }}</strong></div>
+                                <div><span>Pokémon Caught</span><strong>{{ (player?.numPokemonCaptured || 0).toLocaleString() }}</strong></div>
+                                <div><span>Pokédex Entries</span><strong>{{ (player?.numUniquePokedexEntries || 0).toLocaleString() }}</strong></div>
+                                <div><span>Distance Walked</span><strong>{{ parseFloat(player?.kmWalked || 0).toFixed(2) }} km</strong></div>
+                                <div><span>PokéStops Visited</span><strong>{{ (player?.pokeStopVisits || 0).toLocaleString() }}</strong></div>
                             </div>
                         </section>
 

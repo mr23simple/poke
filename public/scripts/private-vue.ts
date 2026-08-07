@@ -2138,6 +2138,39 @@ pokemons.sort((a, b) => {
             }
         });
 
+        const copyDuplicatesTrashString = () => {
+            if (!defaultCleanupData.value || defaultCleanupData.value.length === 0) {
+                alert('No duplicate Pokémon found to copy!');
+                return;
+            }
+            const speciesIds = defaultCleanupData.value.map(group => group[0].pokemonId);
+            const searchStr = '#' + speciesIds.join(',');
+            navigator.clipboard.writeText(searchStr).then(() => {
+                alert(`Copied duplicate search string to clipboard: ${searchStr}`);
+            }).catch(err => {
+                alert(`Duplicate search string: ${searchStr}`);
+            });
+        };
+
+        const applyTrashPreset = (presetType) => {
+            if (presetType === 'strict') {
+                trashConfig.value.keepShiny = true;
+                trashConfig.value.keepLucky = true;
+                trashConfig.value.keepShadow = true;
+                trashConfig.value.keep4Star = true;
+                trashConfig.value.keepNundo = true;
+                trashConfig.value.useMinIv = true;
+                trashConfig.value.minIvPercent = 90;
+                trashConfig.value.useRankGL = true;
+                trashConfig.value.keepRankGL = 25;
+                trashConfig.value.useRankUL = true;
+                trashConfig.value.keepRankUL = 25;
+                trashConfig.value.useRankML = true;
+                trashConfig.value.keepRankML = 25;
+            }
+            showTrashModal.value = true;
+        };
+
         const generateTrashString = () => {
             const config = trashConfig.value;
             const groups = {};

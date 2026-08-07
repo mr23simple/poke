@@ -356,7 +356,7 @@
                                         <span>✏️</span>
                                     </div>
                                 </div>
-                                <div><strong>Lv. {{ player.level }}</strong></div>
+                                <div><strong>Lv. {{ player?.level || 1 }}</strong></div>
                             </div>
                             <div class="xp-bar-container">
                                 <div class="xp-bar" :style="{ width: xpPercentage + '%' }"></div>
@@ -365,10 +365,10 @@
                             <div class="grid-stats">
                                 <div><span>Stardust</span><strong>{{ stardust.toLocaleString() }}</strong></div>
                                 <div><span>PokéCoins</span><strong>{{ pokecoins.toLocaleString() }}</strong></div>
-                                <div><span>Pokémon Caught</span><strong>{{ player.numPokemonCaptured?.toLocaleString() }}</strong></div>
-                                <div><span>Pokédex Entries</span><strong>{{ player.numUniquePokedexEntries?.toLocaleString() }}</strong></div>
-                                <div><span>Distance Walked</span><strong>{{ parseFloat(player.kmWalked || 0).toFixed(2) }} km</strong></div>
-                                <div><span>PokéStops Visited</span><strong>{{ player.pokeStopVisits?.toLocaleString() }}</strong></div>
+                                <div><span>Pokémon Caught</span><strong>{{ (player?.numPokemonCaptured || 0).toLocaleString() }}</strong></div>
+                                <div><span>Pokédex Entries</span><strong>{{ (player?.numUniquePokedexEntries || 0).toLocaleString() }}</strong></div>
+                                <div><span>Distance Walked</span><strong>{{ parseFloat(player?.kmWalked || 0).toFixed(2) }} km</strong></div>
+                                <div><span>PokéStops Visited</span><strong>{{ (player?.pokeStopVisits || 0).toLocaleString() }}</strong></div>
                             </div>
                         </section>
 
