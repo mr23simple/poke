@@ -11,10 +11,10 @@
     <link rel="shortcut icon" href="/assets/favicon-BR64d0U5.ico">
     <!-- 1. Include Vue.js library (Production Build) -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script type="module" crossorigin src="/assets/private-tzOlabvZ.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/loadHeader-nBo_D9Us.js">
-  <link rel="stylesheet" crossorigin href="/assets/loadHeader-8Zj28wCf.css">
-  <link rel="stylesheet" crossorigin href="/assets/private-yxxS7baT.css">
+  <script type="module" crossorigin src="/assets/private-DSKT9-Kz.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/loadHeader-C7DKq-uC.js">
+  <link rel="stylesheet" crossorigin href="/assets/loadHeader-CtiP5f5g.css">
+  <link rel="stylesheet" crossorigin href="/assets/private-C5Ls6fGl.css">
 </head>
 <body class="dashboard-private">
     <div id="header-placeholder"></div>
@@ -746,7 +746,7 @@
 
                 <!-- Sub-Grouped View (Grouped by Form / Costume) -->
                 <div v-if="groupSubstitutes" class="cleanup-scroll-container">
-                    <details v-for="species in formGroupedCleanupData" :key="species.speciesName" class="cleanup-accordion card mb-3" open>
+                    <details v-for="species in formGroupedCleanupData" :key="species.speciesName" class="cleanup-accordion card mb-3">
                         <summary class="cleanup-accordion-header">
                             <div class="flex items-center gap-3">
                                 <div v-if="!isLiteMode && species.forms[0]?.pokemons[0]?.sprite" class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" :style="createBackgroundStyle(species.forms[0]?.pokemons[0]?.typeColors)">
@@ -759,13 +759,18 @@
                         </summary>
                         <div class="cleanup-table-wrapper p-3">
                             <template v-for="formGroup in species.forms" :key="formGroup.displayName">
-                                <div v-if="formGroup.pokemons.length > 1" class="form-group-wrapper mb-4">
-                                    <div class="flex items-center gap-2 mb-2 pb-1 border-b border-base-200">
-                                        <span class="font-semibold text-sm text-primary">🎭 {{ formGroup.displayName }}</span>
-                                        <span class="text-xs text-neutral-500">({{ formGroup.pokemons.length }} items)</span>
+                                <details v-if="formGroup.pokemons.length > 1" class="cleanup-sub-accordion mb-2">
+                                    <summary class="cleanup-sub-accordion-header">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-sm text-primary">🎭 {{ formGroup.displayName }}</span>
+                                            <span class="badge badge-sm badge-ghost text-xs">({{ formGroup.pokemons.length }} items)</span>
+                                        </div>
+                                        <span class="accordion-arrow">▼</span>
+                                    </summary>
+                                    <div class="pt-2">
+                                        <grid-component :pokemons="formGroup.pokemons" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
                                     </div>
-                                    <grid-component :pokemons="formGroup.pokemons" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
-                                </div>
+                                </details>
                             </template>
                         </div>
                     </details>
@@ -773,7 +778,7 @@
 
                 <!-- Default View (Grouped by Pokemon ID) -->
                 <div v-else class="cleanup-scroll-container">
-                    <details v-for="(group, index) in defaultCleanupData" :key="index" class="cleanup-accordion card mb-3" open>
+                    <details v-for="(group, index) in defaultCleanupData" :key="index" class="cleanup-accordion card mb-3">
                         <summary class="cleanup-accordion-header">
                             <div class="flex items-center gap-3">
                                 <div v-if="!isLiteMode && group[0]?.sprite" class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" :style="createBackgroundStyle(group[0]?.typeColors)">

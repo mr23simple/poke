@@ -920,13 +920,40 @@ body.dashboard-private, body:not([class]) {
 .cleanup-accordion-header:hover {
     background: rgba(0, 0, 0, 0.06);
 }
-.cleanup-accordion[open] .accordion-arrow {
+.cleanup-accordion[open] > summary .accordion-arrow,
+.cleanup-sub-accordion[open] > summary .accordion-arrow {
     transform: rotate(180deg);
 }
 .accordion-arrow {
     transition: transform 0.2s ease;
     font-size: 0.8rem;
     opacity: 0.7;
+}
+
+/* Sub-Accordion Styles for Form Groups */
+.cleanup-sub-accordion {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+.cleanup-sub-accordion summary {
+    list-style: none;
+}
+.cleanup-sub-accordion summary::-webkit-details-marker {
+    display: none;
+}
+.cleanup-sub-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+.cleanup-sub-accordion-header:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .cleanup-row {
