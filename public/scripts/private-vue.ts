@@ -2646,7 +2646,7 @@ pokemons.sort((a, b) => {
             teamColor, xpPercentage, xpProgressText, stardust, pokecoins, highlights,
             groupedItems, itemCategoryOrder, filteredPokemon,
             totalPokeBalls, totalPotions, totalRevives,
-            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getCardClass, getBadges, getLevelFromCpm, openPokemonModal, displayMove, getIvColor, getPokemonTypes,
+            toggleSortDirection, getItemSprite, createBackgroundStyle, getIvPercent, getIvPercentAsNumber, getCardClass, getBadges, getLevelFromCpm, openPokemonModal, displayMove, getIvColor, getPokemonTypes,
             showCleanupModal, openCleanupModal, closeCleanupModal, cleanupSearchQuery, groupSubstitutes, defaultCleanupData, formGroupedCleanupData,
             showTeamBuilderModal, openTeamBuilderModal, closeTeamBuilderModal, selectedRaidBoss, raidBosses,
             maxBattles, selectedMaxBoss,
