@@ -339,8 +339,7 @@ function filterPokemon(pokemons, query, pokedexService, moveMap) {
 const GridComponent = {
     props: {
         pokemons: { type: Array, default: () => [] },
-        isLiteMode: { type: Boolean, default: false },
-        viewMode: { type: String, default: 'landscape' }
+        isLiteMode: { type: Boolean, default: false }
     },
     emits: ['pokemon-clicked'],
     data() {
@@ -375,8 +374,8 @@ const GridComponent = {
     },
     template: `
         <div class="grid-component-wrapper">
-            <!-- 1. Table View -->
-            <div v-if="viewMode === 'table'" class="overflow-x-auto w-full">
+            <!-- Table View -->
+            <div class="overflow-x-auto w-full">
                 <table class="table table-sm md:table-md w-full">
                     <thead>
                         <tr>
@@ -420,53 +419,6 @@ const GridComponent = {
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- 2. Portrait Card Template -->
-            <div v-else-if="viewMode === 'portrait'" class="pokemon-portrait-grid">
-                <div v-for="p in visiblePokemons" :key="p.id" class="pokemon-card-portrait card" @click="$emit('pokemon-clicked', p)">
-                    <div class="card-portrait-header" :style="createBackgroundStyle(p.typeColors)">
-                        <div v-if="p.pokemonDisplay?.shiny" class="vfx-layer shiny-glint"></div>
-                        <div v-if="p.pokemonDisplay?.alignment === 1" class="vfx-layer shadow-aura"></div>
-                        <div v-if="p.pokemonDisplay?.alignment === 2" class="vfx-layer purified-glow"></div>
-                        <span class="cp-pill">CP {{ p.cp }}</span>
-                        <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="displayName(p)" loading="lazy" decoding="async" class="portrait-sprite">
-                        <span v-else class="text-lg font-bold text-center py-4">{{ displayName(p) }}</span>
-                    </div>
-                    <div class="card-portrait-body">
-                        <h4 class="portrait-name">{{ displayName(p) }}</h4>
-                        <div class="badges-row" v-html="getBadges(p, '', true)"></div>
-                        <div class="portrait-iv-container">
-                            <div class="portrait-iv-bar-bg">
-                                <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
-                            </div>
-                            <small class="portrait-iv-text">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Landscape Card Template -->
-            <div v-else-if="viewMode === 'landscape'" class="pokemon-landscape-grid">
-                <div v-for="p in visiblePokemons" :key="p.id" class="pokemon-card-landscape card" @click="$emit('pokemon-clicked', p)">
-                    <div class="landscape-avatar-col" :style="createBackgroundStyle(p.typeColors)">
-                        <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="displayName(p)" loading="lazy" decoding="async" class="landscape-sprite">
-                        <span v-else class="font-bold text-sm">{{ displayName(p).substring(0, 3) }}</span>
-                    </div>
-                    <div class="landscape-info-col">
-                        <div class="landscape-title-row">
-                            <span class="landscape-name">{{ displayName(p) }}</span>
-                            <span class="landscape-cp">CP {{ p.cp }}</span>
-                        </div>
-                        <div class="badges-row" v-html="getBadges(p, '', true)"></div>
-                        <div class="landscape-iv-row">
-                            <div class="portrait-iv-bar-bg">
-                                <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
-                            </div>
-                            <small class="landscape-iv-num">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Load More Pagination Button -->
