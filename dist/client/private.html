@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="/assets/favicon-BR64d0U5.ico">
     <!-- 1. Include Vue.js library (Production Build) -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script type="module" crossorigin src="/assets/private-BX7xdRY1.js"></script>
+  <script type="module" crossorigin src="/assets/private-QI0YKx4Z.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/loadHeader-CM3yMTv0.js">
   <link rel="stylesheet" crossorigin href="/assets/loadHeader-D48O7bF7.css">
   <link rel="stylesheet" crossorigin href="/assets/private-BHJolPMa.css">
@@ -156,20 +156,22 @@
                                 <div v-if="formGroup.pokemons.length > 1" class="form-group-wrapper">
                                     <h5 class="form-group-header">{{ formGroup.displayName }}</h5>
                                     <div class="form-group-box">
-                                        <div v-for="p in formGroup.pokemons" :key="p.id" :class="['pokemon-card', { 'no-image': isLiteMode || !p.sprite }]" @click="openPokemonModal(p)">
-                                            <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
-                                                <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
+                                        <div v-for="p in formGroup.pokemons" :key="p.id" class="pokemon-card-portrait card" @click="openPokemonModal(p)">
+                                            <div class="card-portrait-header" :style="createBackgroundStyle(p.typeColors)">
+                                                <span class="cp-pill">CP {{ p.cp }}</span>
+                                                <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="p.nickname || p.name" loading="lazy" decoding="async" class="portrait-sprite">
+                                                <span v-else class="text-xs font-bold text-center py-2">{{ p.nickname || p.name }}</span>
                                             </div>
-                                            <p class="pokemon-name">
-                                                <span :class="{'lite-name-span': isLiteMode}" :style="isLiteMode ? createBackgroundStyle(p.typeColors) : ''">{{ p.nickname || p.name }}</span>
-                                                <br v-if="getBadges(p, '', true)">
-                                                <span v-html="getBadges(p, '', true)"></span>
-                                            </p>
-                                            <p class="pokemon-cp">CP {{ p.cp }}</p>
-                                            <div class="iv-bar-container">
-                                                <div class="iv-bar" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                            <div class="card-portrait-body">
+                                                <h4 class="portrait-name">{{ p.nickname || p.name }}</h4>
+                                                <div class="badges-row" v-html="getBadges(p, '', true)"></div>
+                                                <div class="portrait-iv-container">
+                                                    <div class="portrait-iv-bar-bg">
+                                                        <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                                    </div>
+                                                    <small class="portrait-iv-text">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
+                                                </div>
                                             </div>
-                                            <small>{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
                                         </div>
                                     </div>
                                 </div>
@@ -185,20 +187,22 @@
                             <h4>{{ group[0].name }} ({{ group.length }})</h4>
                         </div>
                         <div class="pokemon-row-scroll">
-                            <div v-for="p in group" :key="p.id" :class="['pokemon-card', { 'no-image': isLiteMode || !p.sprite }]" @click="openPokemonModal(p)">
-                                <div class="pokemon-image-container" :style="createBackgroundStyle(p.typeColors)">
-                                    <img :src="p.sprite" :alt="p.nickname || p.name" loading="lazy">
+                            <div v-for="p in group" :key="p.id" class="pokemon-card-portrait card" @click="openPokemonModal(p)">
+                                <div class="card-portrait-header" :style="createBackgroundStyle(p.typeColors)">
+                                    <span class="cp-pill">CP {{ p.cp }}</span>
+                                    <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="p.nickname || p.name" loading="lazy" decoding="async" class="portrait-sprite">
+                                    <span v-else class="text-xs font-bold text-center py-2">{{ p.nickname || p.name }}</span>
                                 </div>
-                                <p class="pokemon-name">
-                                    <span :class="{'lite-name-span': isLiteMode}" :style="isLiteMode ? createBackgroundStyle(p.typeColors) : ''">{{ p.nickname || p.name }}</span>
-                                    <br v-if="getBadges(p, '', true)">
-                                    <span v-html="getBadges(p, '', true)"></span>
-                                </p>
-                                <p class="pokemon-cp">CP {{ p.cp }}</p>
-                                <div class="iv-bar-container">
-                                    <div class="iv-bar" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                <div class="card-portrait-body">
+                                    <h4 class="portrait-name">{{ p.nickname || p.name }}</h4>
+                                    <div class="badges-row" v-html="getBadges(p, '', true)"></div>
+                                    <div class="portrait-iv-container">
+                                        <div class="portrait-iv-bar-bg">
+                                            <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                        </div>
+                                        <small class="portrait-iv-text">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
+                                    </div>
                                 </div>
-                                <small>{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
                             </div>
                         </div>
                     </div>
@@ -406,7 +410,7 @@
                             <div class="summary-header">
                                 <h2>Pokémon Highlights</h2>
                             </div>
-                            <grid-component :pokemons="highlights" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                            <grid-component :pokemons="highlights" :is-lite-mode="isLiteMode" view-mode="portrait" @pokemon-clicked="openPokemonModal($event)"></grid-component>
                         </section>
                     </div>
                 </div>
@@ -836,7 +840,7 @@
                     </template>
                 </div>
 
-                <grid-component :pokemons="activeTabSuggestions" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                <grid-component :pokemons="activeTabSuggestions" :is-lite-mode="isLiteMode" view-mode="portrait" @pokemon-clicked="openPokemonModal($event)"></grid-component>
             </div>
         </div>
         

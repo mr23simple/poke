@@ -340,7 +340,7 @@ const GridComponent = {
     props: {
         pokemons: { type: Array, default: () => [] },
         isLiteMode: { type: Boolean, default: false },
-        viewMode: { type: String, default: 'table' }
+        viewMode: { type: String, default: 'landscape' }
     },
     emits: ['pokemon-clicked'],
     data() {
@@ -639,7 +639,7 @@ createApp({
         const isLiteMode = ref(localStorage.getItem('liteMode') === 'enabled');
 
         // --- View Mode State ---
-        const viewMode = ref(localStorage.getItem('poke_view_mode') || 'table');
+        const viewMode = ref(localStorage.getItem('poke_view_mode') || 'landscape');
         watch(viewMode, (newMode) => {
             localStorage.setItem('poke_view_mode', newMode);
         });
