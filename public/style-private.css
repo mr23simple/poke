@@ -862,6 +862,14 @@ body.dashboard-private, body:not([class]) {
     flex-shrink: 0;
 }
 
+.team-builder-suggestions-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+    margin-top: 10px;
+    padding-right: 4px;
+}
+
 #cleanup-modal-content #all-pokemon-list {
     flex-grow: 1;
     overflow-y: auto;

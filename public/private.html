@@ -732,7 +732,120 @@
                 </div>
             </section>
         </main>
-        </main>
+
+        <!-- Cleanup Modal -->
+        <div id="cleanup-modal-backdrop" v-if="showCleanupModal" @click.self="showCleanupModal = false">
+            <div id="cleanup-modal-content" class="card">
+                <button id="cleanup-modal-close-btn" class="modal-close-btn" @click="showCleanupModal = false">&times;</button>
+                <div class="summary-header">
+                    <h2>Pokémon Cleanup</h2>
+                    <div class="toggle-container">
+                        <label>
+                            <input type="checkbox" v-model="groupSubstitutes"> Group by Form
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sub-Grouped View -->
+                <div v-if="groupSubstitutes" class="cleanup-scroll-container">
+                    <div v-for="species in formGroupedCleanupData" :key="species.speciesName" class="cleanup-row">
+                        <div class="cleanup-row-header">
+                            <h4>{{ species.speciesName }} ({{ species.count }})</h4>
+                        </div>
+                        <div class="cleanup-table-wrapper">
+                            <template v-for="formGroup in species.forms">
+                                <div v-if="formGroup.pokemons.length > 1" class="form-group-wrapper mb-3">
+                                    <h5 class="form-group-header font-bold text-sm mb-1 opacity-80">{{ formGroup.displayName }}</h5>
+                                    <grid-component :pokemons="formGroup.pokemons" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Default View -->
+                <div v-else class="cleanup-scroll-container">
+                    <div v-for="(group, index) in defaultCleanupData" :key="index" class="cleanup-row">
+                        <div class="cleanup-row-header">
+                            <h4>{{ group[0].name }} ({{ group.length }})</h4>
+                        </div>
+                        <div class="cleanup-table-wrapper">
+                            <grid-component :pokemons="group" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trash String Generator Modal -->
+        <div id="trash-modal-backdrop" v-if="showTrashModal" @click.self="showTrashModal = false">
+            <div id="trash-modal-content" class="card trash-modal-redesign">
+                <button id="trash-modal-close-btn" class="modal-close-btn" @click="showTrashModal = false">&times;</button>
+                
+                <div class="summary-header">
+                    <h2>Trash String Generator</h2>
+                </div>
+
+                <div class="trash-scroll-container">
+                    <div class="trash-presets-bar">
+                        <span class="preset-label">Quick Presets:</span>
+                        <button class="btn-preset" @click="applyTrashPreset('strict')">✨ Strict Keeper (90%+ IV & Top PvP)</button>
+                    </div>
+
+                    <div class="trash-config-panel">
+                        <h4 class="panel-subtitle">Transfer Exemption Rules (Keepers)</h4>
+                        <div class="trash-checkbox-grid">
+                            <label><input type="checkbox" v-model="trashConfig.keepShiny"> ✨ Shiny</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepLucky"> 🍀 Lucky</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepShadow"> 👤 Shadow</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepPurified"> ✝️ Purified</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepLegendary"> 👑 Legendary / Mythical</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepCostume"> 🎩 Costume</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepFavorite"> ⭐ Favorite</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepBackground"> 🌌 Location Card</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepXXSXXL"> 📏 XXS / XXL</label>
+                            <label><input type="checkbox" v-model="trashConfig.keep4Star"> 💯 100% IV (4*)</label>
+                            <label><input type="checkbox" v-model="trashConfig.keepNundo"> 0️⃣ 0% IV (0*)</label>
+                        </div>
+
+                        <div class="trash-thresholds-grid">
+                            <div class="threshold-item">
+                                <label><input type="checkbox" v-model="trashConfig.useMinIv"> Min IV % Keeper:</label>
+                                <input type="number" min="0" max="100" v-model.number="trashConfig.minIvPercent" class="number-input"> %
+                            </div>
+                            <div class="threshold-item">
+                                <label><input type="checkbox" v-model="trashConfig.useRankGL"> Keep Great League Top:</label>
+                                <input type="number" min="1" max="500" v-model.number="trashConfig.keepRankGL" class="number-input">
+                            </div>
+                            <div class="threshold-item">
+                                <label><input type="checkbox" v-model="trashConfig.useRankUL"> Keep Ultra League Top:</label>
+                                <input type="number" min="1" max="500" v-model.number="trashConfig.keepRankUL" class="number-input">
+                            </div>
+                            <div class="threshold-item">
+                                <label><input type="checkbox" v-model="trashConfig.useRankML"> Keep Master League Top:</label>
+                                <input type="number" min="1" max="500" v-model.number="trashConfig.keepRankML" class="number-input">
+                            </div>
+                        </div>
+
+                        <div class="generate-btn-wrapper">
+                            <button class="btn-primary btn-generate" @click="generateTrashString">Generate Search String</button>
+                        </div>
+                    </div>
+
+                    <div v-if="generatedTrashStrings.length > 0" class="trash-results-panel">
+                        <h4 class="panel-subtitle">Generated Search Strings</h4>
+                        <div v-for="(res, idx) in generatedTrashStrings" :key="idx" class="trash-result-card">
+                            <div class="result-card-header">
+                                <span class="result-desc">{{ res.desc }}</span>
+                                <span class="result-count">{{ res.count }}</span>
+                            </div>
+                            <textarea readonly class="trash-textarea">{{ res.text }}</textarea>
+                            <button class="btn-secondary btn-sm" @click="copyToClipboard(res.text)">Copy to Clipboard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Team Builder Modal -->
         <div id="team-builder-modal-backdrop" v-if="showTeamBuilderModal" @click.self="closeTeamBuilderModal()">
@@ -826,7 +939,9 @@
                     </template>
                 </div>
 
-                <grid-component :pokemons="activeTabSuggestions" :is-lite-mode="isLiteMode" view-mode="portrait" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                <div class="team-builder-suggestions-container">
+                    <grid-component :pokemons="activeTabSuggestions" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                </div>
             </div>
         </div>
         
