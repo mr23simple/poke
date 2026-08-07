@@ -893,6 +893,42 @@ body.dashboard-private, body:not([class]) {
     padding: 10px 20px 20px 20px;
 }
 
+/* Cleanup Collapsible Accordion Styles */
+.cleanup-accordion {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: var(--card-bg, #ffffff);
+    overflow: hidden;
+}
+.cleanup-accordion summary {
+    list-style: none;
+}
+.cleanup-accordion summary::-webkit-details-marker {
+    display: none;
+}
+.cleanup-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+.cleanup-accordion-header:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+.cleanup-accordion[open] .accordion-arrow {
+    transform: rotate(180deg);
+}
+.accordion-arrow {
+    transition: transform 0.2s ease;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
 .cleanup-row {
     margin-bottom: 20px;
 }
