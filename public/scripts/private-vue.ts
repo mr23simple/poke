@@ -1231,6 +1231,8 @@ pokemons.sort((a, b) => {
             return duplicateGroups;
         });
 
+        const duplicateCount = computed(() => (defaultCleanupData.value || []).length);
+
         const formGroupedCleanupData = computed(() => {
             const pokemonsToProcess = filterPokemon(allPokemons.value, cleanupSearchQuery.value, pokedexService, moveMap);
             const groupedBySpecies = pokemonsToProcess.reduce((acc, p) => {
