@@ -37,11 +37,16 @@ app.use(session({
     cookie: { maxAge: 86400000 }
 }));
 const staticOptions = {
-    maxAge: 0,
+    maxAge: '7d',
     etag: true,
     lastModified: true,
-    setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'public, no-cache, must-revalidate');
+    setHeaders: (res, pathName) => {
+        if (/\.(png|jpe?g|gif|webp|ico|svg|woff2?|ttf|eot)$/i.test(pathName)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+        else {
+            res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+        }
     }
 };
 const isProd = config.rootDir.includes('dist') || __dirname.includes('dist');

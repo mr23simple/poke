@@ -337,66 +337,144 @@ function filterPokemon(pokemons, query, pokedexService, moveMap) {
  * A reusable grid component to display a list of Pokémon cards.
  */
 const GridComponent = {
-    props: ['pokemons', 'isLiteMode'],
+    props: {
+        pokemons: { type: Array, default: () => [] },
+        isLiteMode: { type: Boolean, default: false },
+        viewMode: { type: String, default: 'table' }
+    },
     emits: ['pokemon-clicked'],
-    template: `
-        <div class="overflow-x-auto w-full">
-            <table class="table table-sm md:table-md w-full">
-                <thead>
-                    <tr>
-                        <th>Pokémon</th>
-                        <th class="text-right">Stats</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="p in pokemons" :key="p.id" class="hover cursor-pointer" @click="$emit('pokemon-clicked', p)">
-                        <!-- Col 1: Pokémon (Sprite, Name, and Tags flow horizontally on wide screens) -->
-                        <td class="align-middle py-2">
-                            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                                <div v-if="!isLiteMode && p.sprite" class="avatar placeholder flex-shrink-0">
-                                    <div class="w-10 h-10 rounded-full relative flex items-center justify-center" :style="createBackgroundStyle(p.typeColors)">
-                                        <img :src="p.sprite" :alt="displayName(p)" class="w-8 h-8 object-contain" loading="lazy" />
-                                    </div>
-                                </div>
-                                <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                                    <span class="font-bold text-sm md:text-base leading-tight">{{ displayName(p) }}</span>
-                                    <div class="flex flex-wrap gap-1" v-html="getBadges(p, '', true)"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <!-- Col 2: CP & Stats (CP and IV Stats flow horizontally on wide screens) -->
-                        <td class="align-middle py-2 text-right">
-                            <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-1 md:gap-4">
-                                <div class="flex flex-col items-end md:items-start text-right md:text-left">
-                                    <span class="font-bold text-sm md:text-base whitespace-nowrap">CP {{ p.cp }}</span>
-                                    <div v-if="p.score" class="text-xs text-neutral-500 font-medium whitespace-nowrap">
-                                        {{ p.scoreLabel || 'Score' }}: {{ p.score.toFixed(2) }}
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-end w-full max-w-[120px] md:max-w-[160px]">
-                                    <div class="w-full bg-neutral-200 dark:bg-neutral-700 h-2 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
-                                    </div>
-                                    <span class="text-[10px] md:text-xs text-neutral-500 font-semibold mt-0.5 whitespace-nowrap">
-                                        {{ getIvPercent(p) }}% <span class="opacity-75">({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    `,
+    data() {
+        return {
+            displayLimit: 60
+        };
+    },
+    computed: {
+        visiblePokemons() {
+            return (this.pokemons || []).slice(0, this.displayLimit);
+        },
+        hasMore() {
+            return (this.pokemons || []).length > this.displayLimit;
+        }
+    },
+    watch: {
+        pokemons() {
+            this.displayLimit = 60;
+        }
+    },
     methods: {
+        loadMore() {
+            this.displayLimit += 60;
+        },
         displayName(p) { return p.nickname || p.name; },
-        // Expose global helpers to template
         getIvPercent,
         getBadges,
         getCardClass,
         createBackgroundStyle,
-        getIvColor
-    }
+        getIvColor,
+        getLevelFromCpm
+    },
+    template: `
+        <div class="grid-component-wrapper">
+            <!-- 1. Table View -->
+            <div v-if="viewMode === 'table'" class="overflow-x-auto w-full">
+                <table class="table table-sm md:table-md w-full">
+                    <thead>
+                        <tr>
+                            <th>Pokémon</th>
+                            <th class="text-right">Stats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="p in visiblePokemons" :key="p.id" class="hover cursor-pointer" @click="$emit('pokemon-clicked', p)">
+                            <td class="align-middle py-2">
+                                <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                    <div v-if="!isLiteMode && p.sprite" class="avatar placeholder flex-shrink-0">
+                                        <div class="w-10 h-10 rounded-full relative flex items-center justify-center" :style="createBackgroundStyle(p.typeColors)">
+                                            <img :src="p.sprite" :alt="displayName(p)" class="w-8 h-8 object-contain" loading="lazy" decoding="async" />
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                                        <span class="font-bold text-sm md:text-base leading-tight">{{ displayName(p) }}</span>
+                                        <div class="flex flex-wrap gap-1" v-html="getBadges(p, '', true)"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle py-2 text-right">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-1 md:gap-4">
+                                    <div class="flex flex-col items-end md:items-start text-right md:text-left">
+                                        <span class="font-bold text-sm md:text-base whitespace-nowrap">CP {{ p.cp }}</span>
+                                        <div v-if="p.score" class="text-xs text-neutral-500 font-medium whitespace-nowrap">
+                                            {{ p.scoreLabel || 'Score' }}: {{ p.score.toFixed(2) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end w-full max-w-[120px] md:max-w-[160px]">
+                                        <div class="w-full bg-neutral-200 dark:bg-neutral-700 h-2 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                                        </div>
+                                        <span class="text-[10px] md:text-xs text-neutral-500 font-semibold mt-0.5 whitespace-nowrap">
+                                            {{ getIvPercent(p) }}% <span class="opacity-75">({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 2. Portrait Card Template -->
+            <div v-else-if="viewMode === 'portrait'" class="pokemon-portrait-grid">
+                <div v-for="p in visiblePokemons" :key="p.id" class="pokemon-card-portrait card" @click="$emit('pokemon-clicked', p)">
+                    <div class="card-portrait-header" :style="createBackgroundStyle(p.typeColors)">
+                        <div v-if="p.pokemonDisplay?.shiny" class="vfx-layer shiny-glint"></div>
+                        <div v-if="p.pokemonDisplay?.alignment === 1" class="vfx-layer shadow-aura"></div>
+                        <div v-if="p.pokemonDisplay?.alignment === 2" class="vfx-layer purified-glow"></div>
+                        <span class="cp-pill">CP {{ p.cp }}</span>
+                        <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="displayName(p)" loading="lazy" decoding="async" class="portrait-sprite">
+                        <span v-else class="text-lg font-bold text-center py-4">{{ displayName(p) }}</span>
+                    </div>
+                    <div class="card-portrait-body">
+                        <h4 class="portrait-name">{{ displayName(p) }}</h4>
+                        <div class="badges-row" v-html="getBadges(p, '', true)"></div>
+                        <div class="portrait-iv-container">
+                            <div class="portrait-iv-bar-bg">
+                                <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                            </div>
+                            <small class="portrait-iv-text">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Landscape Card Template -->
+            <div v-else-if="viewMode === 'landscape'" class="pokemon-landscape-grid">
+                <div v-for="p in visiblePokemons" :key="p.id" class="pokemon-card-landscape card" @click="$emit('pokemon-clicked', p)">
+                    <div class="landscape-avatar-col" :style="createBackgroundStyle(p.typeColors)">
+                        <img v-if="!isLiteMode && p.sprite" :src="p.sprite" :alt="displayName(p)" loading="lazy" decoding="async" class="landscape-sprite">
+                        <span v-else class="font-bold text-sm">{{ displayName(p).substring(0, 3) }}</span>
+                    </div>
+                    <div class="landscape-info-col">
+                        <div class="landscape-title-row">
+                            <span class="landscape-name">{{ displayName(p) }}</span>
+                            <span class="landscape-cp">CP {{ p.cp }}</span>
+                        </div>
+                        <div class="badges-row" v-html="getBadges(p, '', true)"></div>
+                        <div class="landscape-iv-row">
+                            <div class="portrait-iv-bar-bg">
+                                <div class="portrait-iv-bar-fill" :style="{ width: getIvPercent(p) + '%', backgroundColor: getIvColor(getIvPercent(p)) }"></div>
+                            </div>
+                            <small class="landscape-iv-num">{{ getIvPercent(p) }}% ({{ p.individualAttack }}/{{ p.individualDefense }}/{{ p.individualStamina }})</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Pagination Button -->
+            <div v-if="hasMore" class="load-more-container text-center py-4">
+                <button class="btn-secondary" @click="loadMore">Load More (Showing {{ visiblePokemons.length }} of {{ pokemons.length }})</button>
+            </div>
+        </div>
+    `
 };
 
 const RaidBossSelector = {
@@ -559,6 +637,191 @@ createApp({
         const costumeIdMap = ref({});
         const pvpDataVersion = ref(0);
         const isLiteMode = ref(localStorage.getItem('liteMode') === 'enabled');
+
+        // --- View Mode State ---
+        const viewMode = ref(localStorage.getItem('poke_view_mode') || 'table');
+        watch(viewMode, (newMode) => {
+            localStorage.setItem('poke_view_mode', newMode);
+        });
+
+        // --- Search Autocomplete Engine ---
+        const isSearchFocused = ref(false);
+        const selectedSuggestionIndex = ref(-1);
+
+        const suggestionCatalog = [
+            { category: 'attribute', value: 'shiny', desc: 'Shiny Pokémon' },
+            { category: 'attribute', value: 'lucky', desc: 'Lucky Pokémon' },
+            { category: 'attribute', value: 'perfect', desc: '100% IV (4*)' },
+            { category: 'attribute', value: 'nundo', desc: '0% IV (0*)' },
+            { category: 'attribute', value: 'shadow', desc: 'Shadow Pokémon' },
+            { category: 'attribute', value: 'purified', desc: 'Purified Pokémon' },
+            { category: 'attribute', value: 'legendary', desc: 'Legendary Pokémon' },
+            { category: 'attribute', value: 'mythical', desc: 'Mythical Pokémon' },
+            { category: 'attribute', value: 'dynamax', desc: 'Dynamax Pokémon' },
+            { category: 'attribute', value: 'gigantamax', desc: 'Gigantamax Pokémon' },
+            { category: 'attribute', value: 'favorite', desc: 'Favorited Pokémon' },
+            { category: 'attribute', value: 'traded', desc: 'Traded Pokémon' },
+            { category: 'attribute', value: 'hatched', desc: 'Hatched Pokémon' },
+            { category: 'attribute', value: 'background', desc: 'Special Location Card' },
+            { category: 'attribute', value: 'pvp', desc: 'Top PvP Ranked' },
+            { category: 'star', value: '4*', desc: '100% IV' },
+            { category: 'star', value: '3*', desc: '82.2% - 97.8% IV' },
+            { category: 'star', value: '2*', desc: '66.7% - 80% IV' },
+            { category: 'star', value: '1*', desc: '51.1% - 64.4% IV' },
+            { category: 'star', value: '0*', desc: '0% - 48.9% IV' },
+            { category: 'pvp', value: 'gl-10', desc: 'Great League Top 10' },
+            { category: 'pvp', value: 'gl-50', desc: 'Great League Top 50' },
+            { category: 'pvp', value: 'ul-10', desc: 'Ultra League Top 10' },
+            { category: 'pvp', value: 'ul-50', desc: 'Ultra League Top 50' },
+            { category: 'pvp', value: 'ml-10', desc: 'Master League Top 10' },
+            { category: 'type', value: 'fire', desc: 'Fire Type' },
+            { category: 'type', value: 'water', desc: 'Water Type' },
+            { category: 'type', value: 'grass', desc: 'Grass Type' },
+            { category: 'type', value: 'electric', desc: 'Electric Type' },
+            { category: 'type', value: 'dragon', desc: 'Dragon Type' },
+            { category: 'type', value: 'psychic', desc: 'Psychic Type' },
+            { category: 'type', value: 'ghost', desc: 'Ghost Type' },
+            { category: 'type', value: 'dark', desc: 'Dark Type' },
+            { category: 'type', value: 'steel', desc: 'Steel Type' },
+            { category: 'move', value: '@fire', desc: 'Fire Moves' },
+            { category: 'move', value: '@water', desc: 'Water Moves' },
+            { category: 'move', value: '@dragon', desc: 'Dragon Moves' },
+            { category: 'move', value: '@electric', desc: 'Electric Moves' }
+        ];
+
+        const autocompleteSuggestions = computed(() => {
+            const query = (searchQuery.value || '').trim().toLowerCase();
+            if (!query) {
+                return suggestionCatalog.slice(0, 8);
+            }
+            const lastToken = query.split(/[,&;:]/).pop().trim();
+            if (!lastToken) return suggestionCatalog.slice(0, 8);
+
+            const filtered = suggestionCatalog.filter(item => 
+                item.value.toLowerCase().includes(lastToken) || 
+                item.desc.toLowerCase().includes(lastToken)
+            );
+
+            const matchingSpecies = new Set();
+            (allPokemons.value || []).forEach(p => {
+                const name = (p.nickname || p.name || '').toLowerCase();
+                if (name.startsWith(lastToken) || name.includes(lastToken)) {
+                    matchingSpecies.add(p.name);
+                }
+            });
+            Array.from(matchingSpecies).slice(0, 5).forEach(name => {
+                filtered.unshift({
+                    category: 'species',
+                    value: '+' + name.toLowerCase(),
+                    desc: `Family / Species ${name}`
+                });
+            });
+
+            return filtered.slice(0, 10);
+        });
+
+        const applySuggestion = (suggValue) => {
+            const current = searchQuery.value || '';
+            const tokens = current.split(/([,&;:])\s*/);
+            if (tokens.length > 1) {
+                tokens[tokens.length - 1] = suggValue;
+                searchQuery.value = tokens.join('');
+            } else {
+                searchQuery.value = suggValue;
+            }
+            isSearchFocused.value = false;
+            selectedSuggestionIndex.value = -1;
+        };
+
+        const handleSearchKeydown = (e) => {
+            if (!isSearchFocused.value || autocompleteSuggestions.value.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedSuggestionIndex.value = (selectedSuggestionIndex.value + 1) % autocompleteSuggestions.value.length;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedSuggestionIndex.value = (selectedSuggestionIndex.value - 1 + autocompleteSuggestions.value.length) % autocompleteSuggestions.value.length;
+            } else if (e.key === 'Enter' || e.key === 'Tab') {
+                if (selectedSuggestionIndex.value >= 0 && selectedSuggestionIndex.value < autocompleteSuggestions.value.length) {
+                    e.preventDefault();
+                    applySuggestion(autocompleteSuggestions.value[selectedSuggestionIndex.value].value);
+                }
+            } else if (e.key === 'Escape') {
+                isSearchFocused.value = false;
+            }
+        };
+
+        const hideSuggestionsWithDelay = () => {
+            setTimeout(() => {
+                isSearchFocused.value = false;
+            }, 200);
+        };
+
+        // --- New Statistics Computed Properties ---
+        const stats_typeDistribution = computed(() => {
+            if (!allPokemons.value || allPokemons.value.length === 0) return [];
+            const counts = {};
+            let totalTypes = 0;
+            const typeColorMap = pokedexService.value?.typeColorMap || {};
+
+            allPokemons.value.forEach(p => {
+                (p.typeColors || []).forEach(color => {
+                    let typeName = 'Unknown';
+                    for (const [t, c] of Object.entries(typeColorMap)) {
+                        if (c === color) {
+                            typeName = t;
+                            break;
+                        }
+                    }
+                    counts[typeName] = (counts[typeName] || 0) + 1;
+                    totalTypes++;
+                });
+            });
+
+            return Object.entries(counts).map(([name, count]) => {
+                const color = typeColorMap[name] || '#999';
+                const percent = totalTypes > 0 ? Math.round((count / totalTypes) * 100) : 0;
+                return { name, count, percent, color };
+            }).sort((a, b) => b.count - a.count).slice(0, 10);
+        });
+
+        const stats_pvpPreparedness = computed(() => {
+            let glTop10 = 0, glTop50 = 0, ulTop10 = 0, ulTop50 = 0, mlTop10 = 0, mlTop50 = 0;
+            allPokemons.value.forEach(p => {
+                if (p.rankGreat && p.cp <= 1500) {
+                    if (p.rankGreat <= 10) glTop10++;
+                    if (p.rankGreat <= 50) glTop50++;
+                }
+                if (p.rankUltra && p.cp <= 2500) {
+                    if (p.rankUltra <= 10) ulTop10++;
+                    if (p.rankUltra <= 50) ulTop50++;
+                }
+                if (p.rankMaster) {
+                    if (p.rankMaster <= 10) mlTop10++;
+                    if (p.rankMaster <= 50) mlTop50++;
+                }
+            });
+            return { glTop10, glTop50, ulTop10, ulTop50, mlTop10, mlTop50 };
+        });
+
+        const stats_topPowerhouses = computed(() => {
+            return [...allPokemons.value].sort((a, b) => b.cp - a.cp).slice(0, 5);
+        });
+
+        const stats_investmentEstimator = computed(() => {
+            let stardustTo40 = 0, candyTo40 = 0, stardustTo50 = 0, xlCandyTo50 = 0;
+            allPokemons.value.forEach(p => {
+                const iv = getIvPercentAsNumber(p);
+                if (iv >= 95 || (p.rankGreat && p.rankGreat <= 25) || (p.rankUltra && p.rankUltra <= 25)) {
+                    stardustTo40 += 150000;
+                    candyTo40 += 180;
+                    stardustTo50 += 350000;
+                    xlCandyTo50 += 296;
+                }
+            });
+            return { stardustTo40, candyTo40, stardustTo50, xlCandyTo50 };
+        });
 
         // --- Statistics Computed Properties ---
         const stats_shinyRate = computed(() => {
@@ -2360,6 +2623,17 @@ pokemons.sort((a, b) => {
             pokedexMode,
             pokedexDisplayData,
 
+            // View Mode
+            viewMode,
+
+            // Search Autocomplete
+            isSearchFocused,
+            selectedSuggestionIndex,
+            autocompleteSuggestions,
+            applySuggestion,
+            handleSearchKeydown,
+            hideSuggestionsWithDelay,
+
             // Statistics
             stats_shinyRate,
             stats_perfectNundo,
@@ -2371,6 +2645,15 @@ pokemons.sort((a, b) => {
             stats_captureByYear,
             stats_mostCommon,
             stats_acquisitionType,
+            stats_typeDistribution,
+            stats_pvpPreparedness,
+            stats_topPowerhouses,
+            stats_investmentEstimator,
+
+            // Tools Helpers
+            duplicateCount,
+            copyDuplicatesTrashString,
+            applyTrashPreset,
 
             // Trash String
             showTrashModal,

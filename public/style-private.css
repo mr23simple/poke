@@ -1861,4 +1861,249 @@ body.dashboard-private, body:not([class]) {
     }
 }
 
+/* --- Search Autocomplete Dropdown --- */
+.search-input-container {
+    position: relative;
+    flex: 1;
+}
+
+.search-autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+body.dark .search-autocomplete-dropdown {
+    background: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.autocomplete-item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.85rem;
+    transition: background 0.15s ease;
+}
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+.autocomplete-item.active,
+.autocomplete-item:hover {
+    background: rgba(33, 150, 243, 0.1);
+}
+body.dark .autocomplete-item.active,
+body.dark .autocomplete-item:hover {
+    background: rgba(33, 150, 243, 0.2);
+}
+
+.badge-cat {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #e0e0e0;
+    color: #333;
+}
+.badge-cat.attribute { background: #e3f2fd; color: #1976d2; }
+.badge-cat.star { background: #fff8e1; color: #f57f17; }
+.badge-cat.pvp { background: #f3e5f5; color: #7b1fa2; }
+.badge-cat.type { background: #e8f5e9; color: #388e3c; }
+.badge-cat.move { background: #fff3e0; color: #e65100; }
+.badge-cat.species { background: #fce4ec; color: #c2185b; }
+
+.item-value {
+    font-weight: 700;
+    color: inherit;
+}
+.item-desc {
+    color: #777;
+    margin-left: auto;
+    font-size: 0.75rem;
+}
+
+/* --- New Statistics Cards --- */
+.type-distribution-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.type-dist-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.type-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.type-pill {
+    padding: 1px 8px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.type-bar-bg {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+body.dark .type-bar-bg {
+    background: #333;
+}
+.type-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.pvp-stat-boxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.pvp-stat-box {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border-left: 4px solid #333;
+    background: rgba(0,0,0,0.03);
+}
+.pvp-stat-box.gl { border-left-color: #3498db; }
+.pvp-stat-box.ul { border-left-color: #9b59b6; }
+.pvp-stat-box.ml { border-left-color: #f1c40f; }
+.pvp-stat-box h5 {
+    margin: 0 0 6px 0;
+    font-size: 0.85rem;
+}
+.pvp-ranks-count {
+    display: flex;
+    gap: 16px;
+    font-size: 0.8rem;
+}
+
+.powerhouse-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.powerhouse-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.02);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+.powerhouse-row:hover {
+    background: rgba(0,0,0,0.06);
+}
+.powerhouse-sprite {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+.powerhouse-details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.investment-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.invest-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.invest-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+}
+.invest-value {
+    display: flex;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* --- Redesigned Tools Hub --- */
+.tools-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+.tool-hub-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tool-hub-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+}
+.tool-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.tool-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+.tool-titles h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.15rem;
+}
+.tool-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+.badge-dup { background: #ffe0b2; color: #e65100; }
+.badge-active { background: #e1f5fe; color: #0288d1; }
+.badge-raid { background: #e8f5e9; color: #2e7d32; }
+
+.tool-description {
+    font-size: 0.875rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
+}
+body.dark .tool-description {
+    color: #aaa;
+}
+
+.tool-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
 

@@ -140,3 +140,205 @@
         margin-left: 2px !important;
     }
 }
+
+/* --- View Mode Selector --- */
+.view-mode-selector {
+    display: inline-flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.view-mode-selector button {
+    border: none;
+    background: transparent;
+    padding: 5px 10px;
+    font-size: 0.825rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.view-mode-selector button.active {
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    color: #2196f3;
+}
+body.dark .view-mode-selector button.active {
+    background: #2a2a2a;
+    color: #64b5f6;
+}
+
+/* --- Portrait Card Grid --- */
+.pokemon-portrait-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.pokemon-card-portrait {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card-bg, #ffffff);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+.pokemon-card-portrait:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.card-portrait-header {
+    height: 110px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pokemon-bg, linear-gradient(135deg, #e0e0e0, #c2c2c2));
+}
+
+.cp-pill {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+
+.portrait-sprite {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.card-portrait-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.portrait-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.portrait-iv-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: auto;
+}
+.portrait-iv-bar-bg {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.portrait-iv-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+.portrait-iv-text {
+    font-size: 0.7rem;
+    color: #666;
+    font-weight: 600;
+}
+
+/* --- Landscape Card Grid --- */
+.pokemon-landscape-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.pokemon-card-landscape {
+    display: flex;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card-bg, #ffffff);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 86px;
+}
+.pokemon-card-landscape:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.landscape-avatar-col {
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pokemon-bg, #eee);
+    flex-shrink: 0;
+}
+.landscape-sprite {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.landscape-info-col {
+    padding: 8px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.landscape-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.landscape-name {
+    font-weight: 700;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.landscape-cp {
+    font-weight: 800;
+    font-size: 0.875rem;
+    color: #2196f3;
+}
+
+.landscape-iv-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.landscape-iv-row .portrait-iv-bar-bg {
+    flex: 1;
+}
+.landscape-iv-num {
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}

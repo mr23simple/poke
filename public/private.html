@@ -138,6 +138,7 @@
                 <div class="summary-header">
                     <h2>Pokemon Cleanup</h2>
                     <div class="cleanup-controls">
+                        <button class="btn-secondary btn-sm" @click="copyDuplicatesTrashString()" title="Copy search string for duplicate species to transfer">Copy Duplicates String</button>
                         <label class="checkbox-label">
                             <input type="checkbox" v-model="groupSubstitutes">
                             Group by Form/Costume
@@ -417,9 +418,41 @@
             <section id="pokemon-section" v-show="activeTab === 'pokemon'" class="card">
                 <div class="summary-header">
                     <h2>My Pokémon ({{ filteredPokemon.length }})</h2>
+                    <!-- View Mode Controls -->
+                    <div class="view-mode-selector">
+                        <button :class="{ active: viewMode === 'table' }" @click="viewMode = 'table'" title="Table View">
+                            <span class="icon">☰</span> Table
+                        </button>
+                        <button :class="{ active: viewMode === 'portrait' }" @click="viewMode = 'portrait'" title="Portrait Cards">
+                            <span class="icon">🎴</span> Portrait
+                        </button>
+                        <button :class="{ active: viewMode === 'landscape' }" @click="viewMode = 'landscape'" title="Landscape Banners">
+                            <span class="icon">📇</span> Landscape
+                        </button>
+                    </div>
                 </div>
                 <div class="sort-bar">
-                    <input type="text" id="search-bar" placeholder="Search: shiny, electric, !legendary, etc." v-model="searchQuery">
+                    <!-- Search with Autocomplete Dropdown -->
+                    <div class="search-input-container">
+                        <input type="text" id="search-bar" 
+                               placeholder="Search: shiny, electric, !legendary, pvp, @fire, etc." 
+                               v-model="searchQuery"
+                               @focus="isSearchFocused = true"
+                               @blur="hideSuggestionsWithDelay"
+                               @keydown="handleSearchKeydown"
+                               autocomplete="off">
+                        
+                        <div v-if="isSearchFocused && autocompleteSuggestions.length > 0" class="search-autocomplete-dropdown">
+                            <div v-for="(item, idx) in autocompleteSuggestions" :key="item.value"
+                                 class="autocomplete-item"
+                                 :class="{ active: selectedSuggestionIndex === idx }"
+                                 @mousedown.prevent="applySuggestion(item.value)">
+                                <span class="badge-cat" :class="item.category">{{ item.category }}</span>
+                                <span class="item-value">{{ item.value }}</span>
+                                <span class="item-desc">{{ item.desc }}</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="sort-controls">
                         <label for="sort-by">Sort by:</label>
                         <select id="sort-by" v-model="sortKey">
@@ -431,7 +464,7 @@
                         <button id="sort-direction" @click="toggleSortDirection">{{ sortDirection === 'desc' ? '▼ Desc' : '▲ Asc' }}</button>
                     </div>
                 </div>
-                <grid-component :pokemons="filteredPokemon" :is-lite-mode="isLiteMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
+                <grid-component :pokemons="filteredPokemon" :is-lite-mode="isLiteMode" :view-mode="viewMode" @pokemon-clicked="openPokemonModal($event)"></grid-component>
             </section>
 
             <!-- Pokedex Tab -->
@@ -494,7 +527,87 @@
                         </div>
                     </div>
 
-                    <!-- 5. Lucky Pokémon Percentage (Gauge/Pie Chart) -->
+                    <!-- 4. NEW: Elemental Type Breakdown -->
+                    <div class="stat-card card">
+                        <h4>Type Distribution</h4>
+                        <div class="type-distribution-grid">
+                            <div v-for="t in stats_typeDistribution" :key="t.name" class="type-dist-bar" :style="{ '--type-color': t.color }">
+                                <div class="type-header">
+                                    <span class="type-pill" :style="{ backgroundColor: t.color }">{{ t.name }}</span>
+                                    <span class="type-count">{{ t.count }} ({{ t.percent }}%)</span>
+                                </div>
+                                <div class="type-bar-bg">
+                                    <div class="type-bar-fill" :style="{ width: t.percent + '%', backgroundColor: t.color }"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. NEW: PvP League Preparedness -->
+                    <div class="stat-card card">
+                        <h4>PvP League Preparedness</h4>
+                        <div class="pvp-stat-boxes">
+                            <div class="pvp-stat-box gl">
+                                <h5>Great League (≤1500)</h5>
+                                <div class="pvp-ranks-count">
+                                    <span><strong>Top 10:</strong> {{ stats_pvpPreparedness.glTop10 }}</span>
+                                    <span><strong>Top 50:</strong> {{ stats_pvpPreparedness.glTop50 }}</span>
+                                </div>
+                            </div>
+                            <div class="pvp-stat-box ul">
+                                <h5>Ultra League (≤2500)</h5>
+                                <div class="pvp-ranks-count">
+                                    <span><strong>Top 10:</strong> {{ stats_pvpPreparedness.ulTop10 }}</span>
+                                    <span><strong>Top 50:</strong> {{ stats_pvpPreparedness.ulTop50 }}</span>
+                                </div>
+                            </div>
+                            <div class="pvp-stat-box ml">
+                                <h5>Master League</h5>
+                                <div class="pvp-ranks-count">
+                                    <span><strong>Top 10:</strong> {{ stats_pvpPreparedness.mlTop10 }}</span>
+                                    <span><strong>Top 50:</strong> {{ stats_pvpPreparedness.mlTop50 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. NEW: Combat Powerhouses Showcase -->
+                    <div class="stat-card card">
+                        <h4>Top Combat Powerhouses</h4>
+                        <div class="powerhouse-list">
+                            <div v-for="p in stats_topPowerhouses" :key="p.id" class="powerhouse-row" @click="openPokemonModal(p)">
+                                <img :src="p.sprite" :alt="p.name" class="powerhouse-sprite" loading="lazy">
+                                <div class="powerhouse-details">
+                                    <strong>{{ p.nickname || p.name }}</strong>
+                                    <small>CP {{ p.cp }} | IV {{ getIvPercent(p) }}%</small>
+                                </div>
+                                <span class="badge perfect-badge" v-if="getIvPercentAsNumber(p) === 100">100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. NEW: Resource Investment Estimator -->
+                    <div class="stat-card card">
+                        <h4>Resource Investment Estimates</h4>
+                        <div class="investment-summary">
+                            <div class="invest-item">
+                                <span class="invest-label">Top Candidates to Lvl 40</span>
+                                <div class="invest-value">
+                                    <span>✨ {{ stats_investmentEstimator.stardustTo40.toLocaleString() }} Stardust</span>
+                                    <span>🍬 {{ stats_investmentEstimator.candyTo40.toLocaleString() }} Candy</span>
+                                </div>
+                            </div>
+                            <div class="invest-item">
+                                <span class="invest-label">Top Candidates to Lvl 50</span>
+                                <div class="invest-value">
+                                    <span>✨ {{ stats_investmentEstimator.stardustTo50.toLocaleString() }} Stardust</span>
+                                    <span>🍬 {{ stats_investmentEstimator.xlCandyTo50.toLocaleString() }} XL Candy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Lucky Pokémon Percentage (Gauge/Pie Chart) -->
                     <div class="stat-card card">
                         <h4>Lucky Pokémon Rate</h4>
                         <div class="chart-placeholder pie-chart-container">
@@ -506,7 +619,7 @@
                         </div>
                     </div>
 
-                    <!-- 6. Legendary & Mythical Ratio (Pie Chart) -->
+                    <!-- 9. Legendary & Mythical Ratio (Pie Chart) -->
                     <div class="stat-card card">
                         <h4>Legendary & Mythical Ratio</h4>
                         <div class="chart-placeholder pie-chart-container">
@@ -518,7 +631,7 @@
                         </div>
                     </div>
 
-                    <!-- 7. CP Distribution (Histogram) -->
+                    <!-- 10. CP Distribution (Histogram) -->
                     <div class="stat-card card">
                         <h4>CP Distribution</h4>
                         <div class="chart-placeholder bar-chart">
@@ -526,7 +639,7 @@
                         </div>
                     </div>
 
-                    <!-- 8. Pokémon by Capture Year (Bar Chart) -->
+                    <!-- 11. Pokémon by Capture Year (Bar Chart) -->
                     <div class="stat-card card">
                         <h4>Pokémon by Capture Year</h4>
                         <div class="chart-placeholder bar-chart">
@@ -534,7 +647,7 @@
                         </div>
                     </div>
 
-                    <!-- 9. Top 10 Most Common Species (Horizontal Bar Chart) -->
+                    <!-- 12. Top 10 Most Common Species (Horizontal Bar Chart) -->
                     <div class="stat-card card">
                         <h4>Most Common Pokémon</h4>
                         <div class="chart-placeholder bar-chart-horizontal">
@@ -559,7 +672,7 @@
                         </div>
                     </div>
 
-                    <!-- 15. Mega Evolution History (Icon Grid) -->
+                    <!-- 14. Mega Evolution History (Icon Grid) -->
                     <div class="stat-card card">
                         <h4>Mega-Evolved Species ({{ stats_megaEvolvedList.length }})</h4>
                         <div class="chart-placeholder icon-grid-container">
@@ -573,15 +686,64 @@
                 </div>
             </section>
 
-            <!-- Tools Tab -->
+            <!-- Tools Tab (Redesigned Command Hub) -->
             <section id="tools-section" v-show="activeTab === 'tools'">
-                <div class="tools-container">
-                    <button class="btn-primary" @click="openCleanupModal()">Pokemon Cleanup</button>
-                    <button class="btn-primary" @click="showTrashModal = true">Trash String Generator</button>
-                    <button class="btn-primary" @click="openTeamBuilderModal()">Raid Team Builder</button>
-                    <!-- Content for Pokemon Cleanup will go here -->
+                <div class="tools-hub-grid">
+                    <!-- Tool 1: Pokemon Cleanup -->
+                    <div class="tool-hub-card card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon">🧹</div>
+                            <div class="tool-titles">
+                                <h3>Pokémon Cleanup</h3>
+                                <span class="tool-badge badge-dup" v-if="duplicateCount > 0">{{ duplicateCount }} Duplicate Groups</span>
+                            </div>
+                        </div>
+                        <p class="tool-description">
+                            Scan your storage for duplicate Pokémon species, forms, and costumes. Compare IVs and easily manage transfers.
+                        </p>
+                        <div class="tool-card-actions">
+                            <button class="btn-primary" @click="openCleanupModal()">Launch Cleanup</button>
+                            <button class="btn-secondary" @click="copyDuplicatesTrashString()" title="Copy search string for duplicate species">Copy Duplicates String</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2: Trash String Generator -->
+                    <div class="tool-hub-card card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon">🗑️</div>
+                            <div class="tool-titles">
+                                <h3>Trash String Generator</h3>
+                                <span class="tool-badge badge-active">Search Rules</span>
+                            </div>
+                        </div>
+                        <p class="tool-description">
+                            Generate precise Pokémon GO search strings to select non-essential Pokémon for mass transfer based on custom keep rules.
+                        </p>
+                        <div class="tool-card-actions">
+                            <button class="btn-primary" @click="showTrashModal = true">Configure Rules</button>
+                            <button class="btn-secondary" @click="applyTrashPreset('strict')">Quick Strict Preset</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 3: Raid Team Builder -->
+                    <div class="tool-hub-card card">
+                        <div class="tool-card-header">
+                            <div class="tool-icon">⚔️</div>
+                            <div class="tool-titles">
+                                <h3>Raid Team Builder</h3>
+                                <span class="tool-badge badge-raid">{{ raidBosses.length }} Raid Bosses</span>
+                            </div>
+                        </div>
+                        <p class="tool-description">
+                            Calculate optimal counter teams from your Pokémon storage against current Raid Bosses, Max Battles, or custom enemies.
+                        </p>
+                        <div class="tool-card-actions">
+                            <button class="btn-primary" @click="openTeamBuilderModal()">Open Team Builder</button>
+                        </div>
+                    </div>
                 </div>
             </section>
+        </main>
         </main>
 
         <!-- Team Builder Modal -->
