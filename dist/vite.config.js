@@ -24,10 +24,22 @@ export default defineConfig({
             ]
         })
     ],
+    css: {
+        lightningcss: {
+            customAtRules: {
+                property: {
+                    prelude: '<custom-ident>',
+                    body: 'declaration-list'
+                }
+            }
+        }
+    },
     root: 'public',
     build: {
         outDir: '../dist/client',
         emptyOutDir: true,
+        cssMinify: 'esbuild',
+        cssTarget: ['chrome100', 'safari16', 'firefox128'],
         rollupOptions: {
             input: {
                 main: path.resolve(__dirname, 'public/index.html'),
